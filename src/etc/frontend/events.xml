@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="layout_generate_blocks_after">
+        <observer name="zaius_engage_layout" instance="Zaius\Engage\Observer\PageViewObserver"/>
+    </event>
+    <event name="checkout_cart_add_product_complete">
+        <observer name="zaius_engage_add_to_cart" instance="Zaius\Engage\Observer\CartAddObserver"/>
+    </event>
+    <event name="checkout_cart_update_items_before">
+        <observer name="zaius_engage_update_cart" instance="Zaius\Engage\Observer\CartUpdateObserver"/>
+    </event>
+    <event name="sales_quote_remove_item">
+        <observer name="zaius_engage_quote" instance="Zaius\Engage\Observer\CartRemoveObserver"/>
+    </event>
+    <event name="wishlist_add_product">
+        <observer name="zaius_engage_whishlist" instance="Zaius\Engage\Observer\WishlistAddObserver"/>
+    </event>
+    <event name="customer_register_success">
+        <observer name="zaius_engage_register" instance="Zaius\Engage\Observer\CustomerRegisterObserver"/>
+    </event>
+    <event name="customer_login">
+        <observer name="zaius_engage_login" instance="Zaius\Engage\Observer\CustomerLoginObserver"/>
+    </event>
+    <event name="customer_logout">
+        <observer name="zaius_engage_logout" instance="Zaius\Engage\Observer\CustomerLogoutObserver"/>
+    </event>
+</config>

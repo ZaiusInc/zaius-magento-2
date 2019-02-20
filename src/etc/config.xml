@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <zaius_engage>
+            <status>
+                <status>1</status>
+            </status>
+            <settings>
+                <is_collect_all_product_attributes>1</is_collect_all_product_attributes>
+                <is_tracking_orders_on_frontend>0</is_tracking_orders_on_frontend>
+                <timeout>30</timeout>
+            </settings>
+            <batch_updates>
+                <status>0</status>
+                <schedule>*/5 * * * *</schedule>
+            </batch_updates>
+            <zaius_localizations>
+                <locale_toggle>0</locale_toggle>
+            </zaius_localizations>
+        </zaius_engage>
+    </default>
+</config>

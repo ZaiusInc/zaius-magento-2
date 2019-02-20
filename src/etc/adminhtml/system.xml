@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="zaius" translate="label" sortOrder="1">
+            <label>Zaius</label>
+        </tab>
+
+        <section id="zaius_engage" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Zaius Engage</label>
+            <tab>zaius</tab>
+            <resource>Zaius_Engage::zaius_engage</resource>
+
+            <group id="status" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Zaius Engage Status</label>
+                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="version" translate="label" type="label" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Version</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\Version</frontend_model>
+                    <comment>
+                        Zaius Engage Version
+                    </comment>
+                </field>
+                <field id="composer" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Composer Installed?</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
+                    <comment>
+                        Checks if Composer is installed.
+                    </comment>
+                </field>
+                <field id="sdk" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SDK Installed?</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
+                    <comment>
+                        Checks if the Zaius SDK is installed.
+                    </comment>
+                </field>
+            </group>
+
+            <group id="config" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Configuration</label>
+                <field id="zaius_tracker_id" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Zaius Tracker ID</label>
+                    <comment><![CDATA[
+                Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
+                    </comment>
+                </field>
+                <field id="zaius_private_api" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Zaius Private API Key</label>
+                    <comment><![CDATA[
+                Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
+                    </comment>
+                </field>
+                <field id="amazon_active" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled Amazon S3</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="amazon_s3_key" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Amazon S3 Key</label>
+                    <depends>
+                        <field id="*/*/amazon_active">1</field>
+                    </depends>
+                    <comment><![CDATA[
+                Found at: <a href="https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3" target="_blank">Integrations</a> in your Zaius Account. ]]>
+                    </comment>
+                </field>
+                <field id="amazon_s3_secret" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Amazon S3 Secret</label>
+                    <depends>
+                        <field id="*/*/amazon_active">1</field>
+                    </depends>
+                    <comment><![CDATA[
+                Found at: <a href="https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3" target="_blank">Integrations</a> in your Zaius Account. ]]>
+                    </comment>
+                </field>
+            </group>
+
+            <group id="settings" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Settings</label>
+                <field id="is_collect_all_product_attributes" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Collect All Product Attributes</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        Choose if you want to collect all product attributes, or only the minimum.
+                    </comment>
+                </field>
+                <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Track Orders on Frontend</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        Choose if you want to track orders.
+                    </comment>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Timeout</label>
+                    <comment>Number of seconds to wait before timing out the connection to Zaius.</comment>
+                </field>
+
+
+            </group>
+
+            <group id="zaius_localizations" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Zaius Localizations</label>
+                <comment>Localizations are currently in beta. Please consult with your Zaius Customer Success Manager prior to enabling this feature</comment>
+                <field id="locale_toggle" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enabled?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="schema_update" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Schema Update</label>
+                <field id="schema_update" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Update Schema?</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\SchemaUpdateButton</frontend_model>
+                </field>
+            </group>
+
+
+            <group id="batch_updates" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Batch Updates</label>
+                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Batch Updates?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+
+    </system>
+</config>

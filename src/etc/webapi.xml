@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/zaius/engage/customers" method="GET">
+        <service class="Zaius\Engage\Api\CustomerRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Zaius_Engage::api"/>
+        </resources>
+    </route>
+    <route url="/V1/zaius/engage/orders" method="GET">
+        <service class="Zaius\Engage\Api\OrderRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Zaius_Engage::api"/>
+        </resources>
+    </route>
+    <route url="/V1/zaius/engage/products" method="GET">
+        <service class="Zaius\Engage\Api\ProductRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Zaius_Engage::api"/>
+        </resources>
+    </route>
+
+    <route url="/V1/zaius/engage/locales" method="GET">
+        <service class="Zaius\Engage\Api\LocalesInterface" method="getList"/>
+        <resources>
+            <resource ref="Zaius_Engage::api"/>
+        </resources>
+    </route>
+
+    <route url="/V1/zaius/engage/create_coupons" method="POST">
+        <service class="Zaius\Engage\Api\CouponsInterface" method="createCoupons"/>
+        <resources>
+            <resource ref="Zaius_Engage::api"/>
+        </resources>
+    </route>
+
+
+</routes>
