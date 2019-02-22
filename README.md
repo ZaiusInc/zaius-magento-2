@@ -32,7 +32,7 @@ composer update zaius/*
 ### ZIP
 
 1. Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
-2. Extract the contnets of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
+2. Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
 
 ## Verify & Enable the Zaius Magento 2 Connector
 
