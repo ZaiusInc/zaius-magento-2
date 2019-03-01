@@ -138,6 +138,17 @@ class Client
     {
         $zaiusClient = $this->_sdk->getSdkClient();
         switch ($event['type']) {
+            case 'list':
+                if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
+                    $s3Client = $zaiusClient->getS3Client(
+                        $this->_helper->getZaiusTrackerId(),
+                        $this->_helper->getAmazonS3Key(),
+                        $this->_helper->getAmazonS3Secret()
+                    );
+                    $s3Client->uploadEvents($event);
+                }
+                $zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
+                break;
             case 'product':
                 if ($this->isBatchUpdate()) {
                     $event = self::transformForBatchEvent($event);

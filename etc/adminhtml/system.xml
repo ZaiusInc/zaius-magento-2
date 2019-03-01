@@ -79,21 +79,33 @@
 
             <group id="settings" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Settings</label>
-                <field id="is_collect_all_product_attributes" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Collect All Product Attributes</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <field id="global_id_prefix" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Global ID Prefix</label>
                     <comment>
-                        Choose if you want to collect all product attributes, or only the minimum.
+                        Specify a Global ID Prefix.
                     </comment>
                 </field>
-                <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="newsletter_list_id" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Zaius Newsletter List ID</label>
+                    <comment>
+                        Specify a Newsletter List ID.
+                    </comment>
+                </field>
+                <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Track Orders on Frontend</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         Choose if you want to track orders.
                     </comment>
                 </field>
-                <field id="timeout" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="is_collect_all_product_attributes" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Collect All Product Attributes</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        Choose if you want to collect all product attributes, or only the minimum.
+                    </comment>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Timeout</label>
                     <comment>Number of seconds to wait before timing out the connection to Zaius.</comment>
                 </field>

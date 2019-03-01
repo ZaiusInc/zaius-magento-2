@@ -2,6 +2,7 @@
 
 namespace Zaius\Engage\Observer;
 
+use Magento\Framework\App\State;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Newsletter\Model\Subscriber;
@@ -12,16 +13,19 @@ use Zaius\Engage\Helper\Data as Helper;
 class NewsletterSubscriberSaveObserver
     implements ObserverInterface
 {
+    protected $_state;
     protected $_storeManager;
     protected $_helper;
     protected $_client;
 
     public function __construct(
+        State $state,
         StoreManager $storeManager,
         Helper $helper,
         Client $client
     )
     {
+        $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
@@ -43,25 +47,27 @@ class NewsletterSubscriberSaveObserver
                 default:
                     return $this;
             }
-            if ($store->getId() != 0) {
-                $this->_helper->addEventToSession([
-                    'type' => 'newsletter',
-                    'data' => [
-                        'action' => $action,
-                        'email' => $subscriber->getSubscriberEmail(),
-                        'zaius_engage_version' => $this->_helper->getVersion()
-                    ]
-                ]);
+
+            $event = array();
+            $event['type'] = 'list';
+            $event['data']['action'] = $action;
+            $event['data']['list_id'] = $this->_helper->getNewsletterListId();
+            $event['data']['email'] = $subscriber->getSubscriberEmail();
+            $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
+
+            $state = $this->_state->getAreaCode();
+
+            if ($state !== 'adminhtml') {
+                $event['data']['vuid'] = $this->_helper->getVuid();
+                foreach ($this->_helper->getVTSRC() as $vtsrc => $value) {
+                    $event['data'][$vtsrc] = $value;
+                }
             }
-            $this->_client->postEntity([
-                'type' => 'customer',
-                'event' => 'newsletter_subscriber_save_after',
-                'data' => [
-                    'email' => $subscriber->getSubscriberEmail(),
-                    'subscribed' => $action == 'subscribe',
-                    'zaius_engage_version' => $this->_helper->getVersion()
-                ]
-            ]);
+
+            $this->_client->postEvent($event);
+            $event['data']['list_id'] = 'zaius_all';
+            $this->_client->postEvent($event);
+
         }
         return $this;
     }

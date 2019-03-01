@@ -17,6 +17,7 @@ use Magento\Quote\Model\Quote;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Model\RuleRepository;
+use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Model\Session;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
@@ -38,6 +39,7 @@ class Data
     protected $_registry;
     protected $_moduleList;
     protected $_ruleRepository;
+    protected $_storeManager;
     protected $_localeHelper;
     protected $_sdk;
     protected $_logger;
@@ -50,6 +52,7 @@ class Data
         Registry $registry,
         ModuleListInterface $moduleList,
         RuleRepository $ruleRepository,
+        StoreManagerInterface $storeManager,
         Context $context,
         Sdk $sdk,
         LocaleHelper $localeHelper,
@@ -63,6 +66,7 @@ class Data
         $this->_registry = $registry;
         $this->_moduleList = $moduleList;
         $this->_ruleRepository = $ruleRepository;
+        $this->_storeManager = $storeManager;
         $this->_localeHelper = $localeHelper;
         $this->_sdk = $sdk;
         $this->_logger = $logger;
@@ -445,5 +449,33 @@ class Data
         }
 
         return $productId;
+    }
+
+    public function getGlobalIDPrefix($store = null)
+    {
+        return $this->scopeConfig->getValue('zaius_engage/settings/global_id_prefix', 'store', $store);
+    }
+
+    public function applyGlobalIDPrefix($idToPrefix)
+    {
+        $prefix = $this->getGlobalIDPrefix();
+        if (!empty($prefix) && !empty($idToPrefix)) {
+            $idToPrefix = $prefix . $idToPrefix;
+        }
+        return $idToPrefix;
+    }
+
+    public function getNewsletterListId($store = null)
+    {
+        $listId =  $this->scopeConfig->getValue('zaius_engage/settings/newsletter_list_id', 'store', $store);
+        if (empty($listId)) {
+            $listId = 'newsletter';
+        }
+        $storeName = $this->_storeManager->getStore()->getName();
+        $storeName = mb_strtolower($storeName, mb_detect_encoding($storeName));
+        $storeName = mb_ereg_replace('\s+', '_', $storeName);
+        $storeName = mb_ereg_replace('[^a-z0-9_\.\-]', '', $storeName);
+        $listId = $storeName . '_' . $listId;
+        return $this->applyGlobalIDPrefix($listId);
     }
 }
