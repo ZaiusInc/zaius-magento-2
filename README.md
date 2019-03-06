@@ -9,7 +9,8 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 1. Magento 2 "^2.2.5"
-2. Composer
+2. PHP 5 >= 5.5.0, PHP 7
+3. Composer
 
 ## Installing
 
