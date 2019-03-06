@@ -28,6 +28,14 @@ composer install
 composer update zaius/*
 ```
 
+Note: during beta testing, you may need to specify your willingness to use the beta releases of both the module and the underlying PHP SDK:
+```bash
+composer require zaius/zaius-magento-2:1.0.*@beta
+composer require zaius/zaius-php-sdk:1.0.*@beta
+composer install
+composer update zaius/*
+```
+
 ### ZIP
 
 1. Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
@@ -136,7 +144,7 @@ After installing the module, all configuration is done via Stores >> Configurati
 
 #### Schema Update
 
-**FUNCTIONALITY DEPRECIATED**
+**FUNCTIONALITY DEPRECATED**
 
 #### Batch Updates
 
