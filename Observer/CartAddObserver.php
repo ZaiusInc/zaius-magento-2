@@ -76,8 +76,8 @@ class CartAddObserver
                 'zaius_alias_cart_id' => $quote->getId(),
                 'valid_cart' => $this->_helper->isValidCart($quote),
                 'cart_json' => $this->_helper->prepareCartJSON($quote, $info),
-                'zaius_cart' => $this->_helper->prepareZaiusCart($quote, $info),
-                'zaius_cart_url' => $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info)
+                'cart_param' => $this->_helper->prepareZaiusCart($quote, $info),
+                'cart_url' => $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info)
             ];
             if (isset($quoteHash)) {
                 $eventData['cart_id'] = $quote->getId();

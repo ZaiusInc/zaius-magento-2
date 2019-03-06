@@ -62,7 +62,7 @@ class Sdk
     public function getSdkPath()
     {
         $base_path = $this->_directoryList->getRoot();
-        return $base_path . '/vendor/zaius/zaius_sdk';
+        return $base_path . '/vendor/zaius/zaius-php-sdk';
     }
 
     /**

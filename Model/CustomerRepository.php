@@ -124,8 +124,8 @@ class CustomerRepository
             'email' => $customer->getEmail(),
             'first_name' => $customer->getFirstname(),
             'last_name' => $customer->getLastname(),
-            '_store_view_code' => $this->_localeHelper->getWebsiteCode($customer->getWebsiteId()),
-            '_store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId())
+            'store_view_code' => $this->_localeHelper->getWebsiteCode($customer->getWebsiteId()),
+            'store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId())
         ];
         $addressType = null;
         if ($isFullCustomerObject && $customer->getData('default_billing')) {

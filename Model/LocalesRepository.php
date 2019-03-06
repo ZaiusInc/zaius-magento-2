@@ -4,7 +4,8 @@ namespace Zaius\Engage\Model;
 
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Locale\Deployed\Options;
+//use Magento\Framework\Locale\Deployed\Options; // Magento 2.2.x+ Compatibility Only
+use Magento\Framework\Locale\TranslatedLists; // Using TranslatedLists for Magento 2.1 + Compatibility
 use Magento\Framework\Locale\Resolver;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\LocalesInterface;
@@ -24,7 +25,7 @@ class LocalesRepository implements LocalesInterface
     /** @var Resolver */
     protected $localeResolver;
 
-    /** @var Options */
+    /** @var TranslatedLists */
     protected $localeOptions;
 
     /**
@@ -33,13 +34,15 @@ class LocalesRepository implements LocalesInterface
      * @param ScopeConfigInterface $scopeConfig
      * @param CurrencyFactory $currencyFactory
      * @param Resolver $localeResolver
-     * @param Options $localeOptions
+     * @param TranslatedLists $localeOptions
      */
-    public function __construct(StoreManagerInterface $storeManager,
-                                ScopeConfigInterface $scopeConfig,
-                                CurrencyFactory $currencyFactory,
-                                Resolver $localeResolver,
-                                Options $localeOptions)
+    public function __construct(
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
+        CurrencyFactory $currencyFactory,
+        Resolver $localeResolver,
+        TranslatedLists $localeOptions
+    )
     {
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;

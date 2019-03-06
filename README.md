@@ -9,7 +9,8 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 1. Magento 2 "^2.2.5"
-2. Composer
+2. PHP 5 >= 5.5.0, PHP 7
+3. Composer
 
 ## Installing
 
@@ -17,14 +18,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 By far the quickest and easiest way to install and maintain the Zaius connector is to use Composer.
 
-1. Add the repository to your composer file.
-2. Require the Zaius Magento 2 package.
-3. Install the Zaius Magento 2 package.
-4. Finally, make sure the package is up-to-date.
+1. Require the Zaius Magento 2 package.
+2. Install the Zaius Magento 2 package.
+3. Finally, make sure the package is up-to-date.
 
 ```bash
-composer config repositories.zaius-magento-2 vcs https://github.com/ZaiusInc/zaius-magento-2.git
 composer require zaius/zaius-magento-2
+composer install
+composer update zaius/*
+```
+
+Note: during beta testing, you may need to specify your willingness to use the beta releases of both the module and the underlying PHP SDK:
+```bash
+composer require zaius/zaius-magento-2:1.0.*@beta
+composer require zaius/zaius-php-sdk:1.0.*@beta
 composer install
 composer update zaius/*
 ```
@@ -102,6 +109,50 @@ php bin/magento cache:clean
 ```
 
 ## Configuration
+
+After installing the module, all configuration is done via Stores >> Configuration >> Zaius >> Engage.
+
+#### Zaius Engage Status
+
+**Enabled**: Enable or disable the Zaius Engage Connector functionality.
+
+**Version**: The currently installed version of the Zaius Engage Connector.
+
+**Composer Installed?**: Checks if Composer is installed. Will *ALWAYS* be installed for Magento 2 projects.
+
+**SDK Installed?**: Checks if the [Zaius PHP SDK](https://github.com/ZaiusInc/zaius-php-sdk) is installed. The SDK is **REQUIRED** by the Zaius Engage Connector, and installed automatically with Composer.
+
+#### Configuration
+
+**Zaius Tracker ID**: Configuration field for the Zaius client Tracker ID. Found at [API Management](https://app.zaius.com/app?scope=731#/api_management) in the Zaius client Account.
+
+**Zaius Private API Key**: Configuration field for the Zaius Private API Key. Found at [API Management](https://app.zaius.com/app?scope=731#/api_management) in the Zaius client Account. This is **REQUIRED** for [Batch Updates](Batch Updates) to work.
+
+**Enable Amazon S3**: Enable or disable the Amazon S3 Upload functionality.
+
+**Amazon S3 Key**: Configuration field for the Zaius Client Amazon S3 Key. Found At [Integrations](https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3) in the Zaius Client Account. This is **REQUIRED** if Amazon S3 functionality is enabled.
+
+**Amazon S3 Secret**: Configuration field for the Zaius Client Amazon S3 Secret. Found At [Integrations](https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3) in the Zaius Client Account. This is **REQUIRED** if Amazon S3 functionality is enabled.
+
+#### Settings
+
+**Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes, or only the minimum.
+
+**Track Orders on Frontend**: Enable or disable the functionality to track orders on the frontend of the website.
+
+**Timeout**: Specify a number of seconds to wait before timing out the connection to Zaius.
+
+#### Schema Update
+
+**FUNCTIONALITY DEPRECATED**
+
+#### Batch Updates
+
+**Enabled?**: Enable or disable the Batch Update functionality. With batch updates enabled, updates are sent to Zaius on a schedule, instead of "on-the-fly". This can lower resource use. Clients must enter their [Zaius Private API Key](Zaius Private API Key) for this functionality to communicate with Zaius.
+
+#### Zaius Localizations
+
+**Enabled?**: Enable or disable the Zaius Localizations functionality. With Zaius Localizations functionality enabled, localized store_view data will be sent to Zaius.
 
 ## Versioning
 
