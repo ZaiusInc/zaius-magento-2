@@ -127,7 +127,7 @@ class CouponsManagement extends CouponManagementService implements CouponsInterf
                     'codes' => $codes
                 )
             );
-            return json_encode($event);
+            return $event;
         } catch (\Exception $e) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Error occurred when generating coupons: %1', $e->getMessage())
