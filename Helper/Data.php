@@ -318,7 +318,7 @@ class Data
                 $zaiusAliasCookies[] = $cookie;
             }
         }
-        if (count($zaiusAliasCookies)) {
+        if (is_array($zaiusAliasCookies)) {
             return $zaiusAliasCookies;
         }
         return false;
@@ -399,12 +399,12 @@ class Data
         if ($this->isBatchUpdate()) {
             $zaiusClient = $this->_sdk->getSdkClient();
             $event = Client::transformForBatchEvent($event);
-            if (isset($event['identifiers'])) {
+            if (!isset($event['identifiers'])) {
                 $vuid = $this->getVuid();
                 $zm64_id = $this->getZM64_ID();
                 $zaiusAliasCookies = $this->getZaiusAliasCookies();
                 $event['identifiers'] = array_filter(compact('vuid', 'zm64_id'));
-                if (count($zaiusAliasCookies)) {
+                if (is_array($zaiusAliasCookies)) {
                     foreach ($zaiusAliasCookies as $field => $value) {
                         $event['identifiers'][$field] = $value;
                     }
