@@ -28,10 +28,19 @@ composer install
 composer update zaius/*
 ```
 
-Note: during beta testing, you may need to specify your willingness to use the beta releases of both the module and the underlying PHP SDK:
+Note: during beta testing, you will need to specify your willingness to use the beta releases of both the module and the underlying PHP SDK:
+
+1. Edit your `<MAGENTO_ROOT>/composer.json` file:
+
 ```bash
-composer require zaius/zaius-magento-2:1.0.*@beta
-composer require zaius/zaius-php-sdk:1.0.*@beta
+"minimum-stability" "beta",
+"prefer-stable": true
+```
+
+2. Add the required packages:
+
+```bash
+composer require zaius/zaius-magento-2:^1.0
 composer install
 composer update zaius/*
 ```
