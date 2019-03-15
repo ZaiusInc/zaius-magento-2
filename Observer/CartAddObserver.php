@@ -74,10 +74,7 @@ class CartAddObserver
                 'product_id' => $this->_helper->getProductId($product),
                 'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
                 'zaius_alias_cart_id' => $quote->getId(),
-                'valid_cart' => $this->_helper->isValidCart($quote),
-                'cart_json' => $this->_helper->prepareCartJSON($quote, $info),
-                'cart_param' => $this->_helper->prepareZaiusCart($quote, $info),
-                'cart_url' => $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info)
+                'valid_cart' => $this->_helper->isValidCart($quote)
             ];
             if (isset($quoteHash)) {
                 $eventData['cart_id'] = $quote->getId();
@@ -88,6 +85,11 @@ class CartAddObserver
                 foreach ($vtsrc as $field => $value) {
                     $eventData[$field] = $value;
                 }
+            }
+            if (count($quote->getAllVisibleItems()) > 0) {
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $info);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $info);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info);
             }
 
             $this->_client->postEvent([

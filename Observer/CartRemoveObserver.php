@@ -51,11 +51,13 @@ class CartRemoveObserver
                 'product_id' => $this->_helper->getProductId($item),
                 'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($item->getProduct() ?? $item),
                 'zaius_engage_version' => $this->_helper->getVersion(),
-                'valid_cart' => $this->_helper->isValidCart($quote),
-                'cart_json' => $this->_helper->prepareCartJSON($quote, $info),
-                'cart_param' => $this->_helper->prepareZaiusCart($quote, $info),
-                'cart_url' => $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info)
+                'valid_cart' => $this->_helper->isValidCart($quote)
             ];
+            if (count($quote->getAllVisibleItems()) > 0) {
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $info);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $info);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info);
+            }
             $this->_helper->addEventToSession([
                 'type' => 'product',
                 'data' => $eventData
