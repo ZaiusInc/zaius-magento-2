@@ -176,7 +176,7 @@ class Data
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
             return false;
         }
-        if ($quote->getItemsCount()){
+        if (count($quote->getAllVisibleItems()) > 0){
             return true;
         }
         return false;
@@ -191,7 +191,7 @@ class Data
         $json = array();
         foreach ($items as $item) {
             $pid = $this->getProductId($item);
-            $qty = $info[$item->getId()]['qty'] ?? $info;
+            $qty = $item->getQty(); //$info[$item->getId()]['qty'] ?? $info;
             $data = [
                 'product_id' => $pid,
                 'quantity' => $qty
@@ -213,7 +213,8 @@ class Data
 //            $json['details']['discount'] = '0';
 //            $json['details']['discount_percent'] = '0';
 //        }
-        return json_encode($json);
+        return $json;
+        //return json_encode($json);
     }
 
     public function prepareZaiusCartUrl($baseUrl)
