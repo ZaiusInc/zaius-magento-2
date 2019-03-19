@@ -29,7 +29,7 @@ class CartClearObserver
         $this->_checkoutSession = $checkoutSession;
     }
 
-    public function execute(Observer $observer, $item = null, $info = null)
+    public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
             /** @var Quote $quote */
@@ -44,7 +44,7 @@ class CartClearObserver
             $visible = count($quote->getAllVisibleItems());
             $quoteCollectionCount = count($quote->getItemsCollection());
 
-            if ($visible !== $quoteCollectionCount) {
+            if ($visible === 0 && $visible !== $quoteCollectionCount) {
                 foreach ($quoteCollection as $item) {
                     $eventData = [
                         'action' => $action,
