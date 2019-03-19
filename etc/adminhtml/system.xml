@@ -46,12 +46,14 @@
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="zaius_private_api" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Zaius Private API Key</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="amazon_active" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled Amazon S3</label>
