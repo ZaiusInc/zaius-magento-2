@@ -70,8 +70,9 @@ class Sdk
      */
     public function getSdkClient()
     {
-        $apiKey = $this->getZaiusPrivateKey();
-        $zaiusClient = new \ZaiusSDK\ZaiusClient($apiKey);
+        $apiKey = $this->getZaiusTrackerId();
+        $privateKey = $this->getZaiusPrivateKey();
+        $zaiusClient = new \ZaiusSDK\ZaiusClient($apiKey, $privateKey);
 
         $zaiusClient->setQueueDatabaseCredentials([
             'driver' => 'mysql',
@@ -83,6 +84,15 @@ class Sdk
         ], $this->_deploymentConfig->get('db/connection/default/dbname') . '.zaius_job');
 
         return $zaiusClient;
+    }
+
+    /**
+     * @param \Magento\Store\Model\Store|int|null $store
+     * @return string
+     */
+    public function getZaiusTrackerId($store = null)
+    {
+        return $this->scopeConfig->getValue('zaius_engage/config/zaius_tracker_id', 'store', $store);
     }
 
     /**
