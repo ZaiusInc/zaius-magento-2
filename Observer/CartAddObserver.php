@@ -5,6 +5,7 @@ namespace Zaius\Engage\Observer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Helper\Data;
@@ -16,6 +17,7 @@ class CartAddObserver
     implements ObserverInterface
 {
     protected $_storeManager;
+    protected $_productRepository;
     protected $_helper;
     protected $_client;
     protected $_checkoutSession;
@@ -23,6 +25,7 @@ class CartAddObserver
 
     public function __construct(
         StoreManagerInterface $storeManager,
+        ProductRepository $productRepository,
         Data $helper,
         Client $client,
         CheckoutSession $checkoutSession,
@@ -30,6 +33,7 @@ class CartAddObserver
     )
     {
         $this->_storeManager = $storeManager;
+        $this->_productRepository = $productRepository;
         $this->_helper = $helper;
         $this->_client = $client;
         $this->_checkoutSession = $checkoutSession;
@@ -57,6 +61,12 @@ class CartAddObserver
                 $info = $product->getQty();
                 $action = 'add_to_cart';
             }
+
+            /** @var Product $product */
+            $sku = $product->getSku();
+            $id = $product->getIdBySku($sku);
+            $product = $this->_productRepository->getById($id);
+
             $quoteHash = $this->_helper->encryptQuote($quote);
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
 

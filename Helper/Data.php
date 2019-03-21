@@ -6,6 +6,7 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -43,6 +44,7 @@ class Data
     protected $_localeHelper;
     protected $_sdk;
     protected $_logger;
+    protected $_productRepository;
 
     public function __construct(
         CookieManagerInterface $cookieManager,
@@ -56,7 +58,8 @@ class Data
         Context $context,
         Sdk $sdk,
         LocaleHelper $localeHelper,
-        Logger $logger
+        Logger $logger,
+        ProductRepository $productRepository
     )
     {
         $this->_cookieManager = $cookieManager;
@@ -70,6 +73,7 @@ class Data
         $this->_localeHelper = $localeHelper;
         $this->_sdk = $sdk;
         $this->_logger = $logger;
+        $this->_productRepository = $productRepository;
         parent::__construct($context);
     }
 
@@ -184,13 +188,16 @@ class Data
 
     public function prepareCartJSON($quote, $info)
     {
+        /** @var Quote $quote */
         if ($quote->getItemsCount() == 0) {
             return array('items' => []);
         }
         $items = $quote->getAllVisibleItems();
         $json = array();
         foreach ($items as $item) {
-            $pid = $this->getProductId($item);
+            /** @var Product $product */
+            $product = $this->_productRepository->get($item->getSku());
+            $pid = $this->getProductId($product);
             $qty = $item->getQty(); //$info[$item->getId()]['qty'] ?? $info;
             $data = [
                 'product_id' => $pid,
@@ -231,7 +238,9 @@ class Data
         $this->_logger->info('Logging zaiusCart: ' . json_encode($quote->getItemsCount()));
         $zaiusCart = array();
         foreach ($items as $item) {
-            $pid = $this->getProductId($item);
+            /** @var Product $product */
+            $product = $this->_productRepository->get($item->getSku());
+            $pid = $this->getProductId($product);
             $qty = $item->getQty();
             $data = $pid .':'.$qty;
             $zaiusCart[] = $data;
@@ -436,6 +445,9 @@ class Data
         $productId = null;
 
         if ($product instanceof Product) {
+//            if ($product->getTypeId() === 'configurable') {
+//                $productId = 'configurable';
+//            }
             $productId = $product->getId();
         }
         if ($product instanceof \Magento\Sales\Model\Order\Item) {

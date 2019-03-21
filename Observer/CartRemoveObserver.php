@@ -4,6 +4,7 @@ namespace Zaius\Engage\Observer;
 
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Magento\Framework\Event\Observer;
@@ -15,16 +16,19 @@ class CartRemoveObserver
     implements ObserverInterface
 {
     protected $_storeManager;
+    protected $_productRepository;
     protected $_helper;
     protected $_checkoutSession;
 
     public function __construct(
         StoreManagerInterface $storeManager,
+        ProductRepository $productRepository,
         Data $helper,
         CheckoutSession $checkoutSession
     )
     {
         $this->_storeManager = $storeManager;
+        $this->_productRepository = $productRepository;
         $this->_helper = $helper;
         $this->_checkoutSession = $checkoutSession;
     }
@@ -44,6 +48,10 @@ class CartRemoveObserver
                 $info = $item->getQty();
                 $action = 'remove_from_cart';
             }
+
+            /** @var Product $item */
+            $sku = $item->getSku();
+            $item = $this->_productRepository->get($sku);
 
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
             $eventData = [
