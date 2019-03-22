@@ -211,6 +211,41 @@ class Client
         return $zaiusClient->postProduct($this->_productRepository->getProductEventData($event, $product), $this->isBatchUpdate());
     }
 
+    /**
+     * @param $objectName string
+     * @return mixed
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function getObjectFields($objectName)
+    {
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient();
+        return $zaiusClient->getObjectFields($objectName);
+    }
+
+    /**
+     * @param $objectName string
+     * @param $fieldArray array
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function createObjectField($objectName, $fieldArray = array())
+    {
+        if (empty($fieldArray)) {
+            return;
+        }
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient();
+        foreach ($fieldArray as $field) {
+            $fieldName = $field['name'];
+            $type = $field['type'];
+            $displayName = $field['display_name'];
+            $description = $field['description'];
+
+            $this->_logger->info($fieldName . ' ' . $type . ' ' . $displayName . ' ' . $description);
+            $zaiusClient->createObjectField($objectName, $fieldName, $type, $displayName, $description, $this->isBatchUpdate());
+        }
+    }
+
     protected function isBatchUpdate()
     {
         return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);
