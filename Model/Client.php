@@ -230,10 +230,11 @@ class Client
      */
     public function createObjectField($objectName, $fieldArray = array())
     {
+        $this->_logger->info(__METHOD__);
         if (empty($fieldArray)) {
+            $this->_logger->info('$fieldArray empty.');
             return;
         }
-        $this->_logger->info(__METHOD__);
         $zaiusClient = $this->_sdk->getSdkClient();
         foreach ($fieldArray as $field) {
             $fieldName = $field['name'];

@@ -42,16 +42,16 @@ class SchemaRepository
             'description' => 'Website from which this customer originated (according to the Magento Webite > Store > Store View hierachy.)'
         ];
         $magentoStore = [
-            'name'=>'magento_store',
-            'display_name'=> 'Magento Store',
-            'type'=>'string',
-            'description'=>'Store from which this customer originated (according to the Magento Website > Store > Store View hierachy.)'
+            'name' => 'magento_store',
+            'display_name' => 'Magento Store',
+            'type' => 'string',
+            'description' => 'Store from which this customer originated (according to the Magento Website > Store > Store View hierachy.)'
         ];
         $magentoStoreView = [
-            'name'=>'magento_store_view',
-            'display_name'=>'Magento Store View',
-            'type'=>'string',
-            'description'=>'Store View from which this customer originated (according to the Magento Website > Store > Store View hierachy.)'
+            'name' => 'magento_store_view',
+            'display_name' => 'Magento Store View',
+            'type' => 'string',
+            'description' => 'Store View from which this customer originated (according to the Magento Website > Store > Store View hierachy.)'
         ];
 
         return array($magentoWebsite, $magentoStore, $magentoStoreView);
@@ -83,6 +83,69 @@ class SchemaRepository
         $this->_client->createObjectField($customerObject, $delta);
     }
 
+    public function getProductsFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $productsObject = 'products';
+        return $this->_client->getObjectFields($productsObject);
+    }
+
+    public function setProductsFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $productsObject = 'products';
+        $currentSchema = $this->getProductsFields();
+        $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
+        $magentoSchema = $this->setUniversalFields();
+        $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
+        $qty = [
+            'name' => 'qty',
+            'display_name' => 'Quantity',
+            'type' => 'number',
+            'description' => 'Number of units of this product available in inventory.'
+        ];
+        $magentoSchema[] = $qty;
+        $isInStock = [
+            'name' => 'is_in_stock',
+            'display_name' => 'Is In Stock',
+            'type' => 'boolean',
+            'description' => 'Whether the product should be considered in stock according to Magento settings.'
+        ];
+        $magentoSchema[] = $isInStock;
+        $description = [
+            'name' => 'description',
+            'display_name' => 'Description',
+            'type' => 'string',
+            'description' => 'Full-text or HTML product description as displayed on the web site.'
+        ];
+        $magentoSchema[] = $description;
+        $specialPriceFromDate = [
+            'name' => 'special_price_from_date',
+            'display_name' => 'Special Price Start Date',
+            'type' => 'timestamp',
+            'description' => 'Beginning of a sale period.'
+        ];
+        $magentoSchema[] = $specialPriceFromDate;
+        $specialPriceToDate = [
+            'name' => 'special_price_to_date',
+            'display_name' => 'Special Price End Date',
+            'type' => 'timestamp',
+            'description' => 'End of a sale period.'
+        ];
+        $magentoSchema[] = $specialPriceToDate;
+        $specialPrice = [
+            'name' => 'special_price',
+            'display_name' => 'Special Price',
+            'type' => 'number',
+            'description' => 'Price during sale period defined by the \'Special Price Start Date\' and \'Special Price End Date\'.'
+        ];
+        $magentoSchema[] = $specialPrice;
+        $delta = $this->processDelta($magentoSchema, $currentSchema);
+        $this->_logger->info('$delta: ' . json_encode($delta));
+        $this->_logger->info('magentoSchema_push: ' . json_encode($magentoSchema));
+        $this->_client->createObjectField($productsObject, $delta);
+    }
+
     /**
      * @param $magentoSchema
      * @param $currentSchema
@@ -96,7 +159,7 @@ class SchemaRepository
             foreach ($currentSchema as $current) {
                 $this->_logger->info('current: ' . json_encode($current['name']));
                 $match = false;
-                if ($magento['name'] == $current['name']) {
+                if ($magento['name'] === $current['name']) {
                     $match = true;
                     break;
                 }
@@ -115,5 +178,7 @@ class SchemaRepository
         $this->_logger->info(__METHOD__);
         //set customers fields if they don't exist
         $this->setCustomersFields();
+
+        $this->setProductsFields();
     }
 }
