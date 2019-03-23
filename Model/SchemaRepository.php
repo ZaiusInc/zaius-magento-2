@@ -210,6 +210,32 @@ class SchemaRepository
     }
 
     /**
+     * @return mixed
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function getOrdersFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $ordersObject = 'orders';
+        return $this->_client->getObjectFields($ordersObject);
+    }
+
+    /**
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function setOrdersFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $ordersObject = 'orders';
+        $currentSchema = $this->getOrdersFields();
+        $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
+        $magentoSchema = $this->setUniversalFields();
+        $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
+        $delta = $this->processDelta($magentoSchema, $currentSchema);
+        $this->_client->createObjectField($ordersObject, $delta);
+    }
+
+    /**
      * @param $magentoSchema
      * @param $currentSchema
      * @return array
@@ -245,5 +271,7 @@ class SchemaRepository
         $this->setProductsFields();
 
         $this->setEventsFields();
+
+        $this->setOrdersFields();
     }
 }
