@@ -146,6 +146,95 @@ class SchemaRepository
         $this->_client->createObjectField($productsObject, $delta);
     }
 
+    public function getEventsFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $eventsObject = 'events';
+        return $this->_client->getObjectFields($eventsObject);
+    }
+
+    public function setEventsFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $eventsObject = 'events';
+        $currentSchema = $this->getEventsFields();
+        $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
+        $magentoSchema = $this->setUniversalFields();
+        $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
+        $cartId = [
+            'name' => 'cart_id',
+            'display_name' => 'Cart Id',
+            'type' => 'string',
+            'description' => 'Magento quote ID, a unique identifier for this user\'s shopping cart.'
+        ];
+        $magentoSchema[] = $cartId;
+        $cartHash = [
+            'name' => 'cart_hash',
+            'display_name' => 'Cart Hash',
+            'type' => 'string',
+            'description' => 'A hashed representation of the user\'s current shopping cart.'
+        ];
+        $magentoSchema[] = $cartHash;
+        $validCart = [
+            'name' => 'valid_cart',
+            'display_name' => 'Valid Cart',
+            'type' => 'boolean',
+            'description' => 'Whether the cart is targetable (has items in it).'
+        ];
+        $magentoSchema[] = $validCart;
+        $cartJson = [
+            'name' => 'cart_json',
+            'display_name' => 'Cart JSON',
+            'type' => 'string',
+            'description' => 'A stringified representation of the user\'s current shopping cart.'
+        ];
+        $magentoSchema[] = $cartJson;
+        $cartParam = [
+            'name' => 'cart_param',
+            'display_name' => 'Cart Param',
+            'type' => 'string',
+            'description' => 'A URL parameterized version of the user\'s current shopping cart for potential recovery.'
+        ];
+        $magentoSchema[] = $cartParam;
+        $cartUrl = [
+            'name' => 'cart_url',
+            'display_name' => 'Cart Url',
+            'type' => 'string',
+            'description' => 'The full cart recovery URL for this user\'s current shopping cart, including Cart Param.'
+        ];
+        $magentoSchema[] = $cartUrl;
+        $delta = $this->processDelta($magentoSchema, $currentSchema);
+        $this->_logger->info('$delta: ' . json_encode($delta));
+        $this->_logger->info('magentoSchema_push: ' . json_encode($magentoSchema));
+        $this->_client->createObjectField($eventsObject, $delta);
+    }
+
+    /**
+     * @return mixed
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function getOrdersFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $ordersObject = 'orders';
+        return $this->_client->getObjectFields($ordersObject);
+    }
+
+    /**
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function setOrdersFields()
+    {
+        $this->_logger->info(__METHOD__);
+        $ordersObject = 'orders';
+        $currentSchema = $this->getOrdersFields();
+        $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
+        $magentoSchema = $this->setUniversalFields();
+        $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
+        $delta = $this->processDelta($magentoSchema, $currentSchema);
+        $this->_client->createObjectField($ordersObject, $delta);
+    }
+
     /**
      * @param $magentoSchema
      * @param $currentSchema
@@ -180,5 +269,9 @@ class SchemaRepository
         $this->setCustomersFields();
 
         $this->setProductsFields();
+
+        $this->setEventsFields();
+
+        $this->setOrdersFields();
     }
 }
