@@ -8,8 +8,9 @@
 
 namespace Zaius\Engage\Model;
 
+use Zaius\Engage\Api\ConfigurationInterface;
 
-class ConfigurationRepository
+class ConfigurationRepository implements ConfigurationInterface
 {
     public function getList()
     {
