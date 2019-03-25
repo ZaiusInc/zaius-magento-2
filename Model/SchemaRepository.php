@@ -2,6 +2,7 @@
 
 namespace Zaius\Engage\Model;
 
+use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 
 class SchemaRepository
@@ -9,6 +10,10 @@ class SchemaRepository
 
     /** @var Sdk */
     protected $_client;
+
+    protected $_localeHelper;
+
+    protected $_localesRepository;
 
     /**
      * @var Logger
@@ -22,10 +27,14 @@ class SchemaRepository
      */
     public function __construct(
         Client $client,
+        LocaleHelper $localeHelper,
+        LocalesRepository $localesRepository,
         Logger $logger
     )
     {
         $this->_client = $client;
+        $this->_localeHelper = $localeHelper;
+        $this->_localesRepository = $localesRepository;
         $this->_logger = $logger;
     }
 
@@ -140,6 +149,30 @@ class SchemaRepository
             'description' => 'Price during sale period defined by the \'Special Price Start Date\' and \'Special Price End Date\'.'
         ];
         $magentoSchema[] = $specialPrice;
+
+        if ($this->_localeHelper->isLocalesEnabled()) {
+            $defaultLocale = [
+                'name' => 'default_language_product_id',
+                'display_name' => 'Default Language Product ID',
+                'type' => 'string',
+                'description' => 'The product ID for the non-localized version of this product.'
+            ];
+            $magentoSchema[] = $defaultLocale;
+
+            $localList = $this->_localesRepository->getList();
+
+            foreach ($localList as $store) {
+                $storeView = [
+                    'name' => strtolower($store["store_code"]) . '_product_id',
+                    'display_name' => ucfirst($store["store_code"]) . ' Product ID',
+                    'type' => 'string',
+                    'description' => 'The product ID for the ' . ucfirst($store["store_code"]) . ' localization of this product.'
+                ];
+                $this->_logger->info('$storeView: ' . json_encode($storeView));
+                $magentoSchema[] = $storeView;
+            }
+        }
+
         $delta = $this->processDelta($magentoSchema, $currentSchema);
         $this->_logger->info('$delta: ' . json_encode($delta));
         $this->_logger->info('magentoSchema_push: ' . json_encode($magentoSchema));
