@@ -220,8 +220,7 @@ class Data
 //            $json['details']['discount'] = '0';
 //            $json['details']['discount_percent'] = '0';
 //        }
-        return $json;
-        //return json_encode($json);
+        return json_encode($json);
     }
 
     public function prepareZaiusCartUrl($baseUrl)
