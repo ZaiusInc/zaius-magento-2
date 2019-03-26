@@ -7,7 +7,6 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Module\ResourceInterface as ModuleResourceInterface;
-use Zaius\Engage\Model\SchemaRepository;
 
 class Recurring implements InstallSchemaInterface
 {
@@ -15,17 +14,14 @@ class Recurring implements InstallSchemaInterface
 
     protected $_list;
     protected $_resource;
-    protected $_schemaRepository;
 
     public function __construct(
         ModuleListInterface $list,
-        ModuleResourceInterface $resource,
-        SchemaRepository $schemaRepository
+        ModuleResourceInterface $resource
     )
     {
         $this->_list = $list;
         $this->_resource = $resource;
-        $this->_schemaRepository = $schemaRepository;
     }
     /**
      * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
@@ -44,7 +40,6 @@ class Recurring implements InstallSchemaInterface
             $this->_resource->setDataVersion(self::ZAIUS, $setup_version); //data_version
             $this->_resource->setDbVersion(self::ZAIUS, $setup_version); //schema_version
         }
-        $this->_schemaRepository->upsertObjects();
         $update->endSetup();
     }
 }
