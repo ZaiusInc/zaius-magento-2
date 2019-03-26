@@ -198,7 +198,7 @@ class Data
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
             $pid = $this->getProductId($product);
-            $qty = $item->getQty(); //$info[$item->getId()]['qty'] ?? $info;
+            $qty = $item->getQty();
             $data = [
                 'product_id' => $pid,
                 'quantity' => $qty
@@ -206,20 +206,20 @@ class Data
             $json['items'][] = $data;
         }
         // only add details if a cart has applied rules
-        // slating for later
-//        if ($quote->getAppliedRuleIds()) {
-//            $this->_logger->info("A Product Has A Price Rule: " . $quote->getAppliedRuleIds());
-//            foreach ($quote->getAppliedRuleIds() as $ruleId){
-//                $rule = $this->_ruleRepository->getById($ruleId);
-//                $ruleDescription = $rule->getDescription();
-//            }
-//            $json['details']['valid_until'] = time();
-//            $json['details']['currency_symbol'] = '0';
-//            $json['details']['original_value'] = $quote->getGrandTotal();
-//            $json['details']['discounted_value'] = $quote->getSubtotalWithDiscount();
-//            $json['details']['discount'] = '0';
-//            $json['details']['discount_percent'] = '0';
-//        }
+        //todo ZAIR-77
+        //if ($quote->getAppliedRuleIds()) {
+        //    $this->_logger->info("A Product Has A Price Rule: " . $quote->getAppliedRuleIds());
+        //    foreach ($quote->getAppliedRuleIds() as $ruleId){
+        //        $rule = $this->_ruleRepository->getById($ruleId);
+        //        $ruleDescription = $rule->getDescription();
+        //    }
+        //    $json['details']['valid_until'] = time();
+        //    $json['details']['currency_symbol'] = '0';
+        //    $json['details']['original_value'] = $quote->getGrandTotal();
+        //    $json['details']['discounted_value'] = $quote->getSubtotalWithDiscount();
+        //    $json['details']['discount'] = '0';
+        //    $json['details']['discount_percent'] = '0';
+        //}
         return json_encode($json);
     }
 
@@ -321,7 +321,6 @@ class Data
         $substr = 'zaius_alias_';
         $zaiusAliasCookies = array();
         foreach ($_COOKIE as $key => $value) {
-            // if (substr($key, 0, strlen($substr)) === $substr) {}
             if (strpos($key,$substr) !== false) {
                 $cookie = $this->_cookieManager->getCookie($key);
                 $zaiusAliasCookies[] = $cookie;
@@ -444,9 +443,6 @@ class Data
         $productId = null;
 
         if ($product instanceof Product) {
-//            if ($product->getTypeId() === 'configurable') {
-//                $productId = 'configurable';
-//            }
             $productId = $product->getId();
         }
         if ($product instanceof \Magento\Sales\Model\Order\Item) {
