@@ -172,6 +172,8 @@ class Client
                     );
                     $s3Client->uploadOrders($event);
                 }
+                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                break;
             default:
                 return $this->_post($event, $this->getApiBaseUrl() . '/events', $this->isBatchUpdate());
         }
@@ -196,7 +198,6 @@ class Client
     public function postOrder($order, $eventType = 'purchase')
     {
         return $this->postEvent($this->_orderRepository->getOrderEventData($order, $eventType, true));
-
     }
 
     /**
