@@ -13,6 +13,7 @@ use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Api\ProductListItemInterfaceFactory;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
 
@@ -28,6 +29,7 @@ class Client
     protected $_customerRepository;
     protected $_orderRepository;
     protected $_productRepository;
+    protected $_localeHelper;
     protected $_logger;
     protected $_sdk;
     protected $_encoder;
@@ -40,6 +42,7 @@ class Client
         CustomerRepositoryInterface $customerRepository,
         OrderRepositoryInterface $orderRepository,
         ProductRepositoryInterface $productRepository,
+        LocaleHelper $localeHelper,
         Logger $logger,
         Sdk $sdk,
         ScopeConfigInterface $scopeConfig,
@@ -52,6 +55,7 @@ class Client
         $this->_customerRepository = $customerRepository;
         $this->_orderRepository = $orderRepository;
         $this->_productRepository = $productRepository;
+        $this->_localeHelper = $localeHelper;
         $this->_logger = $logger;
         $this->_sdk = $sdk;
         $this->_encoder = $encoder;
@@ -245,6 +249,49 @@ class Client
 
             $this->_logger->info($fieldName . ' ' . $type . ' ' . $displayName . ' ' . $description);
             $zaiusClient->createObjectField($objectName, $fieldName, $type, $displayName, $description, $this->isBatchUpdate());
+        }
+    }
+
+    /**
+     * @param $event
+     * @param $response
+     * @param null $start
+     * @param null $finish
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function postS3Import($event, $response, $start = null, $finish = null)
+    {
+        $zaiusClient = $this->_sdk->getSdkClient();
+        $s3Client = $zaiusClient->getS3Client(
+            $this->_helper->getZaiusTrackerId(),
+            $this->_helper->getAmazonS3Key(),
+            $this->_helper->getAmazonS3Secret()
+        );
+        $website = $this->_storeManager->getWebsite($this->_storeManager->getStore()->getId())->getCode();
+        $storeView = $this->_storeManager->getStore()->getCode();
+        $prefix = $event . 's.';
+        $prefix .= $website . '.';
+        //todo add localization prefix
+        $prefix .= $this->_localeHelper->isLocalesEnabled() ? $storeView . '.' : '';
+        if ($start !== null && $finish !== null) {
+            $prefix .= $start . '-' . $finish . '.';
+        }
+        $this->_logger->info('$prefix: ' . $prefix);
+        switch ($event) {
+            case 'customer':
+                $s3Client->uploadCustomers($response, false, $prefix);
+                break;
+            case 'order':
+                $s3Client->uploadOrders($response, false, $prefix);
+                break;
+            case 'product':
+                $s3Client->uploadProducts($response, false, $prefix);
+                break;
+            case 'subscriber':
+                $s3Client->uploadEvents($response, false, $prefix);
+                break;
         }
     }
 
