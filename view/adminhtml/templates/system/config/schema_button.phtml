@@ -5,7 +5,7 @@
         'prototype',
     ], function (jQuery) {
 
-        var syncSpan = jQuery('#sync_span');
+        var syncSpan = jQuery('#schema_span');
 
         function sync() {
             params = {};
@@ -17,7 +17,7 @@
                 onCreate: function () {
                     syncSpan.find('.synced').hide();
                     syncSpan.find('.syncing').show();
-                    jQuery('#sync_message_span').text('');
+                    jQuery('#schema_message_span').text('');
                 },
                 onSuccess: function (response) {
 
@@ -32,21 +32,21 @@
                         resultText = 'Success!';
                         syncSpan.find('.synced').show();
                     }
-                    jQuery('#sync_message_span').text(resultText);
+                    jQuery('#schema_message_span').text(resultText);
                 }
             });
         }
 
-        jQuery('#sync_btn').click(function () {
+        jQuery('#schema_btn').click(function () {
             sync();
         });
     });
 </script>
 <?php echo $block->getButtonHtml() ?>
-<span class="sync-indicator" id="sync_span">
+<span class="sync-indicator" id="schema_span">
     <img class="syncing" hidden="hidden" alt="Syncing" style="margin:0 5px"
          src="<?php echo $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
     <img class="synced" hidden="hidden" alt="Synced" style="margin:-3px 5px"
          src="<?php echo $block->getViewFileUrl('images/rule_component_apply.gif') ?>"/>
-    <span id="sync_message_span"></span>
+    <span id="schema_message_span"></span>
 </span>

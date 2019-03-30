@@ -70,7 +70,7 @@ class SchemaUpdateButton extends Field
             'Magento\Backend\Block\Widget\Button'
         )->setData(
             [
-                'id' => 'sync_btn',
+                'id' => 'schema_btn',
                 'label' => __('Schema Update'),
             ]
         );
