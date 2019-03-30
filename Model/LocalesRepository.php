@@ -58,6 +58,9 @@ class LocalesRepository implements LocalesInterface
     {
         $ret = [];
         foreach ($this->storeManager->getStores() as $store) {
+            $websiteId = $store->getWebsiteId();
+            $website = $this->storeManager->getWebsite($websiteId)->getCode();
+            $storeId = $store->getId();
             $storeCode = $store->getCode();
             $storeId = $store->getId();
             $locale = $this->scopeConfig->getValue('general/locale/code', \Magento\Store\Model\ScopeInterface::SCOPE_STORES, $storeCode);
@@ -69,6 +72,7 @@ class LocalesRepository implements LocalesInterface
             $ret[$storeCode] = [
                 'label' => $localeName,
                 'base_url' => $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB),
+                'website_code' => $website,
                 'store_code' => $storeCode,
                 'store_id' => $storeId,
                 'locale' => $locale,
