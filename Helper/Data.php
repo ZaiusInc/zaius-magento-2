@@ -186,7 +186,7 @@ class Data
         return false;
     }
 
-    public function prepareCartJSON($quote)
+    public function prepareCartJSON($quote, $id, $qty)
     {
         /** @var Quote $quote */
         if ($quote->getItemsCount() == 0) {
@@ -198,7 +198,9 @@ class Data
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
             $pid = $this->getProductId($product);
-            $qty = $item->getQty();
+            if (strtok($pid, '$') != $id) {
+                $qty = $item->getQty();
+            }
             $data = [
                 'product_id' => $pid,
                 'quantity' => $qty
@@ -228,7 +230,7 @@ class Data
         return $baseUrl . 'zaius/hook/create/client_id/' . $this->getZaiusTrackerId() . '/zaius_cart/';
     }
 
-    public function prepareZaiusCart($quote, $info)
+    public function prepareZaiusCart($quote, $id, $qty)
     {
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
             return false;
@@ -240,11 +242,12 @@ class Data
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
             $pid = $this->getProductId($product);
-            $qty = $item->getQty();
+            if (strtok($pid, '$') != $id) {
+                $qty = $item->getQty();
+            }
             $data = $pid .':'.$qty;
             $zaiusCart[] = $data;
         }
-        $this->_logger->info('Logging zaiusCart: ' . json_encode($zaiusCart));
         //todo determine website/store view, return link?
         return implode(',',$zaiusCart);
     }

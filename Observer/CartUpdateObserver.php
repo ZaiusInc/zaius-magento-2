@@ -52,12 +52,13 @@ class CartUpdateObserver
             $info = $observer->getInfo()->getData();
             foreach ($items as $item) {
                 $product = $observer->getCart()->getQuote()->getItemById($item->getId())->getProduct();
+                $updateQty = $info[$item->getId()]['qty'];
                 if ($item->getQty() != $info[$item->getId()]['qty']) {
                     if ($item->getQty() > $info[$item->getId()]['qty']) {
-                        $this->_cartRemove->execute($observer, $product, $info);
+                        $this->_cartRemove->execute($observer, $product, $info, $updateQty);
                     }
                     if ($item->getQty() < $info[$item->getId()]['qty']) {
-                        $this->_cartAdd->execute($observer, $product, $info);
+                        $this->_cartAdd->execute($observer, $product, $info, $updateQty);
                     }
                 }
             }

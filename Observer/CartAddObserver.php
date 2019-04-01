@@ -40,7 +40,7 @@ class CartAddObserver
         $this->_logger = $logger;
     }
 
-    public function execute(Observer $observer, $product = null, $info = null)
+    public function execute(Observer $observer, $product = null, $info = null, $updateQty = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
 
@@ -65,6 +65,8 @@ class CartAddObserver
             /** @var Product $product */
             $sku = $product->getSku();
             $product = $this->_productRepository->get($sku);
+            $id = $product->getId();
+            $qty = $updateQty;
 
             $quoteHash = $this->_helper->encryptQuote($quote);
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
@@ -96,9 +98,9 @@ class CartAddObserver
                 }
             }
             if (count($quote->getAllVisibleItems()) > 0) {
-                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote);
-                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $info);
-                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info);
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $qty);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $qty);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $qty);
             }
 
             $this->_client->postEvent([
