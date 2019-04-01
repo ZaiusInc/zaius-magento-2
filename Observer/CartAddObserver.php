@@ -57,7 +57,7 @@ class CartAddObserver
             $action = 'update_qty';
             if (is_null($product)){
                 /** @var Product $product */
-                $product = $observer->getEvent()->getData('quote_item');
+                $product = $observer->getEvent()->getData('product');
                 $info = $product->getQty();
                 $action = 'add_to_cart';
             }
