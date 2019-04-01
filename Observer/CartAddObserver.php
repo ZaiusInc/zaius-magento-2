@@ -57,15 +57,14 @@ class CartAddObserver
             $action = 'update_qty';
             if (is_null($product)){
                 /** @var Product $product */
-                $product = $observer->getEvent()->getData('product');
+                $product = $observer->getEvent()->getData('quote_item');
                 $info = $product->getQty();
                 $action = 'add_to_cart';
             }
 
             /** @var Product $product */
             $sku = $product->getSku();
-            $id = $product->getIdBySku($sku);
-            $product = $this->_productRepository->getById($id);
+            $product = $this->_productRepository->get($sku);
 
             $quoteHash = $this->_helper->encryptQuote($quote);
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
@@ -97,7 +96,7 @@ class CartAddObserver
                 }
             }
             if (count($quote->getAllVisibleItems()) > 0) {
-                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $info);
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote);
                 $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $info);
                 $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info);
             }

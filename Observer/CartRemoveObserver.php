@@ -62,7 +62,7 @@ class CartRemoveObserver
                 'valid_cart' => $this->_helper->isValidCart($quote)
             ];
             if (count($quote->getAllVisibleItems()) > 0) {
-                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $info);
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote);
                 $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $info);
                 $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info);
             }

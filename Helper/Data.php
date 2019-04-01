@@ -186,7 +186,7 @@ class Data
         return false;
     }
 
-    public function prepareCartJSON($quote, $info)
+    public function prepareCartJSON($quote)
     {
         /** @var Quote $quote */
         if ($quote->getItemsCount() == 0) {
