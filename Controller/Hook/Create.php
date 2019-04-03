@@ -126,7 +126,7 @@ class Create extends AbstractHook
 //            If default/"overwrite" mode AND there was a previous cart: zaius_cart_result = "overwritten"
 //            If "append" AND there was a previous cart: zaius_cart_result = "appended"
 //            If "noconflict" AND there was a previous cart: zaius_cart_result = "ignored"
-            $this->_cookie->set('not applicable');
+            $this->_cookie->set('not_applicable');
             $cookie = $this->_cookie->get();
             $zaiusCartMode = $request->getParam('zaius_cart_mode');
             switch ($zaiusCartMode) {
