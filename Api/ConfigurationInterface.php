@@ -2,10 +2,15 @@
 
 namespace Zaius\Engage\Api;
 
+/**
+ * Interface ConfigurationInterface
+ * @package Zaius\Engage\Api
+ */
 interface ConfigurationInterface
 {
     /**
-     * @return mixed
+     * @param $jsonOpts
+     * @return string[]
      */
-    public function getList();
+    public function getList($jsonOpts = null);
 }
