@@ -16,6 +16,8 @@ use Zaius\Engage\Logger\Logger;
 class CartAddObserver
     implements ObserverInterface
 {
+    const UPDATE_ITEM_OPTIONS = 'checkout_cart_product_update_after';
+
     protected $_storeManager;
     protected $_productRepository;
     protected $_helper;
@@ -44,6 +46,8 @@ class CartAddObserver
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
 
+            $eventName = $observer->getEvent()->getName();
+
             /** @var Quote $quote */
             $quote = $this->_checkoutSession->getQuote();
 
@@ -67,6 +71,17 @@ class CartAddObserver
             $product = $this->_productRepository->get($sku);
             $id = $product->getId();
             $qty = $updateQty;
+
+            if ($eventName === self::UPDATE_ITEM_OPTIONS) {
+                $this->_logger->info(json_encode($sku));
+                $this->_logger->info(json_encode($observer->getEvent()->getName()));
+                $this->_logger->info(json_encode($id));
+
+                //$lastId = $quote->getItemsCollection()->getLastItem();
+                //$lastId = $lastId->toString();
+
+                //$this->_logger->info(json_encode($lastId));
+            }
 
             $quoteHash = $this->_helper->encryptQuote($quote);
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
