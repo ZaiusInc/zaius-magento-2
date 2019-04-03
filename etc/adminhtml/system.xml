@@ -23,14 +23,14 @@
                         Zaius Engage Version
                     </comment>
                 </field>
-                <field id="composer" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="composer" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Composer Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
                     <comment>
                         Checks if Composer is installed.
                     </comment>
                 </field>
-                <field id="sdk" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sdk" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>SDK Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
                     <comment>
@@ -111,8 +111,6 @@
                     <label>Timeout</label>
                     <comment>Number of seconds to wait before timing out the connection to Zaius.</comment>
                 </field>
-
-
             </group>
 
             <group id="schema_update" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -120,16 +118,6 @@
                 <field id="schema_update" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Update Schema?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\SchemaUpdateButton</frontend_model>
-                </field>
-            </group>
-
-
-            <group id="batch_updates" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Batch Updates</label>
-                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enabled?</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Send events to Zaius in a Batched Process, lowering use of resources.</comment>
                 </field>
             </group>
 
