@@ -186,7 +186,7 @@ class Data
         return false;
     }
 
-    public function prepareCartJSON($quote, $id, $qty)
+    public function prepareCartJSON($quote, $id = null, $info = null)
     {
         /** @var Quote $quote */
         if ($quote->getItemsCount() == 0) {
@@ -198,8 +198,10 @@ class Data
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
             $pid = $this->getProductId($product);
-            if (strtok($pid, '$') != $id) {
-                $qty = $item->getQty();
+            if (strtok($pid, '$') == $id) {
+                $qty = $info[$item->getId()]['qty'] ?? $info;
+            } else {
+                $qty = $info[$item->getId()]['qty'] ?? $item->getQty();
             }
             $data = [
                 'product_id' => $pid,
@@ -230,7 +232,7 @@ class Data
         return $baseUrl . 'zaius/hook/create/client_id/' . $this->getZaiusTrackerId() . '/zaius_cart/';
     }
 
-    public function prepareZaiusCart($quote, $id, $qty)
+    public function prepareZaiusCart($quote, $id, $info)
     {
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
             return false;
@@ -242,8 +244,11 @@ class Data
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
             $pid = $this->getProductId($product);
-            if (strtok($pid, '$') != $id) {
-                $qty = $item->getQty();
+            if (strtok($pid, '$') == $id) {
+                $qty = $info[$item->getId()]['qty'] ?? $info;
+                $this->_logger->info("pid !== id");
+            } else {
+                $qty = $info[$item->getId()]['qty'] ?? $item->getQty();
             }
             $data = $pid .':'.$qty;
             $zaiusCart[] = $data;

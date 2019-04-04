@@ -42,7 +42,7 @@ class CartAddObserver
         $this->_logger = $logger;
     }
 
-    public function execute(Observer $observer, $product = null, $info = null, $updateQty = null)
+    public function execute(Observer $observer, $product = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
 
@@ -62,6 +62,9 @@ class CartAddObserver
             if (is_null($product)){
                 /** @var Product $product */
                 $product = $observer->getEvent()->getData('product');
+                if ($eventName === self::UPDATE_ITEM_OPTIONS) {
+                    $product = $observer->getEvent()->getData('quote_item');
+                }
                 $info = $product->getQty();
                 $action = 'add_to_cart';
             }
@@ -70,18 +73,6 @@ class CartAddObserver
             $sku = $product->getSku();
             $product = $this->_productRepository->get($sku);
             $id = $product->getId();
-            $qty = $updateQty;
-
-            if ($eventName === self::UPDATE_ITEM_OPTIONS) {
-                $this->_logger->info(json_encode($sku));
-                $this->_logger->info(json_encode($observer->getEvent()->getName()));
-                $this->_logger->info(json_encode($id));
-
-                //$lastId = $quote->getItemsCollection()->getLastItem();
-                //$lastId = $lastId->toString();
-
-                //$this->_logger->info(json_encode($lastId));
-            }
 
             $quoteHash = $this->_helper->encryptQuote($quote);
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
@@ -113,9 +104,9 @@ class CartAddObserver
                 }
             }
             if (count($quote->getAllVisibleItems()) > 0) {
-                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $qty);
-                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $qty);
-                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $qty);
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $info);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $info);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $info);
             }
 
             $this->_client->postEvent([

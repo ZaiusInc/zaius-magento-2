@@ -33,7 +33,7 @@ class CartRemoveObserver
         $this->_checkoutSession = $checkoutSession;
     }
 
-    public function execute(Observer $observer, $item = null, $info = null, $updateQty = null)
+    public function execute(Observer $observer, $item = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
             /** @var Quote $quote */
@@ -53,7 +53,6 @@ class CartRemoveObserver
             $sku = $item->getSku();
             $item = $this->_productRepository->get($sku);
             $id = $item->getId();
-            $qty = $updateQty;
 
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
             $eventData = [
@@ -64,9 +63,9 @@ class CartRemoveObserver
                 'valid_cart' => $this->_helper->isValidCart($quote)
             ];
             if (count($quote->getAllVisibleItems()) > 0) {
-                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $qty);
-                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $qty);
-                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $qty);
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $info);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $info);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $info);
             }
             $this->_helper->addEventToSession([
                 'type' => 'product',
