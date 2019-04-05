@@ -60,6 +60,7 @@ class LocalesRepository implements LocalesInterface
         foreach ($this->storeManager->getStores() as $store) {
             $storeCode = $store->getCode();
             $storeId = $store->getId();
+            $storeName = $store->getName();
             $locale = $this->scopeConfig->getValue('general/locale/code', \Magento\Store\Model\ScopeInterface::SCOPE_STORES, $storeCode);
             $currencyCode = $store->getCurrentCurrencyCode();
             $currencySymbol = $this->currencyFactory->create()->load($currencyCode);
@@ -71,6 +72,7 @@ class LocalesRepository implements LocalesInterface
                 'base_url' => $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB),
                 'store_code' => $storeCode,
                 'store_id' => $storeId,
+                'store_name' => $storeName,
                 'locale' => $locale,
                 'currency_code' => $currencyCode,
                 'currency_symbol' => $currencySymbol->getCurrencySymbol(),
