@@ -487,11 +487,7 @@ class Data
         if (empty($listId)) {
             $listId = 'newsletter';
         }
-        $storeName = $this->_storeManager->getStore()->getName();
-        $storeName = mb_strtolower($storeName, mb_detect_encoding($storeName));
-        $storeName = mb_ereg_replace('\s+', '_', $storeName);
-        $storeName = mb_ereg_replace('[^a-z0-9_\.\-]', '', $storeName);
-        $listId = $storeName . '_' . $listId;
-        return $this->applyGlobalIDPrefix($listId);
+        $this->_logger->info(json_encode($listId));
+        return $listId;
     }
 }
