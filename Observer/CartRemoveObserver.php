@@ -60,7 +60,8 @@ class CartRemoveObserver
                 'product_id' => $this->_helper->getProductId($item),
                 'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($item->getProduct() ?? $item),
                 'zaius_engage_version' => $this->_helper->getVersion(),
-                'valid_cart' => $this->_helper->isValidCart($quote)
+                'valid_cart' => $this->_helper->isValidCart($quote),
+                'ts' => time()
             ];
             if (count($quote->getAllVisibleItems()) > 0) {
                 $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $info);

@@ -91,7 +91,8 @@ class CartAddObserver
                 'product_id' => $this->_helper->getProductId($product),
                 'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
                 'zaius_alias_cart_id' => $quote->getId(),
-                'valid_cart' => $this->_helper->isValidCart($quote)
+                'valid_cart' => $this->_helper->isValidCart($quote),
+                'ts' => time()
             ];
             if (isset($quoteHash)) {
                 $eventData['cart_id'] = $quote->getId();

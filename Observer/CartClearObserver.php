@@ -51,7 +51,8 @@ class CartClearObserver
                         'product_id' => $this->_helper->getProductId($item),
                         'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($item->getProduct()),
                         'zaius_engage_version' => $this->_helper->getVersion(),
-                        'valid_cart' => $this->_helper->isValidCart($quote)
+                        'valid_cart' => $this->_helper->isValidCart($quote),
+                        'ts' => time()
                     ];
 
                     $this->_helper->addEventToSession([
