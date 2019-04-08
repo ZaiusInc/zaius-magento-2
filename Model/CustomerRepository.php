@@ -2,6 +2,8 @@
 
 namespace Zaius\Engage\Model;
 
+use Magento\Framework\App\RequestInterface;
+use Magento\Directory\Model\RegionFactory;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Customer\Model\ResourceModel\Customer\Collection as CustomerCollection;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
@@ -19,18 +21,26 @@ use Zaius\Engage\Logger\Logger;
 class CustomerRepository
     implements CustomerRepositoryInterface
 {
+    const ADDRESS_EVENT = 'customer_address_save_after';
+
+    protected $_request;
+    protected $_regionFactory;
     protected $_customerCollectionFactory;
     protected $_helper;
     protected $_logger;
     protected $_localeHelper;
 
     public function __construct(
+        RequestInterface $request,
+        RegionFactory $regionFactory,
         CustomerCollectionFactory $customerCollectionFactory,
         Data $helper,
         Locale $localeHelper,
         Logger $logger
     )
     {
+        $this->_request = $request;
+        $this->_regionFactory = $regionFactory;
         $this->_customerCollectionFactory = $customerCollectionFactory;
         $this->_helper = $helper;
         $this->_logger = $logger;
@@ -114,9 +124,10 @@ class CustomerRepository
 
     /**
      * @param \Magento\Customer\Model\Customer $customer
+     * @param null $eventName
      * @return mixed
      */
-    public function getCustomerEventData($customer)
+    public function getCustomerEventData($customer, $eventName = null)
     {
         $isFullCustomerObject = $customer instanceof Customer;
         $customerData = [
@@ -143,6 +154,17 @@ class CustomerRepository
             $customerData['country'] = $customer->getData("${addressType}_country_id");
             $customerData['phone'] = $customer->getData("${addressType}_telephone");
             $customerData['image_url'] = $customer->getData('image_url');
+        } else if ($eventName === self::ADDRESS_EVENT) {
+            $params = $this->_request->getParams();
+            if (is_numeric($params['region_id'])) {
+                $state = $this->_regionFactory->create()->load($params['region_id'])->getCode();
+            }
+            $customerData['street1'] = isset($params['street'][0]) ? $params['street'][0] : '';
+            $customerData['street2'] = isset($params['street'][1]) ? $params['street'][1] : '';
+            $customerData['city'] = isset($params['city']) ? $params['city'] : '';
+            $customerData['state'] = isset($state) ? $state : '';
+            $customerData['zip'] = isset($params['postcode']) ? $params['postcode'] : '';
+            $customerData['country'] = isset($params['country_id']) ? $params['country_id'] : '';
         }
         if ($isFullCustomerObject && $customer->getData('gender') == 1) {
             $customerData['gender'] = 'M';

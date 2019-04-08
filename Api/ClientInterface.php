@@ -18,9 +18,10 @@ interface ClientInterface
 
     /**
      * @param \Magento\Customer\Model\Customer $customer
+     * @param null $eventName
      * @return $this
      */
-    public function postCustomer($customer);
+    public function postCustomer($customer, $eventName = null);
 
     /**
      * @param \Magento\Sales\Model\Order $order

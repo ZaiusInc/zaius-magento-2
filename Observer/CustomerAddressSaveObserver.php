@@ -35,13 +35,14 @@ class CustomerAddressSaveObserver
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
+            $eventName = $observer->getEvent()->getName();
             /** @var Address $address */
             $address = $observer->getEvent()->getData('customer_address');
             /** @var Customer $customer */
             $customer = $this->_customerRepository->getCustomerCollection()
                 ->addFieldToFilter('entity_id', $address->getCustomer()->getId())
                 ->getFirstItem();
-            $this->_client->postCustomer($customer);
+            $this->_client->postCustomer($customer, $eventName);
         }
         return $this;
     }

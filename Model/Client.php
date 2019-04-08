@@ -63,7 +63,7 @@ class Client
      * @param mixed $object
      * @param string $url
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
     protected function _post($object, $url)
     {
@@ -181,12 +181,14 @@ class Client
 
     /**
      * @param \Magento\Customer\Model\Customer $customer
+     * @param null $eventName
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
-    public function postCustomer($customer)
+    public function postCustomer($customer, $eventName = null)
     {
-        return $this->postEntity($this->_customerRepository->getCustomerEventData($customer));
+        return $this->postEntity($this->_customerRepository->getCustomerEventData($customer, $eventName));
     }
 
     /**
@@ -194,6 +196,7 @@ class Client
      * @param string $eventType
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
     public function postOrder($order, $eventType = 'purchase')
     {
