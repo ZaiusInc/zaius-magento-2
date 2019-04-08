@@ -5,8 +5,8 @@ namespace Zaius\Engage\Observer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
+use Zaius\Engage\Helper\Data;
 
 class CustomerRegisterObserver
     implements ObserverInterface
@@ -30,14 +30,13 @@ class CustomerRegisterObserver
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
             $customer = $observer->getEvent()->getCustomer();
-            $data = $this->_customerRepository->getCustomerEventData($customer);
             $data['action'] = 'register';
             $data['zaius_engage_version'] = $this->_helper->getVersion();
-
             $this->_helper->addEventToSession([
                 'type' => 'customer',
                 'data' => $data
             ]);
         }
+        return $this;
     }
 }
