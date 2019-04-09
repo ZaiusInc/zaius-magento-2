@@ -60,8 +60,10 @@ class SystemConfigObserver
      */
     public function execute(Observer $observer)
     {
-        if ($this->_helper->getStatus($this->_storeManager->getStore())) {
-            $this->_schemaRepository->upsertObjects();
+        $id = $observer->getData('store');
+        $store = $this->_storeManager->getStore($id);
+        if ($this->_helper->getStatus($store)) {
+            $this->_schemaRepository->upsertObjects($store);
         }
     }
 }

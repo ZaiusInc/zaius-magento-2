@@ -251,17 +251,17 @@ class Client
         }
     }
 
-    public function getLists()
+    public function getLists($store = null)
     {
         $this->_logger->info(__METHOD__);
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         return $zaiusClient->getLists();
     }
 
-    public function createList($list)
+    public function createList($list, $store = null)
     {
         $this->_logger->info(__METHOD__);
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         $zaiusClient->createList($list, $this->isBatchUpdate());
     }
 

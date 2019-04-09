@@ -273,19 +273,19 @@ class SchemaRepository
         $this->_client->createObjectField($ordersObject, $delta);
     }
 
-    public function getLists()
+    public function getLists($store = null)
     {
-        return $this->_client->getLists();
+        return $this->_client->getLists($store);
     }
 
-    public function setList()
+    public function setList($store = null)
     {
-        $zaiusLists = $this->getLists();
-        $currentList = $this->_helper->getNewsletterListId();
+        $zaiusLists = $this->getLists($store);
+        $currentList = $this->_helper->getNewsletterListId($store);
         $zaiusLists = array_column($zaiusLists['lists'], 'list_id');
         if (!in_array($currentList, $zaiusLists)) {
             $list['name'] = $currentList;
-            $this->_client->createList($list);
+            $this->_client->createList($list, $store);
         }
     }
 
@@ -316,7 +316,7 @@ class SchemaRepository
     /**
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function upsertObjects()
+    public function upsertObjects($store = null)
     {
         $this->setCustomersFields();
 
@@ -326,6 +326,7 @@ class SchemaRepository
 
         $this->setOrdersFields();
 
-        $this->setList();
+        $this->setList($store);
+        $this->_logger->info('upsert finished.');
     }
 }

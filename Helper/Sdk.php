@@ -68,10 +68,10 @@ class Sdk
     /**
      * @return \ZaiusSDK\ZaiusClient
      */
-    public function getSdkClient()
+    public function getSdkClient($store = null)
     {
-        $apiKey = $this->getZaiusTrackerId();
-        $privateKey = $this->getZaiusPrivateKey();
+        $apiKey = $this->getZaiusTrackerId($store);
+        $privateKey = $this->getZaiusPrivateKey($store);
         $zaiusClient = new \ZaiusSDK\ZaiusClient($apiKey, $privateKey);
 
         $zaiusClient->setQueueDatabaseCredentials([
