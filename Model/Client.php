@@ -251,6 +251,20 @@ class Client
         }
     }
 
+    public function getLists()
+    {
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient();
+        return $zaiusClient->getLists();
+    }
+
+    public function createList($list)
+    {
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient->createList($list, $this->isBatchUpdate());
+    }
+
     protected function isBatchUpdate()
     {
         return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);

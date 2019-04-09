@@ -2,6 +2,7 @@
 
 namespace Zaius\Engage\Model;
 
+use Zaius\Engage\Helper\Data as Helper;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 
@@ -10,6 +11,8 @@ class SchemaRepository
 
     /** @var Sdk */
     protected $_client;
+
+    protected $_helper;
 
     protected $_localeHelper;
 
@@ -27,12 +30,14 @@ class SchemaRepository
      */
     public function __construct(
         Client $client,
+        Helper $helper,
         LocaleHelper $localeHelper,
         LocalesRepository $localesRepository,
         Logger $logger
     )
     {
         $this->_client = $client;
+        $this->_helper = $helper;
         $this->_localeHelper = $localeHelper;
         $this->_localesRepository = $localesRepository;
         $this->_logger = $logger;
@@ -268,6 +273,22 @@ class SchemaRepository
         $this->_client->createObjectField($ordersObject, $delta);
     }
 
+    public function getLists()
+    {
+        return $this->_client->getLists();
+    }
+
+    public function setList()
+    {
+        $zaiusLists = $this->getLists();
+        $currentList = $this->_helper->getNewsletterListId();
+        $zaiusLists = array_column($zaiusLists['lists'], 'list_id');
+        if (!in_array($currentList, $zaiusLists)) {
+            $list['name'] = $currentList;
+            $this->_client->createList($list);
+        }
+    }
+
     /**
      * @param $magentoSchema
      * @param $currentSchema
@@ -297,8 +318,6 @@ class SchemaRepository
      */
     public function upsertObjects()
     {
-        $this->_logger->info(__METHOD__);
-        //set customers fields if they don't exist
         $this->setCustomersFields();
 
         $this->setProductsFields();
@@ -306,5 +325,7 @@ class SchemaRepository
         $this->setEventsFields();
 
         $this->setOrdersFields();
+
+        $this->setList();
     }
 }
