@@ -9,8 +9,8 @@ namespace Zaius\Engage\Api;
 interface ConfigurationInterface
 {
     /**
-     * @param $jsonOpts
-     * @return string[]
+     * @param string $trackingID
+     * @return mixed[]
      */
-    public function getList($jsonOpts = null);
+    public function getList($trackingID = null);
 }

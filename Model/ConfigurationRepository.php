@@ -3,6 +3,7 @@
 namespace Zaius\Engage\Model;
 
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\App\Cache\TypeListInterface as CacheTypes;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Zaius\Engage\Api\ConfigurationInterface;
 use Zaius\Engage\Model\LocalesRepository;
@@ -20,11 +21,20 @@ class ConfigurationRepository implements ConfigurationInterface
      * @var ProductMetadataInterface
      */
     protected $_productMetadata;
+
+    /**
+     * @var CacheTypes
+     */
+    protected $_cacheTypes;
+
     /**
      * @var ScopeConfigInterface
      */
     protected $_scopeConfig;
 
+    /**
+     * @var \Zaius\Engage\Model\LocalesRepository
+     */
     protected $_localesRepository;
 
     /**
@@ -32,11 +42,15 @@ class ConfigurationRepository implements ConfigurationInterface
      */
     protected $_helper;
 
+    /**
+     * @var Logger
+     */
     protected $_logger;
 
     /**
      * ConfigurationRepository constructor.
      * @param ProductMetadataInterface $productMetadata
+     * @param CacheTypes $cacheTypes
      * @param ScopeConfigInterface $scopeConfig
      * @param LocalesRepository $localesRepository
      * @param Helper $helper
@@ -44,6 +58,7 @@ class ConfigurationRepository implements ConfigurationInterface
      */
     public function __construct(
         ProductMetadataInterface $productMetadata,
+        CacheTypes $cacheTypes,
         ScopeConfigInterface $scopeConfig,
         LocalesRepository $localesRepository,
         Helper $helper,
@@ -51,6 +66,7 @@ class ConfigurationRepository implements ConfigurationInterface
     )
     {
         $this->_productMetadata = $productMetadata;
+        $this->_cacheTypes = $cacheTypes;
         $this->_scopeConfig = $scopeConfig;
         $this->_localesRepository = $localesRepository;
         $this->_helper = $helper;
@@ -58,44 +74,36 @@ class ConfigurationRepository implements ConfigurationInterface
     }
 
     /**
-     * @param $jsonOpts
-     * @return false|mixed|string
+     * @param string $trackingID
+     * @return mixed[]
      */
-    public function getList($jsonOpts = null)
+    public function getList($trackingID = null)
     {
         $configuration = [];
-        $version = $this->_helper->getVersion();
+        //$trackingID = isset($trackingID) ? $trackingID : null;
 
-        $opts = json_decode($jsonOpts, true);
-        $zaiusTrackingId = isset($opts['zaius_tracking_id']) ? $opts['zaius_tracking_id'] : null;
-
-        // Check to see if Enterprise Edition FPC is enabled:
-//        $cacheTypes = Mage::app()->getCacheInstance()->getTypes();
-//        $fpcEnabled = false;
-//        foreach ($cacheTypes as $cacheCode => $cacheInfo) {
-//            if ($cacheCode == 'full_page' && $cacheInfo['status']) {
-//                $fpcEnabled = true;
-//                break;
-//            }
-//        }
-        $edition = $this->_productMetadata->getEdition();
-        $mversion = $this->_productMetadata->getVersion();
+        // Check to see if FPC is enabled:
+        $cacheTypes = $this->_cacheTypes->getTypes();
+        $fpcEnabled = false;
+        foreach ($cacheTypes as $cacheCode => $cacheInfo) {
+            if ($cacheCode == 'full_page' && $cacheInfo['status'] === 1) {
+                $fpcEnabled = true;
+                break;
+            }
+        }
+        $mEdition = $this->_productMetadata->getEdition();
+        $mVersion = $this->_productMetadata->getVersion();
+        $zVersion = $this->_helper->getVersion();
 
         $defaultConfig = $this->_scopeConfig->getValue('zaius_engage', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $this->_logger->info(json_encode($zaiusTrackingId));
-        $this->_logger->info(json_encode($defaultConfig['config']['zaius_tracker_id']));
-        $inDefaultConfigArray = in_array($zaiusTrackingId, array_column($defaultConfig, 'zaius_tracker_id'), true);
-//        $inDefaultConfigArray = in_array($zaiusTrackingId, array_map(function ($el) {
-//                return $el['zaius_tracker_id'];
-//            }, $defaultConfig), true);
-        if ($zaiusTrackingId === null || $inDefaultConfigArray) {
+        $inDefaultConfigArray = in_array($trackingID, array_column($defaultConfig, 'zaius_tracker_id'), true);
+        if ($trackingID === null || $inDefaultConfigArray) {
             $defaultConfiguration = array(
                 'default' => array(
-                    //'wsi_enabled' => (bool)Mage::getStoreConfig('api/config/compliance_wsi'),
-                    //'magento_fpc_enabled' => $fpcEnabled,
-                    'magento_edition' => $edition,
-                    'magento_version' => $mversion,
-                    'zaius_engage_version' => $version,
+                    'magento_fpc_enabled' => $fpcEnabled,
+                    'magento_edition' => $mEdition,
+                    'magento_version' => $mVersion,
+                    'zaius_engage_version' => $zVersion,
                     'zaius_engage_enabled' => $this->_helper->getStatus(),
                     'config' => $defaultConfig
                 )
@@ -111,26 +119,23 @@ class ConfigurationRepository implements ConfigurationInterface
             $storeId = $store['store_id'];
 
             $storeConfig = $this->_scopeConfig->getValue('zaius_engage', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode);
-            //unset($storeConfig['settings']['cart_abandon_secret_key']);
             $inStoreConfigArray = $this->_scopeConfig->getValue(
                     'zaius_engage/config/zaius_tracker_id',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeCode
-                ) == $zaiusTrackingId;
+                ) === $trackingID;
 
-            if ($zaiusTrackingId === null || $inStoreConfigArray) {
+            if ($trackingID === null || $inStoreConfigArray) {
                 $configuration[$storeCode] = array(
-                    //'magento_fpc_enabled' => $fpcEnabled,
-                    //'wsi_enabled' => (bool)Mage::getStoreConfig('api/config/compliance_wsi', $storeId),
-                    'magento_edition' => $edition,
-                    'magento_version' => $mversion,
-                    'zaius_engage_version' => $version,
+                    'magento_fpc_enabled' => $fpcEnabled,
+                    'magento_edition' => $mEdition,
+                    'magento_version' => $mVersion,
+                    'zaius_engage_version' => $zVersion,
                     'zaius_engage_enabled' => $this->_helper->getStatus(),
                     'config' => $storeConfig
                 );
             }
         }
-
-        return json_encode($configuration);
+        return $configuration;
     }
 }
