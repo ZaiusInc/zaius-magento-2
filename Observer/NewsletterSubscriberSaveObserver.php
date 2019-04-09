@@ -68,10 +68,11 @@ class NewsletterSubscriberSaveObserver
                 }
             }
 
-            $this->_client->postEvent($event);
-            $event['data']['list_id'] = 'zaius_all';
-            $this->_client->postEvent($event);
-
+            if ($subscriber->isStatusChanged()) {
+                $this->_client->postEvent($event);
+                $event['data']['list_id'] = 'zaius_all';
+                $this->_client->postEvent($event);
+            }
         }
         return $this;
     }
