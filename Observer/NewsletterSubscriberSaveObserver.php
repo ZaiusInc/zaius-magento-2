@@ -64,7 +64,7 @@ class NewsletterSubscriberSaveObserver
             if ($state !== 'adminhtml') {
                 $event['data']['vuid'] = $this->_helper->getVuid();
                 foreach ($this->_helper->getVTSRC() as $vtsrc => $value) {
-                    $event['data'][$vtsrc] = $value;
+                    $event['event'][$vtsrc] = $value;
                 }
             }
 
