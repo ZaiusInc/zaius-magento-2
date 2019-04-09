@@ -86,7 +86,8 @@ class Create extends AbstractHook
         CheckoutSession $session,
         ProductFactory $product,
         \Zaius\Engage\Cookie\ZaiusCartMode $cookie,
-        \Zaius\Engage\Logger\Logger $logger
+        \Zaius\Engage\Logger\Logger $logger,
+        \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableType
     )
     {
         parent::__construct($resultJsonFactory,$data,$context);
@@ -99,6 +100,7 @@ class Create extends AbstractHook
         $this->_product = $product;
         $this->_cookie = $cookie;
         $this->_logger = $logger;
+        $this->_configurable = $configurableType;
     }
 
     /**
@@ -126,9 +128,10 @@ class Create extends AbstractHook
 //            If default/"overwrite" mode AND there was a previous cart: zaius_cart_result = "overwritten"
 //            If "append" AND there was a previous cart: zaius_cart_result = "appended"
 //            If "noconflict" AND there was a previous cart: zaius_cart_result = "ignored"
-            $this->_cookie->set('not_applicable');
+            $this->_cookie->set('not applicable');
             $cookie = $this->_cookie->get();
             $zaiusCartMode = $request->getParam('zaius_cart_mode');
+            // var_dump($quote->getItems()[1]->getProduct()->getId()); die();
             switch ($zaiusCartMode) {
                 case 'noconflict':
                     //causes the platform to ignore the cart string if there is already a pre-existing cart
@@ -152,14 +155,38 @@ class Create extends AbstractHook
                         if ($v > 0){
                             //todo strip locale here?
                             //$k = strstr($k, '$', true) ?: $k;
-                            $product = $this->_product->create()->load($k); //load is depreciated, maybe just move getID to if?
-                            //$product = $this->_product->create()->getId($k);
-                            if ($product->getId()) {
-                                $quote->addProduct(
-                                    $product,
-                                    intval($v)
-                                );
+
+                            $product = $this->_product->create()->load($k);
+
+                            // TODO: Update to reference the interface const:
+                            if ($product->getVisibility() == 1) {
+                                $parentIds = $this->_configurable->getParentIdsByChild($product->getId());
+                                if (count($parentIds) > 0) {
+                                    $parentProduct = $this->_product->create()->load($parentIds[0]);
+                                    $productAttributeOptions = $parentProduct->getTypeInstance(true)->getConfigurableAttributesAsArray($parentProduct);
+                                    foreach($productAttributeOptions as $option) {
+                                        $options[$option['attribute_id']] =  $product->getData($option['attribute_code']);
+                                    }
+                                    $request = new \Magento\Framework\DataObject();
+                                    $request->setData([
+                                        'product_id' => $parentProduct->getId(),
+                                        "qty" => intval($v),
+                                        "selected_configurable_option" => $product->getId(),
+                                        "super_attribute" => $options
+                                    ]);
+                                    $response = $quote->addProduct($parentProduct, $request);
+                                }
+                            } else {
+                                if ($product->getId()) {
+                                    $quote->addProduct(
+                                        $product,
+                                        intval($v)
+                                    );
+                                }
                             }
+                            //load is depreciated, maybe just move getID to if?
+                            //$product = $this->_product->create()->getId($k);
+
                         }
                     }
                     $this->_cart->save($quote);
