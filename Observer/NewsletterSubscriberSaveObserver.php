@@ -40,9 +40,11 @@ class NewsletterSubscriberSaveObserver
             switch ($subscriber->getSubscriberStatus()) {
                 case Subscriber::STATUS_SUBSCRIBED:
                     $action = 'subscribe';
+                    $subscribed = true;
                     break;
                 case Subscriber::STATUS_UNSUBSCRIBED:
                     $action = 'unsubscribe';
+                    $subscribed = false;
                     break;
                 default:
                     return $this;
@@ -50,24 +52,28 @@ class NewsletterSubscriberSaveObserver
 
             $event = array();
             $event['type'] = 'list';
-            $event['data']['action'] = $action;
+            $event['action'] = $action;
             $event['data']['list_id'] = $this->_helper->getNewsletterListId();
             $event['data']['email'] = $subscriber->getSubscriberEmail();
+            $event['data']['subscribed'] = $subscribed;
+            $event['data']['store_id'] = $subscriber->getStoreId();
+            $event['data']['ts'] = strtotime($subscriber->getChangeStatusAt());
             $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
 
             $state = $this->_state->getAreaCode();
 
             if ($state !== 'adminhtml') {
-                $event['data']['vuid'] = $this->_helper->getVuid();
+                $event['identifiers']['vuid'] = $this->_helper->getVuid();
                 foreach ($this->_helper->getVTSRC() as $vtsrc => $value) {
                     $event['data'][$vtsrc] = $value;
                 }
             }
 
-            $this->_client->postEvent($event);
-            $event['data']['list_id'] = 'zaius_all';
-            $this->_client->postEvent($event);
-
+            if ($subscriber->isStatusChanged()) {
+                $this->_client->postEvent($event);
+                $event['data']['list_id'] = 'zaius_all';
+                $this->_client->postEvent($event);
+            }
         }
         return $this;
     }

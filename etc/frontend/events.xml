@@ -7,8 +7,14 @@
     <event name="checkout_cart_add_product_complete">
         <observer name="zaius_engage_add_to_cart" instance="Zaius\Engage\Observer\CartAddObserver"/>
     </event>
+    <event name="checkout_cart_product_update_after">
+        <observer name="zaius_engage_update_cart_item" instance="Zaius\Engage\Observer\CartAddObserver"/>
+    </event>
     <event name="checkout_cart_update_items_before">
         <observer name="zaius_engage_update_cart" instance="Zaius\Engage\Observer\CartUpdateObserver"/>
+    </event>
+    <event name="checkout_cart_save_after">
+        <observer name="zaius_engage_clear_cart" instance="Zaius\Engage\Observer\CartClearObserver"/>
     </event>
     <event name="sales_quote_remove_item">
         <observer name="zaius_engage_quote" instance="Zaius\Engage\Observer\CartRemoveObserver"/>

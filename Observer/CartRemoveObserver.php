@@ -4,6 +4,7 @@ namespace Zaius\Engage\Observer;
 
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Magento\Framework\Event\Observer;
@@ -15,16 +16,19 @@ class CartRemoveObserver
     implements ObserverInterface
 {
     protected $_storeManager;
+    protected $_productRepository;
     protected $_helper;
     protected $_checkoutSession;
 
     public function __construct(
         StoreManagerInterface $storeManager,
+        ProductRepository $productRepository,
         Data $helper,
         CheckoutSession $checkoutSession
     )
     {
         $this->_storeManager = $storeManager;
+        $this->_productRepository = $productRepository;
         $this->_helper = $helper;
         $this->_checkoutSession = $checkoutSession;
     }
@@ -45,6 +49,11 @@ class CartRemoveObserver
                 $action = 'remove_from_cart';
             }
 
+            /** @var Product $item */
+            $sku = $item->getSku();
+            $item = $this->_productRepository->get($sku);
+            $id = $item->getId();
+
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
             $eventData = [
                 'action' => $action,
@@ -52,10 +61,13 @@ class CartRemoveObserver
                 'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($item->getProduct() ?? $item),
                 'zaius_engage_version' => $this->_helper->getVersion(),
                 'valid_cart' => $this->_helper->isValidCart($quote),
-                'cart_json' => $this->_helper->prepareCartJSON($quote, $info),
-                'cart_param' => $this->_helper->prepareZaiusCart($quote, $info),
-                'cart_url' => $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info)
+                'ts' => time()
             ];
+            if (count($quote->getAllVisibleItems()) > 0) {
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $info);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $info);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $info);
+            }
             $this->_helper->addEventToSession([
                 'type' => 'product',
                 'data' => $eventData

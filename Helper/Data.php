@@ -6,6 +6,7 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -43,6 +44,7 @@ class Data
     protected $_localeHelper;
     protected $_sdk;
     protected $_logger;
+    protected $_productRepository;
 
     public function __construct(
         CookieManagerInterface $cookieManager,
@@ -56,7 +58,8 @@ class Data
         Context $context,
         Sdk $sdk,
         LocaleHelper $localeHelper,
-        Logger $logger
+        Logger $logger,
+        ProductRepository $productRepository
     )
     {
         $this->_cookieManager = $cookieManager;
@@ -70,6 +73,7 @@ class Data
         $this->_localeHelper = $localeHelper;
         $this->_sdk = $sdk;
         $this->_logger = $logger;
+        $this->_productRepository = $productRepository;
         parent::__construct($context);
     }
 
@@ -176,22 +180,29 @@ class Data
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
             return false;
         }
-        if ($quote->getItemsCount()){
+        if (count($quote->getAllVisibleItems()) > 0){
             return true;
         }
         return false;
     }
 
-    public function prepareCartJSON($quote, $info)
+    public function prepareCartJSON($quote, $id = null, $info = null)
     {
+        /** @var Quote $quote */
         if ($quote->getItemsCount() == 0) {
             return array('items' => []);
         }
         $items = $quote->getAllVisibleItems();
         $json = array();
         foreach ($items as $item) {
-            $pid = $this->getProductId($item);
-            $qty = $info[$item->getId()]['qty'] ?? $info;
+            /** @var Product $product */
+            $product = $this->_productRepository->get($item->getSku());
+            $pid = $this->getProductId($product);
+            if (strtok($pid, '$') == $id) {
+                $qty = $info[$item->getId()]['qty'] ?? $info;
+            } else {
+                $qty = $info[$item->getId()]['qty'] ?? $item->getQty();
+            }
             $data = [
                 'product_id' => $pid,
                 'quantity' => $qty
@@ -199,20 +210,20 @@ class Data
             $json['items'][] = $data;
         }
         // only add details if a cart has applied rules
-        // slating for later
-//        if ($quote->getAppliedRuleIds()) {
-//            $this->_logger->info("A Product Has A Price Rule: " . $quote->getAppliedRuleIds());
-//            foreach ($quote->getAppliedRuleIds() as $ruleId){
-//                $rule = $this->_ruleRepository->getById($ruleId);
-//                $ruleDescription = $rule->getDescription();
-//            }
-//            $json['details']['valid_until'] = time();
-//            $json['details']['currency_symbol'] = '0';
-//            $json['details']['original_value'] = $quote->getGrandTotal();
-//            $json['details']['discounted_value'] = $quote->getSubtotalWithDiscount();
-//            $json['details']['discount'] = '0';
-//            $json['details']['discount_percent'] = '0';
-//        }
+        //todo ZAIR-77
+        //if ($quote->getAppliedRuleIds()) {
+        //    $this->_logger->info("A Product Has A Price Rule: " . $quote->getAppliedRuleIds());
+        //    foreach ($quote->getAppliedRuleIds() as $ruleId){
+        //        $rule = $this->_ruleRepository->getById($ruleId);
+        //        $ruleDescription = $rule->getDescription();
+        //    }
+        //    $json['details']['valid_until'] = time();
+        //    $json['details']['currency_symbol'] = '0';
+        //    $json['details']['original_value'] = $quote->getGrandTotal();
+        //    $json['details']['discounted_value'] = $quote->getSubtotalWithDiscount();
+        //    $json['details']['discount'] = '0';
+        //    $json['details']['discount_percent'] = '0';
+        //}
         return json_encode($json);
     }
 
@@ -221,7 +232,7 @@ class Data
         return $baseUrl . 'zaius/hook/create/client_id/' . $this->getZaiusTrackerId() . '/zaius_cart/';
     }
 
-    public function prepareZaiusCart($quote, $info)
+    public function prepareZaiusCart($quote, $id, $info)
     {
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
             return false;
@@ -230,12 +241,18 @@ class Data
         $this->_logger->info('Logging zaiusCart: ' . json_encode($quote->getItemsCount()));
         $zaiusCart = array();
         foreach ($items as $item) {
-            $pid = $this->getProductId($item);
-            $qty = $item->getQty();
+            /** @var Product $product */
+            $product = $this->_productRepository->get($item->getSku());
+            $pid = $this->getProductId($product);
+            if (strtok($pid, '$') == $id) {
+                $qty = $info[$item->getId()]['qty'] ?? $info;
+                $this->_logger->info("pid !== id");
+            } else {
+                $qty = $info[$item->getId()]['qty'] ?? $item->getQty();
+            }
             $data = $pid .':'.$qty;
             $zaiusCart[] = $data;
         }
-        $this->_logger->info('Logging zaiusCart: ' . json_encode($zaiusCart));
         //todo determine website/store view, return link?
         return implode(',',$zaiusCart);
     }
@@ -312,7 +329,6 @@ class Data
         $substr = 'zaius_alias_';
         $zaiusAliasCookies = array();
         foreach ($_COOKIE as $key => $value) {
-            // if (substr($key, 0, strlen($substr)) === $substr) {}
             if (strpos($key,$substr) !== false) {
                 $cookie = $this->_cookieManager->getCookie($key);
                 $zaiusAliasCookies[] = $cookie;
@@ -471,11 +487,7 @@ class Data
         if (empty($listId)) {
             $listId = 'newsletter';
         }
-        $storeName = $this->_storeManager->getStore()->getName();
-        $storeName = mb_strtolower($storeName, mb_detect_encoding($storeName));
-        $storeName = mb_ereg_replace('\s+', '_', $storeName);
-        $storeName = mb_ereg_replace('[^a-z0-9_\.\-]', '', $storeName);
-        $listId = $storeName . '_' . $listId;
-        return $this->applyGlobalIDPrefix($listId);
+        $this->_logger->info(json_encode($listId));
+        return $listId;
     }
 }

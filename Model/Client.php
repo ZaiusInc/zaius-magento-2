@@ -63,7 +63,7 @@ class Client
      * @param mixed $object
      * @param string $url
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
     protected function _post($object, $url)
     {
@@ -147,7 +147,8 @@ class Client
                     );
                     $s3Client->uploadEvents($event);
                 }
-                $zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
+                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                //$zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
                 break;
             case 'product':
                 if ($this->isBatchUpdate()) {
@@ -172,6 +173,8 @@ class Client
                     );
                     $s3Client->uploadOrders($event);
                 }
+                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                break;
             default:
                 return $this->_post($event, $this->getApiBaseUrl() . '/events', $this->isBatchUpdate());
         }
@@ -179,12 +182,14 @@ class Client
 
     /**
      * @param \Magento\Customer\Model\Customer $customer
+     * @param null $eventName
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
-    public function postCustomer($customer)
+    public function postCustomer($customer, $eventName = null)
     {
-        return $this->postEntity($this->_customerRepository->getCustomerEventData($customer));
+        return $this->postEntity($this->_customerRepository->getCustomerEventData($customer, $eventName));
     }
 
     /**
@@ -192,11 +197,11 @@ class Client
      * @param string $eventType
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
     public function postOrder($order, $eventType = 'purchase')
     {
         return $this->postEvent($this->_orderRepository->getOrderEventData($order, $eventType, true));
-
     }
 
     /**
@@ -209,6 +214,56 @@ class Client
     {
         $zaiusClient = $this->_sdk->getSdkClient();
         return $zaiusClient->postProduct($this->_productRepository->getProductEventData($event, $product), $this->isBatchUpdate());
+    }
+
+    /**
+     * @param $objectName string
+     * @return mixed
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function getObjectFields($objectName)
+    {
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient();
+        return $zaiusClient->getObjectFields($objectName);
+    }
+
+    /**
+     * @param $objectName string
+     * @param $fieldArray array
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function createObjectField($objectName, $fieldArray = array())
+    {
+        $this->_logger->info(__METHOD__);
+        if (empty($fieldArray)) {
+            $this->_logger->info('$fieldArray empty.');
+            return;
+        }
+        $zaiusClient = $this->_sdk->getSdkClient();
+        foreach ($fieldArray as $field) {
+            $fieldName = $field['name'];
+            $type = $field['type'];
+            $displayName = $field['display_name'];
+            $description = $field['description'];
+
+            $this->_logger->info($fieldName . ' ' . $type . ' ' . $displayName . ' ' . $description);
+            $zaiusClient->createObjectField($objectName, $fieldName, $type, $displayName, $description, $this->isBatchUpdate());
+        }
+    }
+
+    public function getLists($store = null)
+    {
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient($store);
+        return $zaiusClient->getLists();
+    }
+
+    public function createList($list, $store = null)
+    {
+        $this->_logger->info(__METHOD__);
+        $zaiusClient = $this->_sdk->getSdkClient($store);
+        $zaiusClient->createList($list, $this->isBatchUpdate());
     }
 
     protected function isBatchUpdate()

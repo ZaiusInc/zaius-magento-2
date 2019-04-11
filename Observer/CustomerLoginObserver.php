@@ -30,7 +30,6 @@ class CustomerLoginObserver
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
             $customer = $observer->getEvent()->getCustomer();
-            $data = $this->_customerRepository->getCustomerEventData($customer);
             $data['action'] = 'login';
             $data['zaius_engage_version'] = $this->_helper->getVersion();
             $this->_helper->addEventToSession([

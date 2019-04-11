@@ -23,7 +23,8 @@ interface CustomerRepositoryInterface
 
     /**
      * @param \Magento\Customer\Model\Customer $customer
+     * @param null $eventName
      * @return mixed
      */
-    public function getCustomerEventData($customer);
+    public function getCustomerEventData($customer, $eventName = null);
 }

@@ -5,6 +5,7 @@ namespace Zaius\Engage\Observer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Helper\Data;
@@ -15,7 +16,10 @@ use Zaius\Engage\Logger\Logger;
 class CartAddObserver
     implements ObserverInterface
 {
+    const UPDATE_ITEM_OPTIONS = 'checkout_cart_product_update_after';
+
     protected $_storeManager;
+    protected $_productRepository;
     protected $_helper;
     protected $_client;
     protected $_checkoutSession;
@@ -23,6 +27,7 @@ class CartAddObserver
 
     public function __construct(
         StoreManagerInterface $storeManager,
+        ProductRepository $productRepository,
         Data $helper,
         Client $client,
         CheckoutSession $checkoutSession,
@@ -30,6 +35,7 @@ class CartAddObserver
     )
     {
         $this->_storeManager = $storeManager;
+        $this->_productRepository = $productRepository;
         $this->_helper = $helper;
         $this->_client = $client;
         $this->_checkoutSession = $checkoutSession;
@@ -39,6 +45,8 @@ class CartAddObserver
     public function execute(Observer $observer, $product = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
+
+            $eventName = $observer->getEvent()->getName();
 
             /** @var Quote $quote */
             $quote = $this->_checkoutSession->getQuote();
@@ -54,9 +62,18 @@ class CartAddObserver
             if (is_null($product)){
                 /** @var Product $product */
                 $product = $observer->getEvent()->getData('product');
+                if ($eventName === self::UPDATE_ITEM_OPTIONS) {
+                    $product = $observer->getEvent()->getData('quote_item');
+                }
                 $info = $product->getQty();
                 $action = 'add_to_cart';
             }
+
+            /** @var Product $product */
+            $sku = $product->getSku();
+            $product = $this->_productRepository->get($sku);
+            $id = $product->getId();
+
             $quoteHash = $this->_helper->encryptQuote($quote);
             $baseUrl = $this->_storeManager->getStore($quote->getStoreId())->getBaseUrl();
 
@@ -75,9 +92,7 @@ class CartAddObserver
                 'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
                 'zaius_alias_cart_id' => $quote->getId(),
                 'valid_cart' => $this->_helper->isValidCart($quote),
-                'cart_json' => $this->_helper->prepareCartJSON($quote, $info),
-                'cart_param' => $this->_helper->prepareZaiusCart($quote, $info),
-                'cart_url' => $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $info)
+                'ts' => time()
             ];
             if (isset($quoteHash)) {
                 $eventData['cart_id'] = $quote->getId();
@@ -88,6 +103,11 @@ class CartAddObserver
                 foreach ($vtsrc as $field => $value) {
                     $eventData[$field] = $value;
                 }
+            }
+            if (count($quote->getAllVisibleItems()) > 0) {
+                $eventData['cart_json'] = $this->_helper->prepareCartJSON($quote, $id, $info);
+                $eventData['cart_param'] = $this->_helper->prepareZaiusCart($quote, $id, $info);
+                $eventData['cart_url'] = $this->_helper->prepareZaiusCartUrl($baseUrl) . $this->_helper->prepareZaiusCart($quote, $id, $info);
             }
 
             $this->_client->postEvent([

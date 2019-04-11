@@ -22,18 +22,12 @@ By far the quickest and easiest way to install and maintain the Zaius connector 
 2. Install the Zaius Magento 2 package.
 3. Finally, make sure the package is up-to-date.
 
-```bash
-composer require zaius/zaius-magento-2
-composer install
-composer update zaius/*
-```
-
-Note: during beta testing, you will need to specify your willingness to use the beta releases of both the module and the underlying PHP SDK:
+Note: as we continue validating the robustness of the module, you will need to specify your willingness to use the release candidates of both the module and the underlying PHP SDK:
 
 1. Edit your `<MAGENTO_ROOT>/composer.json` file:
 
 ```bash
-"minimum-stability" "beta",
+"minimum-stability" "RC",
 "prefer-stable": true
 ```
 
@@ -45,27 +39,27 @@ composer install
 composer update zaius/*
 ```
 
-### ZIP
+### Alternative install: ZIP
 
 1. Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
 2. Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
 
 ## Verify & Enable the Zaius Magento 2 Connector
 
-To verify that the extension installed properly, run the following command:
+1. To verify that the extension installed properly, run the following command:
 
 ```bash
 php bin/magento module:status
 ```
 
-By default, the extension is probably disabled:
+By default, the extension is probably disabled, and you will see output like this:
 
 ```bash
 List of disabled modules:
 Zaius_Engage
 ```
 
-Enable the extension and clear static view files:
+2. Enable the extension and clear static view files:
 
 ```bash
 php bin/magento module:enable Zaius_Engage --clear-static-content
@@ -83,19 +77,19 @@ Generated classes cleared successfully. Please run the 'setup:di:compile' comman
 Generated static view files cleared successfully.
 ```
 
-Register the extension:
+3. Register the extension:
 
 ```bash
 php bin/magento setup:upgrade
 ```
 
-Recompile your Magento project:
+4. Recompile your Magento project:
 
 ```bash
 php bin/magento setup:di:compile
 ```
 
-Verify that the extension is enabled:
+5. Verify that the extension is enabled:
 
 ```bash
 php bin/magento module:status
@@ -111,7 +105,7 @@ List of disabled modules:
 None
 ```
 
-Clean the cache:
+6. Clean the cache:
 
 ```bash
 php bin/magento cache:clean

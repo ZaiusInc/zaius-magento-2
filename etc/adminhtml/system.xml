@@ -23,14 +23,14 @@
                         Zaius Engage Version
                     </comment>
                 </field>
-                <field id="composer" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="composer" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Composer Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
                     <comment>
                         Checks if Composer is installed.
                     </comment>
                 </field>
-                <field id="sdk" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sdk" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>SDK Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
                     <comment>
@@ -46,12 +46,14 @@
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="zaius_private_api" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Zaius Private API Key</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="amazon_active" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled Amazon S3</label>
@@ -109,8 +111,6 @@
                     <label>Timeout</label>
                     <comment>Number of seconds to wait before timing out the connection to Zaius.</comment>
                 </field>
-
-
             </group>
 
             <group id="schema_update" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -118,16 +118,6 @@
                 <field id="schema_update" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Update Schema?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\SchemaUpdateButton</frontend_model>
-                </field>
-            </group>
-
-
-            <group id="batch_updates" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Batch Updates</label>
-                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enabled?</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Send events to Zaius in a Batched Process, lowering use of resources.</comment>
                 </field>
             </group>
 

@@ -40,5 +40,12 @@
         </resources>
     </route>
 
+    <route url="/V1/zaius/engage/configuration" method="GET">
+        <service class="Zaius\Engage\Api\ConfigurationInterface" method="getList"/>
+        <resources>
+            <resource ref="Zaius_Engage::api"/>
+        </resources>
+    </route>
+
 
 </routes>

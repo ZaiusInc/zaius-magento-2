@@ -2,5 +2,34 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
     <action name="zaius/hook/create">
         <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/cart/index">
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/cart/add">
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/cart/delete">
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/cart/updatePost">
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/cart/updateItemOptions">
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/sidebar/removeItem">
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="checkout/sidebar/updateItemQty">
+        <section name="cart"/>
+        <section name="checkout-data"/>
     </action>
 </config>

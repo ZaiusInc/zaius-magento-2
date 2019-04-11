@@ -111,7 +111,6 @@ class OrderRepository
             $ip = $order->getRemoteIp();
         }
         $orderEventData = [
-            'action' => $eventType,
             'ip' => $ip,
             'ua' => '',
             'order' => $this->getOrderData($order, $eventType)
@@ -119,9 +118,9 @@ class OrderRepository
         if ($order->getCreatedAt()) {
             $orderEventData['ts'] = strtotime($order->getCreatedAt());
         }
-        if ($sendVuid) {
-            $orderEventData['vuid'] = $this->_helper->getVuid();
-        }
+        //if ($sendVuid) {
+            $identifiers['vuid'] = $this->_helper->getVuid();
+        //}
         $store = $order->getStore();
         if ($store) {
             if ($store->getWebsite()) {
@@ -155,6 +154,8 @@ class OrderRepository
         }
         return [
             'type' => 'order',
+            'action' => $eventType,
+            'identifiers' => $identifiers,
             'data' => $orderEventData,
             'broken' => $broken
         ];
