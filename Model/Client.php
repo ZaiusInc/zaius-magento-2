@@ -147,7 +147,8 @@ class Client
                     );
                     $s3Client->uploadEvents($event);
                 }
-                $zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
+                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                //$zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
                 break;
             case 'product':
                 if ($this->isBatchUpdate()) {
