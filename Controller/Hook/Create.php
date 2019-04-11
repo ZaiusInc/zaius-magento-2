@@ -189,7 +189,9 @@ class Create extends AbstractHook
 
                         }
                     }
-                    $this->_cart->save($quote);
+                    $cart = $this->_cart->save($quote);
+                    $cart = $this->_cart->get($quote->getId())->setIsActive(true);
+                    $cart = $this->_cart->get($quote->getId())->collectTotals()->save();
                     $this->_session->replaceQuote($quote)->unsLastRealOrderId();
             }
         } catch (\Exception $e) {
