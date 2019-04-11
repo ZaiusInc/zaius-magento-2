@@ -139,10 +139,10 @@ class CustomerRepository
             'store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId())
         ];
         $addressType = null;
-        if ($isFullCustomerObject && $customer->getData('default_billing')) {
-            $addressType = 'billing';
-        } else if ($isFullCustomerObject && $customer->getData('default_shipping')) {
+        if ($isFullCustomerObject && $customer->getData('default_shipping')) {
             $addressType = 'shipping';
+        } else if ($isFullCustomerObject && $customer->getData('default_billing')) {
+            $addressType = 'billing';
         }
         if (isset($addressType)) {
             $streetParts = preg_split('/\r\n|\r|\n/', ($customer->getData("${addressType}_street") ? $customer->getData("${addressType}_street") : ''));
