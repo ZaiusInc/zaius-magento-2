@@ -68,6 +68,9 @@ class Client
     protected function _post($object, $url)
     {
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->call($object, 'POST', $url, $this->isBatchUpdate());
 
     }
@@ -81,6 +84,9 @@ class Client
     public function postEntity($entity)
     {
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         switch ($entity['type']) {
             case 'product':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
@@ -137,6 +143,9 @@ class Client
     public function postEvent($event)
     {
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         switch ($event['type']) {
             case 'list':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
@@ -213,6 +222,9 @@ class Client
     public function postProduct($event, $product)
     {
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->postProduct($this->_productRepository->getProductEventData($event, $product), $this->isBatchUpdate());
     }
 
@@ -225,6 +237,9 @@ class Client
     {
         $this->_logger->info(__METHOD__);
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->getObjectFields($objectName);
     }
 
@@ -241,6 +256,9 @@ class Client
             return;
         }
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         foreach ($fieldArray as $field) {
             $fieldName = $field['name'];
             $type = $field['type'];

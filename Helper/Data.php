@@ -414,6 +414,9 @@ class Data
     {
         if ($this->isBatchUpdate()) {
             $zaiusClient = $this->_sdk->getSdkClient();
+            if (null === $zaiusClient) {
+                return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+            }
             $event = Client::transformForBatchEvent($event);
             if (!isset($event['identifiers'])) {
                 $vuid = $this->getVuid();
@@ -433,6 +436,9 @@ class Data
                 $events = [];
             }
             $events[] = $event;
+            if (!$this->getZaiusTrackerId() || !$this->getZaiusPrivateKey()) {
+                return json_decode('{"Status":"Failure. Zaius keys can not be null."}', true);
+            }
             $this->_session->setEvents($events);
             $this->_session->setCacheBuster(time());
         }
