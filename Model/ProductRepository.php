@@ -21,10 +21,13 @@ use Zaius\Engage\Logger\Logger;
 class ProductRepository implements ProductRepositoryInterface
 {
     protected static $PRODUCT_ATTRIBUTES_TO_IGNORE = array(
+        // These fields are suppressed because there's no clear path to utility in Zaius.
         'entity_id', 'attribute_set_id', 'type_id',
         'entity_type_id', 'category_ids', 'required_options',
         'has_options', 'created_at', 'updated_at', 'media_gallery',
-        'image', 'small_image', 'thumbnail', 'quantity_and_stock_status',
+        'small_image', 'thumbnail', 'quantity_and_stock_status',
+        // The next fields are suppressed because they're explicitly mapped.
+        'image', 'special_from_date', 'special_to_date',
     );
 
     protected $_storeManager;
@@ -121,8 +124,8 @@ class ProductRepository implements ProductRepositoryInterface
         ];
         if ($product->getData('special_price')) {
             $productData['special_price'] = $product->getData('special_price');
-            $productData['special_price_from_date'] = $product->getData('special_from_date');
-            $productData['special_price_to_date'] = $product->getData('special_to_date');
+            $productData['special_price_from_date'] = strtotime($product->getData('special_from_date')) ?: null;
+            $productData['special_price_to_date'] = strtotime($product->getData('special_to_date')) ?: null;
         }
         $stockItem = $this->_stockRegistry->getStockItem($product->getId());
         if ($stockItem && $stockItem->getId() && $stockItem->getManageStock()) {
