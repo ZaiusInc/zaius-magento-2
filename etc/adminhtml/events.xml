@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="controller_action_predispatch">
+        <observer name="zaius_engage_system_checks" instance="Zaius\Engage\Observer\SystemChecks"/>
+    </event>
     <event name="admin_system_config_changed_section_zaius_engage">
         <observer name="zaius_engage_changed_section" instance="Zaius\Engage\Observer\SystemConfigObserver"/>
     </event>
