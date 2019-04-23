@@ -3,21 +3,18 @@
 namespace Zaius\Engage\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Json\Encoder;
 use Magento\Framework\HTTP\Client\CurlFactory;
+use Magento\Framework\Json\Encoder;
+use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ClientInterface;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
-use Zaius\Engage\Api\ListItemInterface;
 use Zaius\Engage\Api\OrderRepositoryInterface;
-use Zaius\Engage\Api\ProductListItemInterfaceFactory;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
 
-class Client
-    implements ClientInterface
+class Client implements ClientInterface
 {
     const XML_PATH_BATCH_ENABLED = 'zaius_engage/batch_updates/status';
 
@@ -44,8 +41,7 @@ class Client
         Sdk $sdk,
         ScopeConfigInterface $scopeConfig,
         Encoder $encoder
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_curlFactory = $curlFactory;
@@ -83,6 +79,7 @@ class Client
      */
     public function postEntity($entity)
     {
+        $entity['data'] += $this->_helper->getDataSourceFields();
         $zaiusClient = $this->_sdk->getSdkClient();
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
@@ -142,6 +139,7 @@ class Client
      */
     public function postEvent($event)
     {
+        $event['data'] += $this->_helper->getDataSourceFields();
         $zaiusClient = $this->_sdk->getSdkClient();
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);

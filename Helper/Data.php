@@ -393,6 +393,7 @@ class Data extends AbstractHelper
 
     public function addEventToRegistry($event)
     {
+        $event['data'] += $this->getDataSourceFields();
         $events = $this->_registry->registry(self::EVENTS_REGISTRY_KEY);
         if (!$events) {
             $events = [$event];
@@ -410,6 +411,7 @@ class Data extends AbstractHelper
      */
     public function addEventToSession($event)
     {
+        $event['data'] += $this->getDataSourceFields();
         if ($this->isBatchUpdate()) {
             $zaiusClient = $this->_sdk->getSdkClient();
             if (null === $zaiusClient) {
