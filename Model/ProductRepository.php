@@ -139,6 +139,7 @@ class ProductRepository implements ProductRepositoryInterface
         if (!$product->getImage()) {
             $this->_logger->error('ZAIUS: Unable to retrieve product image_url');
         }
+        $productData += $this->_helper->getDataSourceFields();
         $this->_logger->info("Event: $event");
         return $productData;
     }
