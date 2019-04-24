@@ -2,17 +2,13 @@
 
 namespace Zaius\Engage\Block;
 
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Catalog\Model\Category;
 use Magento\Framework\Json\Encoder as JsonEncoder;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
-use Zaius\Engage\Api\EventInterface;
-use Zaius\Engage\Model\Session;
 use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Model\Session;
 
-class Snippet
-    extends Template
+class Snippet extends Template
 {
     protected $_helper;
     protected $_session;
@@ -26,8 +22,7 @@ class Snippet
         JsonEncoder $jsonEncoder,
         Template\Context $context,
         array $data = []
-    )
-    {
+    ) {
         $this->_helper = $helper;
         $this->_session = $session;
         $this->_registry = $registry;
@@ -77,13 +72,18 @@ class Snippet
             }
         }
         if (!$hasPageViewEvent) {
-            array_unshift($events, ['type' => 'pageview', 'data' => []]);
+            $pvEvent = [
+                'type' => 'pageview',
+                'data' => [],
+            ];
+            $pvEvent['data'] += $this->_helper->getDataSourceFields();
+            array_unshift($events, $pvEvent);
         }
 
         $registryEvents = $this->_registry->registry(Data::EVENTS_REGISTRY_KEY);
-        if(is_array($registryEvents) && count($registryEvents)) {
-            foreach($registryEvents as $registryEvent) {
-                $events[]=$registryEvent;
+        if (is_array($registryEvents) && count($registryEvents)) {
+            foreach ($registryEvents as $registryEvent) {
+                $events[] = $registryEvent;
             }
         }
 
@@ -98,6 +98,9 @@ class Snippet
     {
         if ($event['type'] == 'anonymize') {
             return 'zaius.anonymize();';
+        }
+        if (isset($event['data']) && isset($event['data']['data_source_details'])) {
+            $event['data']['data_source_details'] .= 'Sent via Zaius web SDK;';
         }
         return "zaius.event('" . $event['type'] . "', " . $this->_jsonEncoder->encode($event['data']) . ");";
     }

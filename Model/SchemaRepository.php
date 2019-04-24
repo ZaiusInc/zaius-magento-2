@@ -34,8 +34,7 @@ class SchemaRepository
         LocaleHelper $localeHelper,
         LocalesRepository $localesRepository,
         Logger $logger
-    )
-    {
+    ) {
         $this->_client = $client;
         $this->_helper = $helper;
         $this->_localeHelper = $localeHelper;
@@ -53,19 +52,19 @@ class SchemaRepository
             'name' => 'magento_website',
             'display_name' => 'Magento Website',
             'type' => 'string',
-            'description' => 'Website from which this customer originated (according to the Magento Webite > Store > Store View hierachy.)'
+            'description' => 'Website from which this customer originated (according to the Magento Webite > Store > Store View hierachy.)',
         ];
         $magentoStore = [
             'name' => 'magento_store',
             'display_name' => 'Magento Store',
             'type' => 'string',
-            'description' => 'Store from which this customer originated (according to the Magento Website > Store > Store View hierachy.)'
+            'description' => 'Store from which this customer originated (according to the Magento Website > Store > Store View hierachy.)',
         ];
         $magentoStoreView = [
             'name' => 'magento_store_view',
             'display_name' => 'Magento Store View',
             'type' => 'string',
-            'description' => 'Store View from which this customer originated (according to the Magento Website > Store > Store View hierachy.)'
+            'description' => 'Store View from which this customer originated (according to the Magento Website > Store > Store View hierachy.)',
         ];
 
         return array($magentoWebsite, $magentoStore, $magentoStoreView);
@@ -116,51 +115,58 @@ class SchemaRepository
             'name' => 'qty',
             'display_name' => 'Quantity',
             'type' => 'number',
-            'description' => 'Number of units of this product available in inventory.'
+            'description' => 'Number of units of this product available in inventory.',
         ];
         $magentoSchema[] = $qty;
         $isInStock = [
             'name' => 'is_in_stock',
             'display_name' => 'Is In Stock',
             'type' => 'boolean',
-            'description' => 'Whether the product should be considered in stock according to Magento settings.'
+            'description' => 'Whether the product should be considered in stock according to Magento settings.',
         ];
         $magentoSchema[] = $isInStock;
         $description = [
             'name' => 'description',
             'display_name' => 'Description',
             'type' => 'string',
-            'description' => 'Full-text or HTML product description as displayed on the web site.'
+            'description' => 'Full-text or HTML product description as displayed on the web site.',
         ];
         $magentoSchema[] = $description;
         $specialPriceFromDate = [
             'name' => 'special_price_from_date',
             'display_name' => 'Special Price Start Date',
             'type' => 'timestamp',
-            'description' => 'Beginning of a sale period.'
+            'description' => 'Beginning of a sale period.',
         ];
         $magentoSchema[] = $specialPriceFromDate;
         $specialPriceToDate = [
             'name' => 'special_price_to_date',
             'display_name' => 'Special Price End Date',
             'type' => 'timestamp',
-            'description' => 'End of a sale period.'
+            'description' => 'End of a sale period.',
         ];
         $magentoSchema[] = $specialPriceToDate;
         $specialPrice = [
             'name' => 'special_price',
             'display_name' => 'Special Price',
             'type' => 'number',
-            'description' => 'Price during sale period defined by the \'Special Price Start Date\' and \'Special Price End Date\'.'
+            'description' => 'Price during sale period defined by the \'Special Price Start Date\' and \'Special Price End Date\'.',
         ];
         $magentoSchema[] = $specialPrice;
+        $urlKey = [
+            'name' => 'url_key',
+            'display_name' => 'URL Key',
+            'type' => 'text',
+            'description' => 'URL component which creates a link to this product via liquid in the form \'<base_url>/{{url_key}}.html\'.',
+        ];
+        $magentoSchema[] = $urlKey;
 
         if ($this->_localeHelper->isLocalesEnabled()) {
             $defaultLocale = [
                 'name' => 'default_language_product_id',
                 'display_name' => 'Default Language Product ID',
                 'type' => 'string',
-                'description' => 'The product ID for the non-localized version of this product.'
+                'description' => 'The product ID for the non-localized version of this product.',
             ];
             $magentoSchema[] = $defaultLocale;
 
@@ -171,7 +177,7 @@ class SchemaRepository
                     'name' => strtolower($store["store_code"]) . '_product_id',
                     'display_name' => ucfirst($store["store_code"]) . ' Product ID',
                     'type' => 'string',
-                    'description' => 'The product ID for the ' . ucfirst($store["store_code"]) . ' localization of this product.'
+                    'description' => 'The product ID for the ' . ucfirst($store["store_code"]) . ' localization of this product.',
                 ];
                 $this->_logger->info('$storeView: ' . json_encode($storeView));
                 $magentoSchema[] = $storeView;
@@ -203,42 +209,42 @@ class SchemaRepository
             'name' => 'cart_id',
             'display_name' => 'Cart Id',
             'type' => 'string',
-            'description' => 'Magento quote ID, a unique identifier for this user\'s shopping cart.'
+            'description' => 'Magento quote ID, a unique identifier for this user\'s shopping cart.',
         ];
         $magentoSchema[] = $cartId;
         $cartHash = [
             'name' => 'cart_hash',
             'display_name' => 'Cart Hash',
             'type' => 'string',
-            'description' => 'A hashed representation of the user\'s current shopping cart.'
+            'description' => 'A hashed representation of the user\'s current shopping cart.',
         ];
         $magentoSchema[] = $cartHash;
         $validCart = [
             'name' => 'valid_cart',
             'display_name' => 'Valid Cart',
             'type' => 'boolean',
-            'description' => 'Whether the cart is targetable (has items in it).'
+            'description' => 'Whether the cart is targetable (has items in it).',
         ];
         $magentoSchema[] = $validCart;
         $cartJson = [
             'name' => 'cart_json',
             'display_name' => 'Cart JSON',
             'type' => 'string',
-            'description' => 'A stringified representation of the user\'s current shopping cart.'
+            'description' => 'A stringified representation of the user\'s current shopping cart.',
         ];
         $magentoSchema[] = $cartJson;
         $cartParam = [
             'name' => 'cart_param',
             'display_name' => 'Cart Param',
             'type' => 'string',
-            'description' => 'A URL parameterized version of the user\'s current shopping cart for potential recovery.'
+            'description' => 'A URL parameterized version of the user\'s current shopping cart for potential recovery.',
         ];
         $magentoSchema[] = $cartParam;
         $cartUrl = [
             'name' => 'cart_url',
             'display_name' => 'Cart Url',
             'type' => 'string',
-            'description' => 'The full cart recovery URL for this user\'s current shopping cart, including Cart Param.'
+            'description' => 'The full cart recovery URL for this user\'s current shopping cart, including Cart Param.',
         ];
         $magentoSchema[] = $cartUrl;
         $delta = $this->processDelta($magentoSchema, $currentSchema);
@@ -307,7 +313,10 @@ class SchemaRepository
                     break;
                 }
             }
-            if (!$match) $diff[] = $magento;
+            if (!$match) {
+                $diff[] = $magento;
+            }
+
         }
         $this->_logger->info('diff: ' . json_encode($diff));
         return $diff;

@@ -1,4 +1,4 @@
-#Zaius Magento 2 Connector
+# Zaius Magento 2 Connector
 
 Integrate Zaius directly into your Magento instance using the Zaius Magento 2 Connector.
 
@@ -24,14 +24,14 @@ By far the quickest and easiest way to install and maintain the Zaius connector 
 
 Note: as we continue validating the robustness of the module, you will need to specify your willingness to use the release candidates of both the module and the underlying PHP SDK:
 
-1. Edit your `<MAGENTO_ROOT>/composer.json` file:
+* Edit your `<MAGENTO_ROOT>/composer.json` file:
 
 ```bash
 "minimum-stability" "RC",
 "prefer-stable": true
 ```
 
-2. Add the required packages:
+* Add the required packages:
 
 ```bash
 composer require zaius/zaius-magento-2:^1.0
@@ -41,12 +41,12 @@ composer update zaius/*
 
 ### Alternative install: ZIP
 
-1. Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
-2. Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
+* Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
+* Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
 
 ## Verify & Enable the Zaius Magento 2 Connector
 
-1. To verify that the extension installed properly, run the following command:
+* To verify that the extension installed properly, run the following command:
 
 ```bash
 php bin/magento module:status
@@ -59,7 +59,7 @@ List of disabled modules:
 Zaius_Engage
 ```
 
-2. Enable the extension and clear static view files:
+*  Enable the extension and clear static view files:
 
 ```bash
 php bin/magento module:enable Zaius_Engage --clear-static-content
@@ -77,19 +77,19 @@ Generated classes cleared successfully. Please run the 'setup:di:compile' comman
 Generated static view files cleared successfully.
 ```
 
-3. Register the extension:
+* Register the extension:
 
 ```bash
 php bin/magento setup:upgrade
 ```
 
-4. Recompile your Magento project:
+* Recompile your Magento project:
 
 ```bash
 php bin/magento setup:di:compile
 ```
 
-5. Verify that the extension is enabled:
+* Verify that the extension is enabled:
 
 ```bash
 php bin/magento module:status
@@ -105,15 +105,52 @@ List of disabled modules:
 None
 ```
 
-6. Clean the cache:
+* Clean the cache:
 
 ```bash
 php bin/magento cache:clean
 ```
 
+## API Setup
+
+In order to support the coupon code functionality Zaius utilizes, and to enable the Zaius support team to most effectively troubleshoot any issues, we require an API user be created with access to the Zaius APIs.
+
+### Create an appropriate role
+
+In the Magento admin panel, navigate to System > User Roles (under the "Permissions" heading). 
+1. Click "Add New Role". 
+2. Enter the name "Zaius API". 
+3. Click "Role Resources".
+4. Select the "Zaius Engage API" resource.
+5. Click "Save Role".
+
+### Create the API user
+
+Still in the Magento admin panel, navigate to System > All Users (under the "Permissions" heading). 
+1. Click "Add New User". 
+2. Enter the User Name "zaius_api" 
+3. Enter any details you like (Zaius recommends a maintainer's details) for name and email. 
+4. Create a new password for the user (and make sure to save this in a secure password manager or similar key store). 
+5. Click "User Role".
+6. Select the "Zaius API" role you created in the previous section.
+7. Click "Save User.
+
+### Save the API User in Zaius
+
+Navigate to the Zaius integration [(Settings (cogwheel) > Integrations)](https://app.zaius.com/app#/integrations) page, making sure you're editing the Zaius account this Magento store will be integrating with (Test or Prod, for the appropriate brand if relevant).
+1. Click the "Magento" card.
+2. Select "Magento 2" from the Version dropdown.
+3. Enter "zaius_api" as the Username.
+4. Enter the password you configured in the previous section.
+5. Enter the base Magento API URL, which usually matches your website's root URL.
+6. Click Save.
+
+Zaius does not recommend clicking "Start Bulk Import" at this time. Please consult with your Customer Success Manager to coordinate the bulk import process.
+
+
 ## Configuration
 
-After installing the module, all configuration is done via Stores >> Configuration >> Zaius >> Engage.
+After installing the module and setting up the API user, all configuration is done via Stores >> Configuration >> Zaius >> Engage.
 
 #### Zaius Engage Status
 
@@ -127,35 +164,27 @@ After installing the module, all configuration is done via Stores >> Configurati
 
 #### Configuration
 
-**Zaius Tracker ID**: Configuration field for the Zaius client Tracker ID. Found at [API Management](https://app.zaius.com/app?scope=731#/api_management) in the Zaius client Account.
+**Zaius Tracker ID**: Configuration field for the Zaius client Tracker ID. Found at [API Management](https://app.zaius.com/app#/api_management) in the Zaius client Account.
 
-**Zaius Private API Key**: Configuration field for the Zaius Private API Key. Found at [API Management](https://app.zaius.com/app?scope=731#/api_management) in the Zaius client Account. This is **REQUIRED** for [Batch Updates](Batch Updates) to work.
+**Zaius Private API Key**: Configuration field for the Zaius Private API Key. Found at [API Management](https://app.zaius.com/app#/api_management) in the Zaius client Account. This is **REQUIRED** for [Batch Updates](Batch Updates) to work.
 
 **Enable Amazon S3**: Enable or disable the Amazon S3 Upload functionality.
 
-**Amazon S3 Key**: Configuration field for the Zaius Client Amazon S3 Key. Found At [Integrations](https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3) in the Zaius Client Account. This is **REQUIRED** if Amazon S3 functionality is enabled.
+**Amazon S3 Key**: Configuration field for the Zaius Client Amazon S3 Key. Found At [Integrations](https://app.zaius.com/app#/integrations?activeTab=amazon_s3) in the Zaius Client Account. This is **REQUIRED** if Amazon S3 functionality is enabled.
 
-**Amazon S3 Secret**: Configuration field for the Zaius Client Amazon S3 Secret. Found At [Integrations](https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3) in the Zaius Client Account. This is **REQUIRED** if Amazon S3 functionality is enabled.
+**Amazon S3 Secret**: Configuration field for the Zaius Client Amazon S3 Secret. Found At [Integrations](https://app.zaius.com/app#/integrations?activeTab=amazon_s3) in the Zaius Client Account. This is **REQUIRED** if Amazon S3 functionality is enabled.
 
 #### Settings
 
-**Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes, or only the minimum.
+**Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes, or only the minimum. If your product feed has fields which are not yet captured in Zaius, you will likely need to turn this on and create a corresponding custom field. The Zaius support team can assist.
 
-**Track Orders on Frontend**: Enable or disable the functionality to track orders on the frontend of the website.
+**Track Orders on Frontend**: Enable or disable the functionality to track orders on the frontend of the website. Disabled by default as backend order tracking is far more reliable.
 
 **Timeout**: Specify a number of seconds to wait before timing out the connection to Zaius.
 
-#### Schema Update
-
-**FUNCTIONALITY DEPRECATED**
-
-#### Batch Updates
-
-**Enabled?**: Enable or disable the Batch Update functionality. With batch updates enabled, updates are sent to Zaius on a schedule, instead of "on-the-fly". This can lower resource use. Clients must enter their [Zaius Private API Key](Zaius Private API Key) for this functionality to communicate with Zaius.
-
 #### Zaius Localizations
 
-**Enabled?**: Enable or disable the Zaius Localizations functionality. With Zaius Localizations functionality enabled, localized store_view data will be sent to Zaius.
+**Enabled?**: Enable or disable the Zaius Localizations functionality. With Zaius Localizations functionality enabled, localized store_view data will be sent to Zaius. Please consult with your Zaius CSM before enabling.
 
 ## Versioning
 

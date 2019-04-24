@@ -2,15 +2,14 @@
 
 namespace Zaius\Engage\Observer;
 
+use Magento\CatalogInventory\Model\Stock\Item as StockItem;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Model\Client;
-use Magento\CatalogInventory\Model\Stock\Item as StockItem;
 
-class StockItemSaveAfterObserver
-    implements ObserverInterface
+class StockItemSaveAfterObserver implements ObserverInterface
 {
     protected $_helper;
     protected $_client;
@@ -20,8 +19,7 @@ class StockItemSaveAfterObserver
         Data $helper,
         ProductRepositoryInterface $productRepository,
         Client $client
-    )
-    {
+    ) {
         $this->_helper = $helper;
         $this->_client = $client;
         $this->_productRepository = $productRepository;
@@ -37,13 +35,15 @@ class StockItemSaveAfterObserver
                 && ($stockItem->getData('qty') != $stockItem->getOrigData('qty')
                     || $stockItem->getData('is_in_stock') != $stockItem->getOrigData('is_in_stock'))
             ) {
+                $postData = [
+                    'product_id' => $this->_helper->getProductId($product),
+                    'qty' => $stockItem->getQty(),
+                    'is_in_stock' => $stockItem->getIsInStock(),
+                ];
+                $postData += $this->_helper->getDataSourceFields();
                 $this->_client->postEntity([
                     'type' => 'product',
-                    'data' => [
-                        'product_id' => $this->_helper->getProductId($product),
-                        'qty' => $stockItem->getQty(),
-                        'is_in_stock' => $stockItem->getIsInStock()
-                    ]
+                    'data' => $postData,
                 ]);
             }
         }

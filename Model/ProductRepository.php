@@ -2,14 +2,13 @@
 
 namespace Zaius\Engage\Model;
 
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Catalog\Api\Data\ProductInterfaceFactory;
+use Magento\Catalog\Helper\Product as ProductHelper;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
-use Magento\Catalog\Api\Data\ProductInterfaceFactory;
-use Magento\Catalog\Model\Product;
-use Magento\CatalogInventory\Api\StockRegistryInterface;
-use Magento\Catalog\Helper\Product as ProductHelper;
+use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Logger\Logger;
@@ -19,14 +18,16 @@ use Zaius\Engage\Logger\Logger;
  * @package Zaius\Engage\Model
  * @api
  */
-class ProductRepository
-    implements ProductRepositoryInterface
+class ProductRepository implements ProductRepositoryInterface
 {
     protected static $PRODUCT_ATTRIBUTES_TO_IGNORE = array(
+        // These fields are suppressed because there's no clear path to utility in Zaius.
         'entity_id', 'attribute_set_id', 'type_id',
         'entity_type_id', 'category_ids', 'required_options',
         'has_options', 'created_at', 'updated_at', 'media_gallery',
-        'image', 'small_image', 'thumbnail', 'quantity_and_stock_status'
+        'small_image', 'thumbnail', 'quantity_and_stock_status',
+        // The next fields are suppressed because they're explicitly mapped.
+        'image', 'special_from_date', 'special_to_date',
     );
 
     protected $_storeManager;
@@ -46,8 +47,7 @@ class ProductRepository
         ProductHelper $productHelper,
         Data $helper,
         Logger $logger
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->_productFactory = $productFactory;
@@ -67,7 +67,7 @@ class ProductRepository
     {
         /** @var ProductCollection $products */
         $products = $this->_productCollectionFactory->create();
-        $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_price_from_date', 'special_price_to_date', 'short_description', 'image'])
+        $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key'])
             ->setOrder('entity_id', 'asc');
         if ($this->_helper->getIsCollectAllProductAttributes($this->_storeManager->getStore())) {
             $products->addAttributeToSelect(array_keys($this->_getExtraProductAttributes()));
@@ -88,7 +88,7 @@ class ProductRepository
                 $this->_logger->warning("ZAIUS: Null field: product_id.");
 
             } else {
-                $result[] = $this->getProductEventData('product',$product);
+                $result[] = $this->getProductEventData('product', $product);
             }
 
         }
@@ -119,12 +119,13 @@ class ProductRepository
             'description' => $product->getData('short_description'),
             'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
             'price' => $product->getPrice(),
-            'image_url' => $this->_productHelper->getImageUrl($product)
+            'image_url' => $this->_productHelper->getImageUrl($product),
+            'url_key' => $product->getData('url_key'),
         ];
         if ($product->getData('special_price')) {
             $productData['special_price'] = $product->getData('special_price');
-            $productData['special_price_from_date'] = $product->getData('special_price_from_date');
-            $productData['special_price_to_date'] = $product->getData('special_price_to_date');
+            $productData['special_price_from_date'] = strtotime($product->getData('special_from_date')) ?: null;
+            $productData['special_price_to_date'] = strtotime($product->getData('special_to_date')) ?: null;
         }
         $stockItem = $this->_stockRegistry->getStockItem($product->getId());
         if ($stockItem && $stockItem->getId() && $stockItem->getManageStock()) {
@@ -138,6 +139,7 @@ class ProductRepository
         if (!$product->getImage()) {
             $this->_logger->error('ZAIUS: Unable to retrieve product image_url');
         }
+        $productData += $this->_helper->getDataSourceFields();
         $this->_logger->info("Event: $event");
         return $productData;
     }

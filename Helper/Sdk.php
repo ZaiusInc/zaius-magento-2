@@ -72,6 +72,10 @@ class Sdk
     {
         $apiKey = $this->getZaiusTrackerId($store);
         $privateKey = $this->getZaiusPrivateKey($store);
+        if (!$apiKey || !$privateKey) {
+            $zaiusClient = null;
+            return $zaiusClient;
+        }
         $zaiusClient = new \ZaiusSDK\ZaiusClient($apiKey, $privateKey);
 
         $zaiusClient->setQueueDatabaseCredentials([
