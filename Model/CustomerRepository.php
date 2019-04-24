@@ -2,12 +2,11 @@
 
 namespace Zaius\Engage\Model;
 
-use Magento\Framework\App\RequestInterface;
-use Magento\Directory\Model\RegionFactory;
-use Magento\Newsletter\Model\Subscriber;
+use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\Collection as CustomerCollection;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
-use Magento\Customer\Model\Customer;
+use Magento\Directory\Model\RegionFactory;
+use Magento\Framework\App\RequestInterface;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Locale;
@@ -18,8 +17,7 @@ use Zaius\Engage\Logger\Logger;
  * @package Zaius\Engage\Model
  * @api
  */
-class CustomerRepository
-    implements CustomerRepositoryInterface
+class CustomerRepository implements CustomerRepositoryInterface
 {
     const ADDRESS_EVENT = 'customer_address_save_after';
 
@@ -37,8 +35,7 @@ class CustomerRepository
         Data $helper,
         Locale $localeHelper,
         Logger $logger
-    )
-    {
+    ) {
         $this->_request = $request;
         $this->_regionFactory = $regionFactory;
         $this->_customerCollectionFactory = $customerCollectionFactory;
@@ -94,28 +91,28 @@ class CustomerRepository
                 's.customer_id=e.entity_id',
                 ['subscriber_status']
             )->joinLeft(
-                ['billing' => 'customer_address_entity'],
-                'e.default_billing=billing.entity_id',
-                [
-                    'billing_street' => 'street',
-                    'billing_city' => 'city',
-                    'billing_region' => 'region',
-                    'billing_postcode' => 'postcode',
-                    'billing_country_id' => 'country_id',
-                    'billing_telephone' => 'telephone',
-                ]
-            )->joinLeft(
-                ['shipping' => 'customer_address_entity'],
-                'e.default_shipping=shipping.entity_id',
-                [
-                    'shipping_street' => 'street',
-                    'shipping_city' => 'city',
-                    'shipping_region' => 'region',
-                    'shipping_postcode' => 'postcode',
-                    'shipping_country_id' => 'country_id',
-                    'shipping_telephone' => 'telephone',
-                ]
-            );
+            ['billing' => 'customer_address_entity'],
+            'e.default_billing=billing.entity_id',
+            [
+                'billing_street' => 'street',
+                'billing_city' => 'city',
+                'billing_region' => 'region',
+                'billing_postcode' => 'postcode',
+                'billing_country_id' => 'country_id',
+                'billing_telephone' => 'telephone',
+            ]
+        )->joinLeft(
+            ['shipping' => 'customer_address_entity'],
+            'e.default_shipping=shipping.entity_id',
+            [
+                'shipping_street' => 'street',
+                'shipping_city' => 'city',
+                'shipping_region' => 'region',
+                'shipping_postcode' => 'postcode',
+                'shipping_country_id' => 'country_id',
+                'shipping_telephone' => 'telephone',
+            ]
+        );
         $customers->getSelect()
             ->group('e.entity_id');
 
@@ -136,7 +133,7 @@ class CustomerRepository
             'first_name' => $customer->getFirstname(),
             'last_name' => $customer->getLastname(),
             'store_view_code' => $this->_localeHelper->getWebsiteCode($customer->getWebsiteId()),
-            'store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId())
+            'store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId()),
         ];
         $addressType = null;
         if ($isFullCustomerObject && $customer->getData('default_shipping')) {
@@ -174,6 +171,7 @@ class CustomerRepository
         //creating vuid index
         $customerData['vuid'] = $this->_helper->getVuid();
         $customerData['zaius_engage_version'] = $this->_helper->getVersion();
+        $customerData += $this->_helper->getDataSourceFields();
         $broken = false;
 
         if (is_null($customerData['vuid']) && is_null($customerData['customer_id']) && is_null($customerData['email'])) {
@@ -191,7 +189,7 @@ class CustomerRepository
         return [
             'type' => 'customer',
             'data' => $customerData,
-            'broken' => $broken
+            'broken' => $broken,
         ];
     }
 }

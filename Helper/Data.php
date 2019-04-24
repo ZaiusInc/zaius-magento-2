@@ -3,33 +3,32 @@
 namespace Zaius\Engage\Helper;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filter\Encrypt;
+use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Quote\Model\Quote;
-use Magento\Framework\Module\ModuleListInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\SalesRule\Model\RuleRepository;
 use Magento\Store\Model\StoreManagerInterface;
-use Zaius\Engage\Model\Client;
-use Zaius\Engage\Model\Session;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
+use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\Session;
 
-class Data
-    extends AbstractHelper
+class Data extends AbstractHelper
 {
     const MODULE_NAME = 'Zaius_Engage';
     const API_URL = 'http://api.zaius.com/v2';
     const VUID_LENGTH = 36;
+    const DATA_SOURCE = 'magento2';
+    const DATA_SOURCE_TYPE = 'app';
 
     const EVENTS_REGISTRY_KEY = 'zaius_current_events';
 
@@ -60,8 +59,7 @@ class Data
         LocaleHelper $localeHelper,
         Logger $logger,
         ProductRepository $productRepository
-    )
-    {
+    ) {
         $this->_cookieManager = $cookieManager;
         $this->_categoryRepository = $categoryRepository;
         $this->_encryptor = $encryptor;
@@ -180,7 +178,7 @@ class Data
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
             return false;
         }
-        if (count($quote->getAllVisibleItems()) > 0){
+        if (count($quote->getAllVisibleItems()) > 0) {
             return true;
         }
         return false;
@@ -205,7 +203,7 @@ class Data
             }
             $data = [
                 'product_id' => $pid,
-                'quantity' => $qty
+                'quantity' => $qty,
             ];
             $json['items'][] = $data;
         }
@@ -250,11 +248,11 @@ class Data
             } else {
                 $qty = $info[$item->getId()]['qty'] ?? $item->getQty();
             }
-            $data = $pid .':'.$qty;
+            $data = $pid . ':' . $qty;
             $zaiusCart[] = $data;
         }
         //todo determine website/store view, return link?
-        return implode(',',$zaiusCart);
+        return implode(',', $zaiusCart);
     }
 
     /**
@@ -329,7 +327,7 @@ class Data
         $substr = 'zaius_alias_';
         $zaiusAliasCookies = array();
         foreach ($_COOKIE as $key => $value) {
-            if (strpos($key,$substr) !== false) {
+            if (strpos($key, $substr) !== false) {
                 $cookie = $this->_cookieManager->getCookie($key);
                 $zaiusAliasCookies[] = $cookie;
             }
@@ -393,16 +391,17 @@ class Data
         return $this->scopeConfig->getValue(Client::XML_PATH_BATCH_ENABLED);
     }
 
-    public function addEventToRegistry($event) {
+    public function addEventToRegistry($event)
+    {
+        $event['data'] += $this->getDataSourceFields();
         $events = $this->_registry->registry(self::EVENTS_REGISTRY_KEY);
-        if(!$events) {
+        if (!$events) {
             $events = [$event];
-        }
-        else {
-            $events[]=$event;
+        } else {
+            $events[] = $event;
             $this->_registry->unregister(self::EVENTS_REGISTRY_KEY);
         }
-        $this->_registry->register(self::EVENTS_REGISTRY_KEY,$events);
+        $this->_registry->register(self::EVENTS_REGISTRY_KEY, $events);
     }
 
     /**
@@ -412,6 +411,7 @@ class Data
      */
     public function addEventToSession($event)
     {
+        $event['data'] += $this->getDataSourceFields();
         if ($this->isBatchUpdate()) {
             $zaiusClient = $this->_sdk->getSdkClient();
             if (null === $zaiusClient) {
@@ -489,11 +489,23 @@ class Data
 
     public function getNewsletterListId($store = null)
     {
-        $listId =  $this->scopeConfig->getValue('zaius_engage/settings/newsletter_list_id', 'store', $store);
+        $listId = $this->scopeConfig->getValue('zaius_engage/settings/newsletter_list_id', 'store', $store);
         if (empty($listId)) {
             $listId = 'newsletter';
         }
         $this->_logger->info(json_encode($listId));
         return $listId;
+    }
+
+    public function getDataSourceFields()
+    {
+        $dataSource = [
+            'data_source' => self::DATA_SOURCE,
+            'data_source_version' => $this->getVersion() . '-legacy', // legacy is a Zaius annotation, do not remove
+            'data_source_type' => self::DATA_SOURCE_TYPE,
+            // 'data_source_instance' => self::DATA_SOURCE, // skipped until namespacing is revisited
+            'data_source_details' => 'Magento processed at: ' . time() . ';',
+        ];
+        return $dataSource;
     }
 }
