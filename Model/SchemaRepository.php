@@ -156,7 +156,7 @@ class SchemaRepository
         $urlKey = [
             'name' => 'url_key',
             'display_name' => 'URL Key',
-            'type' => 'text',
+            'type' => 'string',
             'description' => 'URL component which creates a link to this product via liquid in the form \'<base_url>/{{url_key}}.html\'.',
         ];
         $magentoSchema[] = $urlKey;
