@@ -99,6 +99,9 @@ class Snippet extends Template
         if ($event['type'] == 'anonymize') {
             return 'zaius.anonymize();';
         }
+        if (isset($event['data']) && isset($event['data']['data_source_details'])) {
+            $event['data']['data_source_details'] .= 'Sent via Zaius web SDK;';
+        }
         return "zaius.event('" . $event['type'] . "', " . $this->_jsonEncoder->encode($event['data']) . ");";
     }
 }
