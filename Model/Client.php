@@ -3,21 +3,18 @@
 namespace Zaius\Engage\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Json\Encoder;
 use Magento\Framework\HTTP\Client\CurlFactory;
+use Magento\Framework\Json\Encoder;
+use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ClientInterface;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
-use Zaius\Engage\Api\ListItemInterface;
 use Zaius\Engage\Api\OrderRepositoryInterface;
-use Zaius\Engage\Api\ProductListItemInterfaceFactory;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
 
-class Client
-    implements ClientInterface
+class Client implements ClientInterface
 {
     const XML_PATH_BATCH_ENABLED = 'zaius_engage/batch_updates/status';
 
@@ -44,8 +41,7 @@ class Client
         Sdk $sdk,
         ScopeConfigInterface $scopeConfig,
         Encoder $encoder
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_curlFactory = $curlFactory;
@@ -68,6 +64,9 @@ class Client
     protected function _post($object, $url)
     {
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->call($object, 'POST', $url, $this->isBatchUpdate());
 
     }
@@ -80,7 +79,11 @@ class Client
      */
     public function postEntity($entity)
     {
+        $entity['data'] += $this->_helper->getDataSourceFields();
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         switch ($entity['type']) {
             case 'product':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
@@ -136,7 +139,11 @@ class Client
      */
     public function postEvent($event)
     {
+        $event['data'] += $this->_helper->getDataSourceFields();
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         switch ($event['type']) {
             case 'list':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
@@ -213,6 +220,9 @@ class Client
     public function postProduct($event, $product)
     {
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->postProduct($this->_productRepository->getProductEventData($event, $product), $this->isBatchUpdate());
     }
 
@@ -225,6 +235,9 @@ class Client
     {
         $this->_logger->info(__METHOD__);
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->getObjectFields($objectName);
     }
 
@@ -241,6 +254,9 @@ class Client
             return;
         }
         $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         foreach ($fieldArray as $field) {
             $fieldName = $field['name'];
             $type = $field['type'];

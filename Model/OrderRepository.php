@@ -2,30 +2,19 @@
 
 namespace Zaius\Engage\Model;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\Order\Address;
-use Zaius\Engage\Api\OrderEventItemInterfaceFactory;
-use Zaius\Engage\Api\OrderEventItemInterface;
-use Zaius\Engage\Api\OrderInterfaceFactory;
-use Zaius\Engage\Api\OrderInterface;
-use Zaius\Engage\Api\OrderItemInterfaceFactory;
-use Zaius\Engage\Api\OrderItemInterface;
-use Zaius\Engage\Api\OrderEventInterfaceFactory;
-use Zaius\Engage\Api\OrderEventInterface;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Psr\Log\LoggerInterface as Logger;
 use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Helper\Data;
-use Psr\Log\LoggerInterface as Logger;
-use Zaius\Engage\Helper\Locale as LocaleHelper;
 
 /**
  * Class OrderRepository
  * @package Zaius\Engage\Model
  * @api
  */
-class OrderRepository
-    implements OrderRepositoryInterface
+class OrderRepository implements OrderRepositoryInterface
 {
     protected $_orderCollectionFactory;
     protected $_helper;
@@ -35,8 +24,7 @@ class OrderRepository
         OrderCollectionFactory $orderCollectionFactory,
         Data $helper,
         \Zaius\Engage\Logger\Logger $logger
-    )
-    {
+    ) {
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_helper = $helper;
         $this->_logger = $logger;
@@ -61,7 +49,7 @@ class OrderRepository
         foreach ($orders as $order) {
             if (!$this->getOrderEventData($order, 'purchase')['broken']) {
                 $result[] = $this->getOrderEventData($order, 'purchase');
-                foreach ($result as $key => & $value) {
+                foreach ($result as $key => &$value) {
                     unset($value['broken']);
                 }
             } else {
@@ -70,7 +58,7 @@ class OrderRepository
             if ($order->getTotalRefunded() > 0) {
                 if (!$this->getOrderEventData($order, 'refund')['broken']) {
                     $result[] = $this->getOrderEventData($order, 'refund');
-                    foreach ($result as $key => & $refundValue) {
+                    foreach ($result as $key => &$refundValue) {
                         unset($refundValue['broken']);
                     }
                 } else {
@@ -79,7 +67,7 @@ class OrderRepository
             } else if ($order->getTotalCanceled() > 0) {
                 if (!$this->getOrderEventData($order, 'cancel')['broken']) {
                     $result[] = $this->getOrderEventData($order, 'cancel');
-                    foreach ($result as $key => & $cancelValue) {
+                    foreach ($result as $key => &$cancelValue) {
                         unset($cancelValue['broken']);
                     }
                 } else {
@@ -113,13 +101,13 @@ class OrderRepository
         $orderEventData = [
             'ip' => $ip,
             'ua' => '',
-            'order' => $this->getOrderData($order, $eventType)
+            'order' => $this->getOrderData($order, $eventType),
         ];
         if ($order->getCreatedAt()) {
             $orderEventData['ts'] = strtotime($order->getCreatedAt());
         }
         //if ($sendVuid) {
-            $identifiers['vuid'] = $this->_helper->getVuid();
+        $identifiers['vuid'] = $this->_helper->getVuid();
         //}
         $store = $order->getStore();
         if ($store) {
@@ -137,6 +125,9 @@ class OrderRepository
             $orderEventData['email'] = $order->getCustomerEmail();
         }
         $orderEventData['zaius_engage_version'] = $this->_helper->getVersion();
+        // Data source fields on items and orders are ignored in Zaius processing,
+        // Event fields are preserved.
+        $orderEventData += $this->_helper->getDataSourceFields();
         $broken = false;
         if (is_null($eventType) || is_null($orderEventData['order']['order_id'])) {
             $broken = true;
@@ -157,7 +148,7 @@ class OrderRepository
             'action' => $eventType,
             'identifiers' => $identifiers,
             'data' => $orderEventData,
-            'broken' => $broken
+            'broken' => $broken,
         ];
     }
 
@@ -185,7 +176,7 @@ class OrderRepository
             'currency' => $order->getBaseCurrencyCode(),
             'native_total' => $nativeTotal,
             'native_subtotal' => $nativeSubtotal,
-            'native_currency' => $order->getCurrencyCode()
+            'native_currency' => $order->getCurrencyCode(),
         ];
         /** @var Address $billing */
         $billing = $order->getBillingAddress();
@@ -227,7 +218,7 @@ class OrderRepository
                     'discount' => 0 - $orderItem->getBaseDiscountAmount(),
                     'native_subtotal' => $orderItem->getRowTotal(),
                     'native_price' => $orderItem->getPrice(),
-                    'native_discount' => 0 - $orderItem->getDiscountAmount()
+                    'native_discount' => 0 - $orderItem->getDiscountAmount(),
                 ];
             }
         }
