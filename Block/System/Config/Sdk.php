@@ -57,6 +57,6 @@ class Sdk extends \Magento\Config\Block\System\Config\Form\Field
             }
         }
 
-        return '<strong>' . (($field === 'sdk') ? strtoupper($field) : ucfirst($field)) . ' Not Detected</strong>';
+        return '<strong style="color:red">' . (($field === 'sdk') ? strtoupper($field) : ucfirst($field)) . ' Not Detected</strong>';
     }
 }
