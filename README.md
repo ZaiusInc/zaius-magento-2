@@ -44,6 +44,16 @@ composer update zaius/*
 * Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
 * Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
 
+The Zaius PHP SDK is required, and must be installed separately if you've chosen to install via ZIP archive.
+
+* Add the required packages:
+
+```bash
+composer require zaius/zaius-php-sdk:^1.0
+composer install
+composer update zaius/*
+```
+
 ## Verify & Enable the Zaius Magento 2 Connector
 
 * To verify that the extension installed properly, run the following command:
