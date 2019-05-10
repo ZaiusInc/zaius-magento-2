@@ -39,7 +39,7 @@ class Sdk
      */
     public function isComposerInstalled()
     {
-        $json = 'composer.json';
+        $json = '/composer.json';
         $base_path = $this->_directoryList->getRoot();
         if (file_exists($base_path . $json)) {
             //composer exists
