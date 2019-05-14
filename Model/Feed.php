@@ -16,12 +16,42 @@ use Magento\Backend\Model\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Helper\Data as Helper;
 
+/**
+ * Class Feed
+ * @package Zaius\Engage\Model
+ */
 class Feed extends \Magento\AdminNotification\Model\Feed
 {
+    /**
+     * @var UrlInterface
+     */
     protected $_backendUrl;
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Helper
+     */
     protected $_helper;
 
+    /**
+     * Feed constructor.
+     * @param UrlInterface $backendUrl
+     * @param StoreManagerInterface $storeManager
+     * @param Helper $helper
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Backend\App\ConfigInterface $backendConfig
+     * @param \Magento\AdminNotification\Model\InboxFactory $inboxFactory
+     * @param \Magento\Framework\HTTP\Adapter\CurlFactory $curlFactory
+     * @param \Magento\Framework\App\DeploymentConfig $deploymentConfig
+     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         UrlInterface $backendUrl,
         StoreManagerInterface $storeManager,
@@ -50,6 +80,9 @@ class Feed extends \Magento\AdminNotification\Model\Feed
         $this->urlBuilder        = $urlBuilder;
     }
 
+    /**
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function alertAdmin()
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

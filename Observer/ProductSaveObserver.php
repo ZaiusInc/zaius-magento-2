@@ -9,13 +9,32 @@ use Magento\Catalog\Model\Product;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data as Helper;
 
+/**
+ * Class ProductSaveObserver
+ * @package Zaius\Engage\Observer
+ */
 class ProductSaveObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Helper
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
 
+    /**
+     * ProductSaveObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Helper $helper
+     * @param Client $client
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Helper $helper,
@@ -27,6 +46,10 @@ class ProductSaveObserver
         $this->_client = $client;
     }
 
+    /**
+     * @param Observer $observer
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

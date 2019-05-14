@@ -4,6 +4,10 @@ namespace Zaius\Engage\Logger;
 
 use Monolog\Logger;
 
+/**
+ * Class Handler
+ * @package Zaius\Engage\Logger
+ */
 class Handler extends \Magento\Framework\Logger\Handler\Base
 {
     /**

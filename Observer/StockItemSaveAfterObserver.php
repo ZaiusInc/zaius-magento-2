@@ -9,12 +9,31 @@ use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Model\Client;
 
+/**
+ * Class StockItemSaveAfterObserver
+ * @package Zaius\Engage\Observer
+ */
 class StockItemSaveAfterObserver implements ObserverInterface
 {
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
+    /**
+     * @var ProductRepositoryInterface
+     */
     protected $_productRepository;
 
+    /**
+     * StockItemSaveAfterObserver constructor.
+     * @param Data $helper
+     * @param ProductRepositoryInterface $productRepository
+     * @param Client $client
+     */
     public function __construct(
         Data $helper,
         ProductRepositoryInterface $productRepository,
@@ -25,6 +44,10 @@ class StockItemSaveAfterObserver implements ObserverInterface
         $this->_productRepository = $productRepository;
     }
 
+    /**
+     * @param Observer $observer
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus()) {

@@ -8,13 +8,31 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Module\ResourceInterface as ModuleResourceInterface;
 
+/**
+ * Class Recurring
+ * @package Zaius\Engage\Setup
+ */
 class Recurring implements InstallSchemaInterface
 {
+    /**
+     * @var ZAIUS
+     */
     const ZAIUS = 'Zaius_Engage';
 
+    /**
+     * @var ModuleListInterface
+     */
     protected $_list;
+    /**
+     * @var ModuleResourceInterface
+     */
     protected $_resource;
 
+    /**
+     * Recurring constructor.
+     * @param ModuleListInterface $list
+     * @param ModuleResourceInterface $resource
+     */
     public function __construct(
         ModuleListInterface $list,
         ModuleResourceInterface $resource

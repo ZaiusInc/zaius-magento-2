@@ -6,6 +6,10 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
+/**
+ * Class SchemaUpdateButton
+ * @package Zaius\Engage\Block\System\Config
+ */
 class SchemaUpdateButton extends Field
 {
     /**

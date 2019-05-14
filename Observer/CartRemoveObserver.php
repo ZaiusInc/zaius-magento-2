@@ -12,14 +12,37 @@ use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Helper\Data;
 use Magento\Checkout\Model\Session as CheckoutSession;
 
+/**
+ * Class CartRemoveObserver
+ * @package Zaius\Engage\Observer
+ */
 class CartRemoveObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var ProductRepository
+     */
     protected $_productRepository;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var CheckoutSession
+     */
     protected $_checkoutSession;
 
+    /**
+     * CartRemoveObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param ProductRepository $productRepository
+     * @param Data $helper
+     * @param CheckoutSession $checkoutSession
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         ProductRepository $productRepository,
@@ -33,6 +56,13 @@ class CartRemoveObserver
         $this->_checkoutSession = $checkoutSession;
     }
 
+    /**
+     * @param Observer $observer
+     * @param null $item
+     * @param null $info
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer, $item = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

@@ -18,10 +18,25 @@ use Zaius\Engage\Helper\Data;
  */
 class IndexPlugin
 {
+    /**
+     * @var QuoteRepository
+     */
     protected $_quoteRepository;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Cart
+     */
     protected $_cart;
 
+    /**
+     * IndexPlugin constructor.
+     * @param QuoteRepository $quoteRepository
+     * @param Data $helper
+     * @param Cart $cart
+     */
     public function __construct(
         QuoteRepository $quoteRepository,
         Data $helper,
@@ -33,6 +48,11 @@ class IndexPlugin
         $this->_cart = $cart;
     }
 
+    /**
+     * @param Index $controller
+     * @param \Closure $next
+     * @return mixed
+     */
     public function aroundExecute(Index $controller, \Closure $next)
     {
         $quoteId = $controller->getRequest()->getParam('cart_id');

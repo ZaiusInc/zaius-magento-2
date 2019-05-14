@@ -22,29 +22,103 @@ use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Model\Session;
 
+/**
+ * Class Data
+ * @package Zaius\Engage\Helper
+ */
 class Data extends AbstractHelper
 {
+    /**
+     * @var MODULE_NAME
+     */
     const MODULE_NAME = 'Zaius_Engage';
+    /**
+     * @var API_URL
+     */
     const API_URL = 'http://api.zaius.com/v2';
+    /**
+     * @var VUID_LENGTH
+     */
     const VUID_LENGTH = 36;
+    /**
+     * @var DATA_SOURCE
+     */
     const DATA_SOURCE = 'magento2';
+    /**
+     * @var DATA_SOURCE_TYPE
+     */
     const DATA_SOURCE_TYPE = 'app';
 
+    /**
+     * @var EVENTS_REGISTRY_KEY
+     */
     const EVENTS_REGISTRY_KEY = 'zaius_current_events';
 
+    /**
+     * @var CookieManagerInterface
+     */
     protected $_cookieManager;
+    /**
+     * @var CategoryRepositoryInterface
+     */
     protected $_categoryRepository;
+    /**
+     * @var EncryptorInterface
+     */
     protected $_encryptor;
+    /**
+     * @var Session
+     */
     protected $_session;
+    /**
+     * @var Registry
+     */
     protected $_registry;
+    /**
+     * @var ModuleListInterface
+     */
     protected $_moduleList;
+    /**
+     * @var RuleRepository
+     */
     protected $_ruleRepository;
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Locale
+     */
     protected $_localeHelper;
+    /**
+     * @var Sdk
+     */
     protected $_sdk;
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var ProductRepository
+     */
     protected $_productRepository;
 
+    /**
+     * Data constructor.
+     * @param CookieManagerInterface $cookieManager
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param EncryptorInterface $encryptor
+     * @param Session $session
+     * @param Registry $registry
+     * @param ModuleListInterface $moduleList
+     * @param RuleRepository $ruleRepository
+     * @param StoreManagerInterface $storeManager
+     * @param Context $context
+     * @param Sdk $sdk
+     * @param Locale $localeHelper
+     * @param Logger $logger
+     * @param ProductRepository $productRepository
+     */
     public function __construct(
         CookieManagerInterface $cookieManager,
         CategoryRepositoryInterface $categoryRepository,
@@ -75,6 +149,9 @@ class Data extends AbstractHelper
         parent::__construct($context);
     }
 
+    /**
+     * @return mixed
+     */
     public function getVersion()
     {
         return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
@@ -184,6 +261,13 @@ class Data extends AbstractHelper
         return false;
     }
 
+    /**
+     * @param $quote
+     * @param null $id
+     * @param null $info
+     * @return array|false|string
+     * @throws NoSuchEntityException
+     */
     public function prepareCartJSON($quote, $id = null, $info = null)
     {
         /** @var Quote $quote */
@@ -225,11 +309,22 @@ class Data extends AbstractHelper
         return json_encode($json);
     }
 
+    /**
+     * @param $baseUrl
+     * @return string
+     */
     public function prepareZaiusCartUrl($baseUrl)
     {
         return $baseUrl . 'zaius/hook/create/client_id/' . $this->getZaiusTrackerId() . '/zaius_cart/';
     }
 
+    /**
+     * @param $quote
+     * @param $id
+     * @param $info
+     * @return bool|string
+     * @throws NoSuchEntityException
+     */
     public function prepareZaiusCart($quote, $id, $info)
     {
         if ($quote == null || $quote->getId() == null || $quote->getCreatedAt() == null || $quote->getStoreId() == null) {
@@ -303,6 +398,10 @@ class Data extends AbstractHelper
         return $vtsrc;
     }
 
+    /**
+     * @param $vtsrc
+     * @return mixed
+     */
     public function prepareVtsrc($vtsrc)
     {
         $explode = explode('|', urldecode($vtsrc));
@@ -313,6 +412,9 @@ class Data extends AbstractHelper
         return $result;
     }
 
+    /**
+     * @return bool|string|null
+     */
     public function getZM64_ID()
     {
         $zm64Cookie = $this->_cookieManager->getCookie('zm64_id');
@@ -322,6 +424,9 @@ class Data extends AbstractHelper
         return false;
     }
 
+    /**
+     * @return array|bool
+     */
     public function getZaiusAliasCookies()
     {
         $substr = 'zaius_alias_';
@@ -386,11 +491,17 @@ class Data extends AbstractHelper
         return implode($separator, $categoryNames);
     }
 
+    /**
+     * @return mixed
+     */
     protected function isBatchUpdate()
     {
         return $this->scopeConfig->getValue(Client::XML_PATH_BATCH_ENABLED);
     }
 
+    /**
+     * @param $event
+     */
     public function addEventToRegistry($event)
     {
         $event['data'] += $this->getDataSourceFields();
@@ -473,11 +584,19 @@ class Data extends AbstractHelper
         return $productId;
     }
 
+    /**
+     * @param null $store
+     * @return mixed
+     */
     public function getGlobalIDPrefix($store = null)
     {
         return $this->scopeConfig->getValue('zaius_engage/settings/global_id_prefix', 'store', $store);
     }
 
+    /**
+     * @param $idToPrefix
+     * @return string
+     */
     public function applyGlobalIDPrefix($idToPrefix)
     {
         $prefix = $this->getGlobalIDPrefix();
@@ -487,6 +606,10 @@ class Data extends AbstractHelper
         return $idToPrefix;
     }
 
+    /**
+     * @param null $store
+     * @return mixed|string
+     */
     public function getNewsletterListId($store = null)
     {
         $listId = $this->scopeConfig->getValue('zaius_engage/settings/newsletter_list_id', 'store', $store);
@@ -497,6 +620,9 @@ class Data extends AbstractHelper
         return $listId;
     }
 
+    /**
+     * @return array
+     */
     public function getDataSourceFields()
     {
         $dataSource = [

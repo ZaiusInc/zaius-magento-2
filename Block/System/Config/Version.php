@@ -4,8 +4,15 @@ namespace Zaius\Engage\Block\System\Config;
 
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
+/**
+ * Class Version
+ * @package Zaius\Engage\Block\System\Config
+ */
 class Version extends \Magento\Config\Block\System\Config\Form\Field
 {
+    /**
+     * @var EXTENSION_URL
+     */
     const EXTENSION_URL = 'https://help.zaius.com/engage';
     /**
      * @var \Zaius\Engage\Helper\Data $helper

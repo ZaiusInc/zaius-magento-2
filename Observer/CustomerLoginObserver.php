@@ -8,13 +8,32 @@ use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 
+/**
+ * Class CustomerLoginObserver
+ * @package Zaius\Engage\Observer
+ */
 class CustomerLoginObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var CustomerRepositoryInterface
+     */
     protected $_customerRepository;
 
+    /**
+     * CustomerLoginObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param Data $helper
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         CustomerRepositoryInterface $customerRepository,
@@ -26,6 +45,11 @@ class CustomerLoginObserver
         $this->_customerRepository = $customerRepository;
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

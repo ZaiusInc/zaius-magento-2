@@ -18,11 +18,24 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Zaius\Engage\Model\Feed;
 
+/**
+ * Class SystemChecks
+ * @package Zaius\Engage\Observer
+ */
 class SystemChecks
     implements ObserverInterface
 {
+    /**
+     * @var Feed
+     */
     protected $_feed;
 
+    /**
+     * SystemChecks constructor.
+     * @param Session $backendSession
+     * @param ManagerInterface $messageManager
+     * @param Feed $feed
+     */
     public function __construct(
         Session $backendSession,
         ManagerInterface $messageManager,
@@ -34,6 +47,10 @@ class SystemChecks
         $this->_feed = $feed;
     }
 
+    /**
+     * @param Observer $observer
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         if ($this->_backendSession->isLoggedIn()) {

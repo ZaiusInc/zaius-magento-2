@@ -16,10 +16,25 @@ use Zaius\Engage\Helper\Data;
  */
 class OrderRepository implements OrderRepositoryInterface
 {
+    /**
+     * @var OrderCollectionFactory
+     */
     protected $_orderCollectionFactory;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var \Zaius\Engage\Logger\Logger
+     */
     protected $_logger;
 
+    /**
+     * OrderRepository constructor.
+     * @param OrderCollectionFactory $orderCollectionFactory
+     * @param Data $helper
+     * @param \Zaius\Engage\Logger\Logger $logger
+     */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         Data $helper,

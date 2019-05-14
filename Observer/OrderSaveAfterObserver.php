@@ -10,14 +10,37 @@ use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data;
 
+/**
+ * Class OrderSaveAfterObserver
+ * @package Zaius\Engage\Observer
+ */
 class OrderSaveAfterObserver
     implements ObserverInterface
 {
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var OrderRepositoryInterface
+     */
     protected $_orderRepository;
+    /**
+     * @var Client
+     */
     protected $_client;
 
+    /**
+     * OrderSaveAfterObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Data $helper
+     * @param Client $client
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         OrderRepositoryInterface $orderRepository,
@@ -31,6 +54,11 @@ class OrderSaveAfterObserver
         $this->_client = $client;
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         /** @var Order $order */

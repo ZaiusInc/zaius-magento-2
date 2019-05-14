@@ -14,22 +14,75 @@ use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
 
+/**
+ * Class Client
+ * @package Zaius\Engage\Model
+ */
 class Client implements ClientInterface
 {
+    /**
+     * @var XML_PATH_BATCH_ENABLED
+     */
     const XML_PATH_BATCH_ENABLED = 'zaius_engage/batch_updates/status';
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var CurlFactory
+     */
     protected $_curlFactory;
+    /**
+     * @var
+     */
     protected $_jsonEncoder;
+    /**
+     * @var CustomerRepositoryInterface
+     */
     protected $_customerRepository;
+    /**
+     * @var OrderRepositoryInterface
+     */
     protected $_orderRepository;
+    /**
+     * @var ProductRepositoryInterface
+     */
     protected $_productRepository;
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var Sdk
+     */
     protected $_sdk;
+    /**
+     * @var Encoder
+     */
     protected $_encoder;
+    /**
+     * @var ScopeConfigInterface
+     */
     protected $_scopeConfig;
 
+    /**
+     * Client constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Data $helper
+     * @param CurlFactory $curlFactory
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param OrderRepositoryInterface $orderRepository
+     * @param ProductRepositoryInterface $productRepository
+     * @param Logger $logger
+     * @param Sdk $sdk
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Encoder $encoder
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper,
@@ -120,6 +173,10 @@ class Client implements ClientInterface
         return Data::API_URL;
     }
 
+    /**
+     * @param $event
+     * @return mixed
+     */
     public static function transformForBatchEvent($event)
     {
         if (isset($event['data']['action'])) {
@@ -268,6 +325,10 @@ class Client implements ClientInterface
         }
     }
 
+    /**
+     * @param null $store
+     * @return mixed
+     */
     public function getLists($store = null)
     {
         $this->_logger->info(__METHOD__);
@@ -275,6 +336,10 @@ class Client implements ClientInterface
         return $zaiusClient->getLists();
     }
 
+    /**
+     * @param $list
+     * @param null $store
+     */
     public function createList($list, $store = null)
     {
         $this->_logger->info(__METHOD__);
@@ -282,6 +347,9 @@ class Client implements ClientInterface
         $zaiusClient->createList($list, $this->isBatchUpdate());
     }
 
+    /**
+     * @return mixed
+     */
     protected function isBatchUpdate()
     {
         return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);

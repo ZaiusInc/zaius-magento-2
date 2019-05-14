@@ -19,15 +19,45 @@ use Zaius\Engage\Logger\Logger;
  */
 class CustomerRepository implements CustomerRepositoryInterface
 {
+    /**
+     * @var ADDRESS_EVENT
+     */
     const ADDRESS_EVENT = 'customer_address_save_after';
 
+    /**
+     * @var RequestInterface
+     */
     protected $_request;
+    /**
+     * @var RegionFactory
+     */
     protected $_regionFactory;
+    /**
+     * @var CustomerCollectionFactory
+     */
     protected $_customerCollectionFactory;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var Locale
+     */
     protected $_localeHelper;
 
+    /**
+     * CustomerRepository constructor.
+     * @param RequestInterface $request
+     * @param RegionFactory $regionFactory
+     * @param CustomerCollectionFactory $customerCollectionFactory
+     * @param Data $helper
+     * @param Locale $localeHelper
+     * @param Logger $logger
+     */
     public function __construct(
         RequestInterface $request,
         RegionFactory $regionFactory,

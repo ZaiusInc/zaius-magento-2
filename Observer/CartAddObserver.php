@@ -13,18 +13,52 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Logger\Logger;
 
+/**
+ * Class CartAddObserver
+ * @package Zaius\Engage\Observer
+ */
 class CartAddObserver
     implements ObserverInterface
 {
+    /**
+     * @var UPDATE_ITEM_OPTIONS
+     */
     const UPDATE_ITEM_OPTIONS = 'checkout_cart_product_update_after';
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var ProductRepository
+     */
     protected $_productRepository;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
+    /**
+     * @var CheckoutSession
+     */
     protected $_checkoutSession;
+    /**
+     * @var Logger
+     */
     protected $_logger;
 
+    /**
+     * CartAddObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param ProductRepository $productRepository
+     * @param Data $helper
+     * @param Client $client
+     * @param CheckoutSession $checkoutSession
+     * @param Logger $logger
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         ProductRepository $productRepository,
@@ -42,6 +76,13 @@ class CartAddObserver
         $this->_logger = $logger;
     }
 
+    /**
+     * @param Observer $observer
+     * @param null $product
+     * @param null $info
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer, $product = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

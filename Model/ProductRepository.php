@@ -20,6 +20,9 @@ use Zaius\Engage\Logger\Logger;
  */
 class ProductRepository implements ProductRepositoryInterface
 {
+    /**
+     * @var array
+     */
     protected static $PRODUCT_ATTRIBUTES_TO_IGNORE = array(
         // These fields are suppressed because there's no clear path to utility in Zaius.
         'entity_id', 'attribute_set_id', 'type_id',
@@ -30,15 +33,49 @@ class ProductRepository implements ProductRepositoryInterface
         'image', 'special_from_date', 'special_to_date',
     );
 
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var ProductCollectionFactory
+     */
     protected $_productCollectionFactory;
+    /**
+     * @var ProductInterfaceFactory
+     */
     protected $_productFactory;
+    /**
+     * @var StockRegistryInterface
+     */
     protected $_stockRegistry;
+    /**
+     * @var ProductHelper
+     */
     protected $_productHelper;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var
+     */
     protected $_extraProductAttributes;
 
+    /**
+     * ProductRepository constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param ProductCollectionFactory $productCollectionFactory
+     * @param ProductInterfaceFactory $productFactory
+     * @param StockRegistryInterface $stockRegistry
+     * @param ProductHelper $productHelper
+     * @param Data $helper
+     * @param Logger $logger
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         ProductCollectionFactory $productCollectionFactory,
@@ -144,6 +181,10 @@ class ProductRepository implements ProductRepositoryInterface
         return $productData;
     }
 
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     protected function _getExtraProductAttributes()
     {
         if (!isset($this->_extraProductAttributes)) {

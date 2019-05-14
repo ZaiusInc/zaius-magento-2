@@ -10,6 +10,10 @@ use Magento\Framework\Locale\Resolver;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\LocalesInterface;
 
+/**
+ * Class LocalesRepository
+ * @package Zaius\Engage\Model
+ */
 class LocalesRepository implements LocalesInterface
 {
 

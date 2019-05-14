@@ -5,6 +5,10 @@ namespace Zaius\Engage\Model;
 use Zaius\Engage\Helper\Sdk;
 use ZaiusSDK\Zaius\Worker;
 
+/**
+ * Class Cron
+ * @package Zaius\Engage\Model
+ */
 class Cron
 {
 
@@ -20,6 +24,9 @@ class Cron
         $this->sdk = $sdk;
     }
 
+    /**
+     *
+     */
     public function process()
     {
         $zaiusClient = $this->sdk->getSdkClient();

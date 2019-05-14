@@ -6,6 +6,10 @@ use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\Session\SessionManagerInterface;
 
+/**
+ * Class ZaiusCartMode
+ * @package Zaius\Engage\Cookie
+ */
 class ZaiusCartMode
 {
     /**
