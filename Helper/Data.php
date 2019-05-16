@@ -339,7 +339,6 @@ class Data extends AbstractHelper
             $pid = $this->getProductId($product);
             if (strtok($pid, '$') == $id) {
                 $qty = $info[$item->getId()]['qty'] ?? $info;
-                $this->_logger->info("pid !== id");
             } else {
                 $qty = $info[$item->getId()]['qty'] ?? $item->getQty();
             }
