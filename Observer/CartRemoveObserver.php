@@ -80,6 +80,10 @@ class CartRemoveObserver
             }
 
             /** @var Product $item */
+            // when working with configurable/simple products, product/item models grab the configurable parent of a
+            // simple product, but contain the sku of the simple product. We need to grab that sku, and load the simple
+            // product model for processing to Zaius.
+            // travis@trellis.co
             $sku = $item->getSku();
             $item = $this->_productRepository->get($sku);
             $id = $item->getId();
