@@ -11,14 +11,37 @@ use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data;
 
 
+/**
+ * Class CustomerSaveObserver
+ * @package Zaius\Engage\Observer
+ */
 class CustomerSaveObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
+    /**
+     * @var CustomerRepositoryInterface
+     */
     protected $_customerRepository;
 
+    /**
+     * CustomerSaveObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Data $helper
+     * @param Client $client
+     * @param CustomerRepositoryInterface $customerRepository
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper,
@@ -32,6 +55,11 @@ class CustomerSaveObserver
         $this->_customerRepository = $customerRepository;
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

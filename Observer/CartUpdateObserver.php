@@ -14,17 +14,52 @@ use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Observer\CartAddObserver;
 use Zaius\Engage\Observer\CartRemoveObserver;
 
+/**
+ * Class CartUpdateObserver
+ * @package Zaius\Engage\Observer
+ */
 class CartUpdateObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
+    /**
+     * @var CheckoutSession
+     */
     protected $_checkoutSession;
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var \Zaius\Engage\Observer\CartAddObserver
+     */
     protected $_cartAdd;
+    /**
+     * @var \Zaius\Engage\Observer\CartRemoveObserver
+     */
     protected $_cartRemove;
 
+    /**
+     * CartUpdateObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Data $helper
+     * @param Client $client
+     * @param CheckoutSession $checkoutSession
+     * @param Logger $logger
+     * @param \Zaius\Engage\Observer\CartAddObserver $cartAddObserver
+     * @param \Zaius\Engage\Observer\CartRemoveObserver $cartRemoveObserver
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper,
@@ -44,6 +79,10 @@ class CartUpdateObserver
         $this->_cartRemove = $cartRemoveObserver;
     }
 
+    /**
+     * @param Observer $observer
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
 

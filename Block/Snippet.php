@@ -8,13 +8,38 @@ use Magento\Framework\View\Element\Template;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Model\Session;
 
+/**
+ * Class Snippet
+ * @package Zaius\Engage\Block
+ */
 class Snippet extends Template
 {
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Session
+     */
     protected $_session;
+    /**
+     * @var Registry
+     */
     protected $_registry;
+    /**
+     * @var JsonEncoder
+     */
     protected $_jsonEncoder;
 
+    /**
+     * Snippet constructor.
+     * @param Data $helper
+     * @param Session $session
+     * @param Registry $registry
+     * @param JsonEncoder $jsonEncoder
+     * @param Template\Context $context
+     * @param array $data
+     */
     public function __construct(
         Data $helper,
         Session $session,
@@ -31,6 +56,10 @@ class Snippet extends Template
         parent::__construct($context, $data);
     }
 
+    /**
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function toHtml()
     {
         if (!$this->_helper->getStatus($this->_storeManager->getStore())) {
@@ -39,6 +68,9 @@ class Snippet extends Template
         return parent::toHtml();
     }
 
+    /**
+     * @return array
+     */
     public function getCacheKeyInfo()
     {
         $info = parent::getCacheKeyInfo();

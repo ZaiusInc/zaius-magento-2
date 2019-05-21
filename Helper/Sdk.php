@@ -5,6 +5,10 @@ namespace Zaius\Engage\Helper;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\Helper\AbstractHelper;
 
+/**
+ * Class Sdk
+ * @package Zaius\Engage\Helper
+ */
 class Sdk
     extends AbstractHelper
 {
@@ -39,8 +43,9 @@ class Sdk
      */
     public function isComposerInstalled()
     {
-        $json = 'composer.json';
-        if (file_exists($json)) {
+        $json = '/composer.json';
+        $base_path = $this->_directoryList->getRoot();
+        if (file_exists($base_path . $json)) {
             //composer exists
             return true;
         }

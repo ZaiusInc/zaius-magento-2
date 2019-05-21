@@ -2,6 +2,10 @@
 
 namespace Zaius\Engage\Api;
 
+/**
+ * Interface ClientInterface
+ * @package Zaius\Engage\Api
+ */
 interface ClientInterface
 {
     /**

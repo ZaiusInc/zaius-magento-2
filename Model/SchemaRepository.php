@@ -6,16 +6,29 @@ use Zaius\Engage\Helper\Data as Helper;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 
+/**
+ * Class SchemaRepository
+ * @package Zaius\Engage\Model
+ */
 class SchemaRepository
 {
 
     /** @var Sdk */
     protected $_client;
 
+    /**
+     * @var Helper
+     */
     protected $_helper;
 
+    /**
+     * @var LocaleHelper
+     */
     protected $_localeHelper;
 
+    /**
+     * @var LocalesRepository
+     */
     protected $_localesRepository;
 
     /**
@@ -96,6 +109,9 @@ class SchemaRepository
         $this->_client->createObjectField($customerObject, $delta);
     }
 
+    /**
+     * @return mixed
+     */
     public function getProductsFields()
     {
         $this->_logger->info(__METHOD__);
@@ -103,6 +119,9 @@ class SchemaRepository
         return $this->_client->getObjectFields($productsObject);
     }
 
+    /**
+     *
+     */
     public function setProductsFields()
     {
         $this->_logger->info(__METHOD__);
@@ -190,6 +209,9 @@ class SchemaRepository
         $this->_client->createObjectField($productsObject, $delta);
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventsFields()
     {
         $this->_logger->info(__METHOD__);
@@ -197,6 +219,9 @@ class SchemaRepository
         return $this->_client->getObjectFields($eventsObject);
     }
 
+    /**
+     *
+     */
     public function setEventsFields()
     {
         $this->_logger->info(__METHOD__);
@@ -279,11 +304,18 @@ class SchemaRepository
         $this->_client->createObjectField($ordersObject, $delta);
     }
 
+    /**
+     * @param null $store
+     * @return mixed
+     */
     public function getLists($store = null)
     {
         return $this->_client->getLists($store);
     }
 
+    /**
+     * @param null $store
+     */
     public function setList($store = null)
     {
         $zaiusLists = $this->getLists($store);

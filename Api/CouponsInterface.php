@@ -2,6 +2,10 @@
 
 namespace Zaius\Engage\Api;
 
+/**
+ * Interface CouponsInterface
+ * @package Zaius\Engage\Api
+ */
 interface CouponsInterface
 {
     /**

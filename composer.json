@@ -3,7 +3,7 @@
   "type": "magento2-module",
   "description": "The Zaius Engage Connector for Magento 2. This module is currently in a RELEASE CANDIDATE state, and therefore testing and monitoring is advised.",
   "license": "MIT",
-  "version": "1.0.0-RC.2",
+  "version": "1.0.0-RC.3",
   "require": {
     "php": ">=5.5",
     "zaius/zaius-php-sdk": "^1.0"

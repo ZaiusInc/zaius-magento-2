@@ -10,14 +10,37 @@ use Magento\Store\Model\StoreManager;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data as Helper;
 
+/**
+ * Class NewsletterSubscriberSaveObserver
+ * @package Zaius\Engage\Observer
+ */
 class NewsletterSubscriberSaveObserver
     implements ObserverInterface
 {
+    /**
+     * @var State
+     */
     protected $_state;
+    /**
+     * @var StoreManager
+     */
     protected $_storeManager;
+    /**
+     * @var Helper
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
 
+    /**
+     * NewsletterSubscriberSaveObserver constructor.
+     * @param State $state
+     * @param StoreManager $storeManager
+     * @param Helper $helper
+     * @param Client $client
+     */
     public function __construct(
         State $state,
         StoreManager $storeManager,
@@ -31,6 +54,12 @@ class NewsletterSubscriberSaveObserver
         $this->_client = $client;
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         $store = $this->_storeManager->getStore();

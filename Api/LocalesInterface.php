@@ -2,6 +2,10 @@
 
 namespace Zaius\Engage\Api;
 
+/**
+ * Interface LocalesInterface
+ * @package Zaius\Engage\Api
+ */
 interface LocalesInterface
 {
     /**

@@ -19,15 +19,45 @@ use Zaius\Engage\Logger\Logger;
  */
 class CustomerRepository implements CustomerRepositoryInterface
 {
+    /**
+     * @var ADDRESS_EVENT
+     */
     const ADDRESS_EVENT = 'customer_address_save_after';
 
+    /**
+     * @var RequestInterface
+     */
     protected $_request;
+    /**
+     * @var RegionFactory
+     */
     protected $_regionFactory;
+    /**
+     * @var CustomerCollectionFactory
+     */
     protected $_customerCollectionFactory;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var Locale
+     */
     protected $_localeHelper;
 
+    /**
+     * CustomerRepository constructor.
+     * @param RequestInterface $request
+     * @param RegionFactory $regionFactory
+     * @param CustomerCollectionFactory $customerCollectionFactory
+     * @param Data $helper
+     * @param Locale $localeHelper
+     * @param Logger $logger
+     */
     public function __construct(
         RequestInterface $request,
         RegionFactory $regionFactory,
@@ -153,7 +183,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             $customerData['image_url'] = $customer->getData('image_url');
         } else if ($eventName === self::ADDRESS_EVENT) {
             $params = $this->_request->getParams();
-            if (is_numeric($params['region_id'])) {
+            if (!empty($params['region_id']) && is_numeric($params['region_id'])) {
                 $state = $this->_regionFactory->create()->load($params['region_id'])->getCode();
             }
             $customerData['street1'] = isset($params['street'][0]) ? $params['street'][0] : '';

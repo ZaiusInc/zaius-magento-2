@@ -15,16 +15,46 @@ use Magento\Framework\Registry;
 use Magento\Framework\View\LayoutInterface;
 use Zaius\Engage\Helper\Data;
 
+/**
+ * Class PageViewObserver
+ * @package Zaius\Engage\Observer
+ */
 class PageViewObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var RequestInterface
+     */
     protected $_request;
+    /**
+     * @var Registry
+     */
     protected $_registry;
+    /**
+     * @var LayoutInterface
+     */
     protected $_layout;
+    /**
+     * @var
+     */
     protected $_localeHelper;
 
+    /**
+     * PageViewObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Data $helper
+     * @param RequestInterface $request
+     * @param Registry $registry
+     * @param LayoutInterface $layout
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper,
@@ -40,6 +70,11 @@ class PageViewObserver
         $this->_layout = $layout;
     }
 
+    /**
+     * @param \Magento\Framework\Event\Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $store = $this->_storeManager->getStore();

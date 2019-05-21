@@ -11,13 +11,32 @@ use Magento\Framework\Event\ObserverInterface;
 use Zaius\Engage\Helper\Data;
 use Magento\Checkout\Model\Session as CheckoutSession;
 
+/**
+ * Class CartClearObserver
+ * @package Zaius\Engage\Observer
+ */
 class CartClearObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var Data
+     */
     protected $_helper;
+    /**
+     * @var CheckoutSession
+     */
     protected $_checkoutSession;
 
+    /**
+     * CartClearObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param Data $helper
+     * @param CheckoutSession $checkoutSession
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper,
@@ -29,6 +48,11 @@ class CartClearObserver
         $this->_checkoutSession = $checkoutSession;
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {

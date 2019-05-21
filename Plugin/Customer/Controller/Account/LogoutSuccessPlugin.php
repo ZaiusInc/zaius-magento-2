@@ -16,8 +16,15 @@ use Magento\Customer\Controller\Account\LogoutSuccess;
  */
 class LogoutSuccessPlugin
 {
+    /**
+     * @var Data
+     */
     protected $_helper;
 
+    /**
+     * LogoutSuccessPlugin constructor.
+     * @param Data $helper
+     */
     public function __construct(
         Data $helper
     )
@@ -25,6 +32,11 @@ class LogoutSuccessPlugin
         $this->_helper = $helper;
     }
 
+    /**
+     * @param LogoutSuccess $controller
+     * @param \Closure $next
+     * @return mixed
+     */
     public function aroundExecute(LogoutSuccess $controller, \Closure $next)
     {
         if ($this->_helper->getStatus()) {

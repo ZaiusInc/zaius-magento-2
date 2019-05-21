@@ -8,12 +8,27 @@ use Magento\Sales\Model\Order\Payment;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data as Helper;
 
+/**
+ * Class OrderPaymentRefundObserver
+ * @package Zaius\Engage\Observer
+ */
 class OrderPaymentRefundObserver
     implements ObserverInterface
 {
+    /**
+     * @var Helper
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
 
+    /**
+     * OrderPaymentRefundObserver constructor.
+     * @param Helper $helper
+     * @param Client $client
+     */
     public function __construct(
         Helper $helper,
         Client $client
@@ -23,6 +38,10 @@ class OrderPaymentRefundObserver
         $this->_client = $client;
     }
 
+    /**
+     * @param Observer $observer
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         /** @var Payment $payment */

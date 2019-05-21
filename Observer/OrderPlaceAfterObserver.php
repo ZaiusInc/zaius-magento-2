@@ -10,14 +10,37 @@ use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data as Helper;
 
+/**
+ * Class OrderPlaceAfterObserver
+ * @package Zaius\Engage\Observer
+ */
 class OrderPlaceAfterObserver
     implements ObserverInterface
 {
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * @var OrderRepositoryInterface
+     */
     protected $_orderRepository;
+    /**
+     * @var Helper
+     */
     protected $_helper;
+    /**
+     * @var Client
+     */
     protected $_client;
 
+    /**
+     * OrderPlaceAfterObserver constructor.
+     * @param StoreManagerInterface $storeManager
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Helper $helper
+     * @param Client $client
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         OrderRepositoryInterface $orderRepository,
@@ -31,6 +54,11 @@ class OrderPlaceAfterObserver
         $this->_client = $client;
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         /** @var Order $order */
