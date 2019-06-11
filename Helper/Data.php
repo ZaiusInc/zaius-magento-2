@@ -479,6 +479,8 @@ class Data extends AbstractHelper
      */
     public function getCategoryNamePathAsString($category, $separator = ' > ')
     {
+        // null guard
+        if (is_null($category)) return "";
         // ignore root category
         $path = array_slice(explode('/', $category->getPath()), 1);
         $categoryNames = [];
