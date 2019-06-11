@@ -229,10 +229,10 @@ class OrderRepository implements OrderRepositoryInterface
                     'subtotal' => $orderItem->getBaseRowTotal(),
                     'sku' => $orderItem->getSku(),
                     'quantity' => $orderItem->getQtyOrdered(),
-                    'price' => $orderItem->getBasePrice(),
+                    'price' => trim($orderItem->getBasePrice()),
                     'discount' => 0 - $orderItem->getBaseDiscountAmount(),
                     'native_subtotal' => $orderItem->getRowTotal(),
-                    'native_price' => $orderItem->getPrice(),
+                    'native_price' => trim($orderItem->getPrice()),
                     'native_discount' => 0 - $orderItem->getDiscountAmount(),
                 ];
             }
