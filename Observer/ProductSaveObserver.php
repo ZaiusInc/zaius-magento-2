@@ -2,19 +2,20 @@
 
 namespace Zaius\Engage\Observer;
 
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Catalog\Model\Product;
-use Zaius\Engage\Model\Client;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Helper\Data as Helper;
+use Zaius\Engage\Model\Client;
+use ZaiusSDK\ZaiusException;
 
 /**
  * Class ProductSaveObserver
  * @package Zaius\Engage\Observer
  */
-class ProductSaveObserver
-    implements ObserverInterface
+class ProductSaveObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -39,8 +40,7 @@ class ProductSaveObserver
         StoreManagerInterface $storeManager,
         Helper $helper,
         Client $client
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
@@ -48,7 +48,8 @@ class ProductSaveObserver
 
     /**
      * @param Observer $observer
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
+     * @throws ZaiusException
      */
     public function execute(Observer $observer)
     {

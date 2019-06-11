@@ -13,6 +13,7 @@ use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
+use ZaiusSDK\ZaiusException;
 
 /**
  * Class Client
@@ -105,14 +106,13 @@ class Client implements ClientInterface
         $this->_sdk = $sdk;
         $this->_encoder = $encoder;
         $this->_scopeConfig = $scopeConfig;
-
     }
 
     /**
      * @param mixed $object
      * @param string $url
      * @return $this
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     protected function _post($object, $url)
     {
@@ -121,14 +121,13 @@ class Client implements ClientInterface
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
         return $zaiusClient->call($object, 'POST', $url, $this->isBatchUpdate());
-
     }
 
     /**
      * @param mixed $entity
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function postEntity($entity)
     {
@@ -185,14 +184,13 @@ class Client implements ClientInterface
         }
 
         return $event;
-
     }
 
     /**
      * @param mixed $event
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function postEvent($event)
     {
@@ -249,7 +247,7 @@ class Client implements ClientInterface
      * @param null $eventName
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function postCustomer($customer, $eventName = null)
     {
@@ -261,7 +259,7 @@ class Client implements ClientInterface
      * @param string $eventType
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function postOrder($order, $eventType = 'purchase')
     {
@@ -272,7 +270,7 @@ class Client implements ClientInterface
      * @param string $event
      * @param \Magento\Catalog\Model\Product $product
      * @return array|null
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function postProduct($event, $product)
     {
@@ -286,7 +284,7 @@ class Client implements ClientInterface
     /**
      * @param $objectName string
      * @return mixed
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function getObjectFields($objectName)
     {
@@ -301,9 +299,10 @@ class Client implements ClientInterface
     /**
      * @param $objectName string
      * @param $fieldArray array
-     * @throws \ZaiusSDK\ZaiusException
+     * @return mixed|void
+     * @throws ZaiusException
      */
-    public function createObjectField($objectName, $fieldArray = array())
+    public function createObjectField($objectName, $fieldArray = [])
     {
         $this->_logger->info(__METHOD__);
         if (empty($fieldArray)) {
@@ -328,6 +327,7 @@ class Client implements ClientInterface
     /**
      * @param null $store
      * @return mixed
+     * @throws ZaiusException
      */
     public function getLists($store = null)
     {
@@ -339,6 +339,7 @@ class Client implements ClientInterface
     /**
      * @param $list
      * @param null $store
+     * @throws ZaiusException
      */
     public function createList($list, $store = null)
     {

@@ -2,12 +2,12 @@
 
 namespace Zaius\Engage\Model;
 
-use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
 use Magento\Catalog\Helper\Product as ProductHelper;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
@@ -23,7 +23,7 @@ class ProductRepository implements ProductRepositoryInterface
     /**
      * @var array
      */
-    protected static $PRODUCT_ATTRIBUTES_TO_IGNORE = array(
+    protected static $PRODUCT_ATTRIBUTES_TO_IGNORE = [
         // These fields are suppressed because there's no clear path to utility in Zaius.
         'entity_id', 'attribute_set_id', 'type_id',
         'entity_type_id', 'category_ids', 'required_options',
@@ -31,7 +31,7 @@ class ProductRepository implements ProductRepositoryInterface
         'small_image', 'thumbnail', 'quantity_and_stock_status',
         // The next fields are suppressed because they're explicitly mapped.
         'image', 'special_from_date', 'special_to_date',
-    );
+    ];
 
     /**
      * @var StoreManagerInterface
@@ -123,11 +123,9 @@ class ProductRepository implements ProductRepositoryInterface
                 $this->_logger->warning("ZAIUS: Call to " . __METHOD__ . " at " . time() . ".");
                 // missing field
                 $this->_logger->warning("ZAIUS: Null field: product_id.");
-
             } else {
                 $result[] = $this->getProductEventData('product', $product);
             }
-
         }
         $this->_logger->info('ZAIUS: Product information fully assembled.');
         // requested operation, time of API call
@@ -172,6 +170,7 @@ class ProductRepository implements ProductRepositoryInterface
         foreach ($this->_getExtraProductAttributes() as $attributeCode => $attribute) {
             $productData[$attributeCode] = $attribute->getFrontend()->getValue($product);
         }
+        $productData['price'] = preg_replace('/\s+/', '', $productData['price']);
         $productData['zaius_engage_version'] = $this->_helper->getVersion();
         if (!$product->getImage()) {
             $this->_logger->error('ZAIUS: Unable to retrieve product image_url');
