@@ -156,7 +156,7 @@ class OrderRepository implements OrderRepositoryInterface
             // requested operation, time of API call
             $this->_logger->warning("ZAIUS: Call to " . __METHOD__ . " at " . time() . ".");
             // missing fields
-            $this->_logger->warning("ZAIUS: Null field(s): " . $emptyAction . $emptyBoth . $emptyListId . ".");
+            $this->_logger->warning("ZAIUS: Null field(s): " . $emptyAction . $emptyBoth . $emptyOrderId . ".");
         }
         return [
             'type' => 'order',
