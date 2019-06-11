@@ -4,7 +4,7 @@
     <default>
         <zaius_engage>
             <status>
-                <status>1</status>
+                <status>0</status>
             </status>
             <settings>
                 <newsletter_list_id>newsletter</newsletter_list_id>

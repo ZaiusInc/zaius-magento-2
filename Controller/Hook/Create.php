@@ -26,6 +26,16 @@ class Create extends AbstractHook
     const COOKIE_DURATION = '86400';
 
     /**
+     * @var CLIENT_ID_PARAM
+     */
+    const CLIENT_ID_PARAM = 'client_id';
+
+    /**
+     * @var ZAIUS_CART_PARAM
+     */
+    const ZAIUS_CART_PARAM = 'zaius_cart';
+
+    /**
      * @var \Magento\Framework\Stdlib\CookieManagerInterface
      */
     protected $_cookieManager;
@@ -122,12 +132,24 @@ class Create extends AbstractHook
         $this->_logger->info('REQUEST to WebHook (Action: ' . $request->getFullActionName() . ')');
         try {
             $this->_logger->info('Entered publish webhook.');
-            $zaiusCart = $request->getParam('zaius_cart');
+            $zaiusCart = $request->getParam(self::ZAIUS_CART_PARAM);
             if (!$zaiusCart) {
                 //todo check for a valid param?
                 return $this->_resultJsonFactory->create()->setData(['status' => 'error', 'message' => 'Invalid Parameter']);
             }
-            //todo zaius_cart_mode
+            $params = $request->getParams();
+            $queryParams = array_diff_key($params, array_flip([self::CLIENT_ID_PARAM, self::ZAIUS_CART_PARAM]));
+            $queryString = null;
+            if (!empty($queryParams)) {
+                $queryString = '?';
+                $paramCount = count($queryParams);
+                $i = 0;
+                foreach ($queryParams as $param => $value) {
+                    $queryString .= $param . '=' . $value;
+                    (($paramCount > 1) && ($paramCount > $i + 1)) ? $queryString .= '&' : '';
+                    $i++;
+                }
+            }
             /** @var Quote $quote */
             $quote = $this->_session->getQuote();
             $quoteCount = $quote->getItemsCount();
@@ -207,6 +229,6 @@ class Create extends AbstractHook
         } catch (\Exception $e) {
             $this->_logger->error('Something happened while running Zaius cart creation. :(' . $e->getMessage());
         }
-        return $this->getResponse()->setRedirect('/checkout/cart/index');
+        return $this->getResponse()->setRedirect('/checkout/cart/index' . $queryString);
     }
 }

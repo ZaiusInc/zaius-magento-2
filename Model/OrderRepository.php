@@ -5,9 +5,9 @@ namespace Zaius\Engage\Model;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
-use Psr\Log\LoggerInterface as Logger;
 use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Logger\Logger;
 
 /**
  * Class OrderRepository
@@ -25,7 +25,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     protected $_helper;
     /**
-     * @var \Zaius\Engage\Logger\Logger
+     * @var Logger
      */
     protected $_logger;
 
@@ -33,12 +33,12 @@ class OrderRepository implements OrderRepositoryInterface
      * OrderRepository constructor.
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param Data $helper
-     * @param \Zaius\Engage\Logger\Logger $logger
+     * @param Logger $logger
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         Data $helper,
-        \Zaius\Engage\Logger\Logger $logger
+        Logger $logger
     ) {
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_helper = $helper;
@@ -49,6 +49,7 @@ class OrderRepository implements OrderRepositoryInterface
      * @param int|null $limit
      * @param int|null $offset
      * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getList($limit = null, $offset = null)
     {
@@ -79,7 +80,7 @@ class OrderRepository implements OrderRepositoryInterface
                 } else {
                     $suppressions++;
                 }
-            } else if ($order->getTotalCanceled() > 0) {
+            } elseif ($order->getTotalCanceled() > 0) {
                 if (!$this->getOrderEventData($order, 'cancel')['broken']) {
                     $result[] = $this->getOrderEventData($order, 'cancel');
                     foreach ($result as $key => &$cancelValue) {
@@ -104,13 +105,14 @@ class OrderRepository implements OrderRepositoryInterface
      * @param \Magento\Sales\Model\Order $order
      * @param string $eventType
      * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getOrderEventData($order, $eventType = 'purchase', $sendVuid = false)
     {
         $ip = '';
         if ($order->getXForwardedFor()) {
             $ip = $order->getXForwardedFor();
-        } else if ($order->getRemoteIp()) {
+        } elseif ($order->getRemoteIp()) {
             $ip = $order->getRemoteIp();
         }
         $orderEventData = [
@@ -136,7 +138,7 @@ class OrderRepository implements OrderRepositoryInterface
         }
         if ($order->getCustomerId()) {
             $orderEventData['customer_id'] = $order->getCustomerId();
-        } else if ($order->getCustomerEmail()) {
+        } elseif ($order->getCustomerEmail()) {
             $orderEventData['email'] = $order->getCustomerEmail();
         }
         $orderEventData['zaius_engage_version'] = $this->_helper->getVersion();
@@ -156,7 +158,7 @@ class OrderRepository implements OrderRepositoryInterface
             // requested operation, time of API call
             $this->_logger->warning("ZAIUS: Call to " . __METHOD__ . " at " . time() . ".");
             // missing fields
-            $this->_logger->warning("ZAIUS: Null field(s): " . $emptyAction . $emptyBoth . $emptyListId . ".");
+            $this->_logger->warning("ZAIUS: Null field(s): " . $emptyAction . $emptyBoth . $emptyOrderId . ".");
         }
         return [
             'type' => 'order',
@@ -223,16 +225,15 @@ class OrderRepository implements OrderRepositoryInterface
             $orderData['items'] = [];
             /** @var \Magento\Sales\Model\Order\Item $orderItem */
             foreach ($order->getAllVisibleItems() as $orderItem) {
-
                 $orderData['items'][] = [
                     'product_id' => $this->_helper->getProductId($orderItem),
                     'subtotal' => $orderItem->getBaseRowTotal(),
                     'sku' => $orderItem->getSku(),
                     'quantity' => $orderItem->getQtyOrdered(),
-                    'price' => $orderItem->getBasePrice(),
+                    'price' => trim($orderItem->getBasePrice()),
                     'discount' => 0 - $orderItem->getBaseDiscountAmount(),
                     'native_subtotal' => $orderItem->getRowTotal(),
-                    'native_price' => $orderItem->getPrice(),
+                    'native_price' => trim($orderItem->getPrice()),
                     'native_discount' => 0 - $orderItem->getDiscountAmount(),
                 ];
             }

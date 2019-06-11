@@ -155,12 +155,12 @@ class ProductRepository implements ProductRepositoryInterface
             'upc' => $product->getData('upc'),
             'description' => $product->getData('short_description'),
             'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
-            'price' => $product->getPrice(),
+            'price' => trim($product->getPrice()),
             'image_url' => $this->_productHelper->getImageUrl($product),
             'url_key' => $product->getData('url_key'),
         ];
         if ($product->getData('special_price')) {
-            $productData['special_price'] = $product->getData('special_price');
+            $productData['special_price'] = trim($product->getData('special_price'));
             $productData['special_price_from_date'] = strtotime($product->getData('special_from_date')) ?: null;
             $productData['special_price_to_date'] = strtotime($product->getData('special_to_date')) ?: null;
         }
