@@ -333,6 +333,9 @@ class Client implements ClientInterface
     {
         $this->_logger->info(__METHOD__);
         $zaiusClient = $this->_sdk->getSdkClient($store);
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         return $zaiusClient->getLists();
     }
 
@@ -345,6 +348,9 @@ class Client implements ClientInterface
     {
         $this->_logger->info(__METHOD__);
         $zaiusClient = $this->_sdk->getSdkClient($store);
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
         $zaiusClient->createList($list, $this->isBatchUpdate());
     }
 
