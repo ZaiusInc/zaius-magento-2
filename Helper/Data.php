@@ -10,7 +10,6 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Filter\Encrypt;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\CookieManagerInterface;
@@ -272,10 +271,10 @@ class Data extends AbstractHelper
     {
         /** @var Quote $quote */
         if ($quote->getItemsCount() == 0) {
-            return array('items' => []);
+            return ['items' => []];
         }
         $items = $quote->getAllVisibleItems();
-        $json = array();
+        $json = [];
         foreach ($items as $item) {
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
@@ -332,7 +331,7 @@ class Data extends AbstractHelper
         }
         $items = $quote->getAllVisibleItems();
         $this->_logger->info('Logging zaiusCart: ' . json_encode($quote->getItemsCount()));
-        $zaiusCart = array();
+        $zaiusCart = [];
         foreach ($items as $item) {
             /** @var Product $product */
             $product = $this->_productRepository->get($item->getSku());
@@ -429,7 +428,7 @@ class Data extends AbstractHelper
     public function getZaiusAliasCookies()
     {
         $substr = 'zaius_alias_';
-        $zaiusAliasCookies = array();
+        $zaiusAliasCookies = [];
         foreach ($_COOKIE as $key => $value) {
             if (strpos($key, $substr) !== false) {
                 $cookie = $this->_cookieManager->getCookie($key);
@@ -449,6 +448,10 @@ class Data extends AbstractHelper
      */
     public function getCurrentOrDeepestCategoryAsString($product)
     {
+        // null guard
+        if (is_null($product)) {
+            return '';
+        }
         /** @var Category $category */
         $category = $this->_registry->registry('current_category');
         if ($category) {
@@ -480,7 +483,9 @@ class Data extends AbstractHelper
     public function getCategoryNamePathAsString($category, $separator = ' > ')
     {
         // null guard
-        if (is_null($category)) return "";
+        if (is_null($category)) {
+            return '';
+        }
         // ignore root category
         $path = array_slice(explode('/', $category->getPath()), 1);
         $categoryNames = [];
@@ -554,7 +559,6 @@ class Data extends AbstractHelper
             $this->_session->setEvents($events);
             $this->_session->setCacheBuster(time());
         }
-
     }
 
     /**
