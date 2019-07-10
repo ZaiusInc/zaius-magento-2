@@ -101,7 +101,7 @@ class Sdk
      */
     public function getZaiusTrackerId($store = null)
     {
-        return $this->scopeConfig->getValue('zaius_engage/config/zaius_tracker_id', 'store', $store);
+        return $this->scopeConfig->getValue('zaius_engage/status/zaius_tracker_id', 'store', $store);
     }
 
     /**
@@ -110,6 +110,6 @@ class Sdk
      */
     public function getZaiusPrivateKey($store = null)
     {
-        return $this->scopeConfig->getValue('zaius_engage/config/zaius_private_api', 'store', $store);
+        return $this->scopeConfig->getValue('zaius_engage/status/zaius_private_api', 'store', $store);
     }
 }
