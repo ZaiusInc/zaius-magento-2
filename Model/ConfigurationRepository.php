@@ -120,7 +120,7 @@ class ConfigurationRepository implements ConfigurationInterface
 
             $storeConfig = $this->_scopeConfig->getValue('zaius_engage', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode);
             $inStoreConfigArray = $this->_scopeConfig->getValue(
-                    'zaius_engage/config/zaius_tracker_id',
+                    'zaius_engage/status/zaius_tracker_id',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeCode
                 ) === $trackingID;
