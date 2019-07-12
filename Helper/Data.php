@@ -179,7 +179,7 @@ class Data extends AbstractHelper
      */
     public function getZaiusTrackerId($store = null)
     {
-        return $this->scopeConfig->getValue('zaius_engage/config/zaius_tracker_id', 'store', $store);
+        return $this->scopeConfig->getValue('zaius_engage/status/zaius_tracker_id', 'store', $store);
     }
 
     /**
@@ -188,7 +188,7 @@ class Data extends AbstractHelper
      */
     public function getZaiusPrivateKey($store = null)
     {
-        return $this->scopeConfig->getValue('zaius_engage/config/zaius_private_api', 'store', $store);
+        return $this->scopeConfig->getValue('zaius_engage/status/zaius_private_api', 'store', $store);
     }
 
     /**
@@ -197,7 +197,7 @@ class Data extends AbstractHelper
      */
     public function getAmazonS3Status($store = null)
     {
-        return $this->scopeConfig->isSetFlag('zaius_engage/config/amazon_active', 'store', $store);
+        return $this->scopeConfig->isSetFlag('zaius_engage/amazon/active', 'store', $store);
     }
 
     /**
@@ -206,7 +206,7 @@ class Data extends AbstractHelper
      */
     public function getAmazonS3Key($store = null)
     {
-        return $this->scopeConfig->getValue('zaius_engage/config/amazon_s3_key', 'store', $store);
+        return $this->scopeConfig->getValue('zaius_engage/amazon/s3_key', 'store', $store);
     }
 
     /**
@@ -215,7 +215,7 @@ class Data extends AbstractHelper
      */
     public function getAmazonS3Secret($store = null)
     {
-        return $this->scopeConfig->getValue('zaius_engage/config/amazon_s3_secret', 'store', $store);
+        return $this->scopeConfig->getValue('zaius_engage/amazon/s3_secret', 'store', $store);
     }
 
     /**
