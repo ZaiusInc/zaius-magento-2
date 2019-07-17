@@ -113,6 +113,7 @@ class Recurring implements InstallSchemaInterface
 
     /**
      * Save a new configuration into the core_config_data
+     * 
      * @param $path
      * @param $value
      * @param string $scope
