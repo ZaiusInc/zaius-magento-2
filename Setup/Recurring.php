@@ -74,6 +74,7 @@ class Recurring implements InstallSchemaInterface
 
         $this->changeConfigPosition($setup, 'zaius_engage/config/zaius_tracker_id', 'zaius_engage/status/zaius_tracker_id', true);
         $this->changeConfigPosition($setup, 'zaius_engage/config/zaius_private_api', 'zaius_engage/status/zaius_private_api', true);
+        $this->saveConfigValue('zaius_engage/settings/is_tracking_orders_on_frontend', 0);
 
         $update->endSetup();
     }
