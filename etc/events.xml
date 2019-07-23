@@ -13,12 +13,6 @@
     <event name="customer_address_save_after">
         <observer name="zaius_engage" instance="Zaius\Engage\Observer\CustomerAddressSaveObserver"/>
     </event>
-    <event name="sales_order_place_after">
-        <observer name="zaius_engage" instance="Zaius\Engage\Observer\OrderPlaceAfterObserver"/>
-    </event>
-    <event name="sales_order_save_after">
-        <observer name="zaius_engage" instance="Zaius\Engage\Observer\OrderSaveAfterObserver"/>
-    </event>
     <event name="sales_order_payment_cancel">
         <observer name="zaius_engage" instance="Zaius\Engage\Observer\OrderPaymentCancelObserver"/>
     </event>
