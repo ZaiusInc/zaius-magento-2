@@ -18,9 +18,6 @@ class Recurring implements InstallSchemaInterface
 {
     const CONFIG_TABLE = 'core_config_data';
 
-    /**
-     * @var ZAIUS
-     */
     const ZAIUS = 'Zaius_Engage';
 
     /**
@@ -39,6 +36,7 @@ class Recurring implements InstallSchemaInterface
 
     /**
      * Recurring constructor.
+     *
      * @param ModuleListInterface $list
      * @param ModuleResourceInterface $resource
      * @param ModuleDataSetupInterface $setup
@@ -74,7 +72,7 @@ class Recurring implements InstallSchemaInterface
 
         $this->changeConfigPosition($setup, 'zaius_engage/config/zaius_tracker_id', 'zaius_engage/status/zaius_tracker_id', true);
         $this->changeConfigPosition($setup, 'zaius_engage/config/zaius_private_api', 'zaius_engage/status/zaius_private_api', true);
-        $this->saveConfigValue('zaius_engage/settings/is_tracking_orders_on_frontend', 0);
+        $this->deleteConfig($setup, 'zaius_engage/settings/is_tracking_orders_on_frontend');
 
         $update->endSetup();
     }
@@ -101,13 +99,30 @@ class Recurring implements InstallSchemaInterface
             }
         }
         if ($removeOldConfig) {
-            $selectRemoveOldVal = $setup->getConnection()->deleteFromSelect($selectOldTrackerId, $this->setup->getTable(self::CONFIG_TABLE));
-            $setup->getConnection()->query($selectRemoveOldVal);
+            $this->deleteConfig($setup, false, $selectOldTrackerId);
         }
     }
 
     /**
+     * Delete a configuration into the core_config_data
+     *
+     * @param SchemaSetupInterface $setup
+     * @param bool $path
+     * @param bool $selectQuery
+     */
+    protected function deleteConfig(SchemaSetupInterface $setup, $path = false, $selectQuery = false){
+        if(!$selectQuery && $path){
+            $selectQuery = $setup->getConnection()->select()
+                ->from($this->setup->getTable(self::CONFIG_TABLE))
+                ->where("path = ?", $path);
+        }
+        $deleteBySelect = $setup->getConnection()->deleteFromSelect($selectQuery, $this->setup->getTable(self::CONFIG_TABLE));
+        $setup->getConnection()->query($deleteBySelect);
+    }
+
+    /**
      * Save a new configuration into the core_config_data
+     *
      * @param $path
      * @param $value
      * @param string $scope
