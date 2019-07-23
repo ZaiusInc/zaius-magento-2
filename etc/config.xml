@@ -9,7 +9,6 @@
             <settings>
                 <newsletter_list_id>newsletter</newsletter_list_id>
                 <is_collect_all_product_attributes>1</is_collect_all_product_attributes>
-                <is_tracking_orders_on_frontend>0</is_tracking_orders_on_frontend>
                 <timeout>30</timeout>
             </settings>
             <batch_updates>
