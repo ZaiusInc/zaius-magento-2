@@ -14,12 +14,15 @@ use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
 use Magento\SalesRule\Model\RuleRepository;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Model\Session;
+use ZaiusSDK\ZaiusException;
 
 /**
  * Class Data
@@ -27,30 +30,12 @@ use Zaius\Engage\Model\Session;
  */
 class Data extends AbstractHelper
 {
-    /**
-     * @var MODULE_NAME
-     */
-    const MODULE_NAME = 'Zaius_Engage';
-    /**
-     * @var API_URL
-     */
-    const API_URL = 'http://api.zaius.com/v2';
-    /**
-     * @var VUID_LENGTH
-     */
-    const VUID_LENGTH = 36;
-    /**
-     * @var DATA_SOURCE
-     */
-    const DATA_SOURCE = 'magento2';
-    /**
-     * @var DATA_SOURCE_TYPE
-     */
-    const DATA_SOURCE_TYPE = 'app';
 
-    /**
-     * @var EVENTS_REGISTRY_KEY
-     */
+    const MODULE_NAME = 'Zaius_Engage';
+    const API_URL = 'http://api.zaius.com/v2';
+    const VUID_LENGTH = 36;
+    const DATA_SOURCE = 'magento2';
+    const DATA_SOURCE_TYPE = 'app';
     const EVENTS_REGISTRY_KEY = 'zaius_current_events';
 
     /**
@@ -157,7 +142,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return bool
      */
     public function getStatus($store = null)
@@ -174,7 +159,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return string
      */
     public function getZaiusTrackerId($store = null)
@@ -183,7 +168,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return bool
      */
     public function getZaiusPrivateKey($store = null)
@@ -192,7 +177,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return bool
      */
     public function getAmazonS3Status($store = null)
@@ -201,7 +186,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return bool
      */
     public function getAmazonS3Key($store = null)
@@ -210,7 +195,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return bool
      */
     public function getAmazonS3Secret($store = null)
@@ -219,7 +204,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * '@param \Magento\Store\Model\Store|int|null $store
+     * '@param Store|int|null $store
      * @return bool
      */
     public function getIsCollectAllProductAttributes($store = null)
@@ -228,16 +213,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
-     * @return bool
-     */
-    public function getIsTrackingOrdersOnFrontend($store = null)
-    {
-        return $this->scopeConfig->isSetFlag('zaius_engage/settings/is_tracking_orders_on_frontend', 'store', $store);
-    }
-
-    /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * @param Store|int|null $store
      * @return int
      */
     public function getTimeout($store = null)
@@ -442,7 +418,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Catalog\Model\Product $product
+     * @param Product $product
      * @return null|string
      * @throws NoSuchEntityException
      */
@@ -475,7 +451,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Catalog\Model\Category $category
+     * @param Category $category
      * @param string $separator
      * @return string
      * @throws NoSuchEntityException
@@ -490,7 +466,7 @@ class Data extends AbstractHelper
         $path = array_slice(explode('/', $category->getPath()), 1);
         $categoryNames = [];
         foreach ($path as $categoryId) {
-            /** @var \Magento\Catalog\Model\Category $category */
+            /** @var Category $category */
             $category = $this->_categoryRepository->get($categoryId);
             $categoryNames[] = $category->getName();
         }
@@ -524,7 +500,7 @@ class Data extends AbstractHelper
     /**
      * @param mixed $event
      * @return $this;
-     * @throws \ZaiusSDK\ZaiusException
+     * @throws ZaiusException
      */
     public function addEventToSession($event)
     {
@@ -578,7 +554,7 @@ class Data extends AbstractHelper
         if ($product instanceof \Magento\Sales\Model\Order\Item) {
             $productId = $product->getProductId();
         }
-        if ($product instanceof \Magento\Quote\Model\Quote\Item) {
+        if ($product instanceof Item) {
             $productId = $product->getProductId();
         }
 
