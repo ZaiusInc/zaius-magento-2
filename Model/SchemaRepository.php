@@ -80,7 +80,7 @@ class SchemaRepository
             'description' => 'Store View from which this customer originated (according to the Magento Website > Store > Store View hierachy.)',
         ];
 
-        return array($magentoWebsite, $magentoStore, $magentoStoreView);
+        return [$magentoWebsite, $magentoStore, $magentoStoreView];
     }
 
     /**
@@ -319,6 +319,9 @@ class SchemaRepository
     public function setList($store = null)
     {
         $zaiusLists = $this->getLists($store);
+        if (array_key_exists('Status', $zaiusLists) && count($zaiusLists) === 1) {
+            return [];
+        }
         $currentList = $this->_helper->getNewsletterListId($store);
         $zaiusLists = array_column($zaiusLists['lists'], 'list_id');
         if (!in_array($currentList, $zaiusLists)) {
@@ -334,11 +337,12 @@ class SchemaRepository
      */
     public function processDelta($magentoSchema, $currentSchema)
     {
-        $diff = array();
+        $diff = [];
+        if (array_key_exists('Status', $currentSchema) && count($currentSchema) === 1) {
+            return $diff;
+        }
         foreach ($magentoSchema as $magento) {
-            $this->_logger->info('magento: ' . json_encode($magento['name']));
             foreach ($currentSchema as $current) {
-                $this->_logger->info('current: ' . json_encode($current['name']));
                 $match = false;
                 if ($magento['name'] === $current['name']) {
                     $match = true;
@@ -348,9 +352,7 @@ class SchemaRepository
             if (!$match) {
                 $diff[] = $magento;
             }
-
         }
-        $this->_logger->info('diff: ' . json_encode($diff));
         return $diff;
     }
 
@@ -368,6 +370,5 @@ class SchemaRepository
         $this->setOrdersFields();
 
         $this->setList($store);
-        $this->_logger->info('upsert finished.');
     }
 }

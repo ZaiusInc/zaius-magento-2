@@ -85,9 +85,10 @@ class Feed extends \Magento\AdminNotification\Model\Feed
      */
     public function alertAdmin()
     {
-        if ($this->_helper->getStatus($this->_storeManager->getStore())) {
-            $trackerId = $this->_helper->getZaiusTrackerId();
-            $privateId = $this->_helper->getZaiusPrivateKey();
+        $trackerId = $this->_helper->getZaiusTrackerId();
+        $privateId = $this->_helper->getZaiusPrivateKey();
+        if ((null === $trackerId || null === $privateId) && $this->_helper->getStatus($this->_storeManager->getStore())) {
+            $this->_messageManager->getMessages(true);
             if (!$trackerId) {
                 $this->_messageManager->addError(__('Zaius Tracker ID missing or not set.<br/><br/>' .
                     __('You can enter the Zaius Tracker ID') . ' ' . '<a href="' . $this->_backendUrl->getUrl('adminhtml/system_config/edit/section/zaius_engage') . '">'
