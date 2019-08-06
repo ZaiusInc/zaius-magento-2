@@ -18,8 +18,7 @@ use ZaiusSDK\ZaiusException;
  * Class NewsletterSubscriberSaveObserver
  * @package Zaius\Engage\Observer
  */
-class NewsletterSubscriberSaveObserver
-    implements ObserverInterface
+class NewsletterSubscriberSaveObserver implements ObserverInterface
 {
     /**
      * @var State
@@ -57,8 +56,7 @@ class NewsletterSubscriberSaveObserver
         Helper $helper,
         Client $client,
         Logger $logger
-    )
-    {
+    ) {
         $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
@@ -101,12 +99,10 @@ class NewsletterSubscriberSaveObserver
             $event['data']['store_id'] = $subscriber->getStoreId();
             $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
 
-            $ts = strtotime($subscriber->getChangeStatusAt());
-
-            if($ts !== FALSE){
+            if (($ts = strtotime($subscriber->getChangeStatusAt())) !== false) {
                 $event['data']['ts'] = $ts;
-            }else{
-                $this->_logger->info('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.$subscriber->getChangeStatusAt());
+            } else {
+                $this->_logger->info('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.print_r($subscriber->getChangeStatusAt()));
             }
 
             $state = $this->_state->getAreaCode();
