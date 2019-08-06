@@ -105,8 +105,8 @@ class NewsletterSubscriberSaveObserver
 
             if($ts !== FALSE){
                 $event['data']['ts'] = $ts;
-            }else{
-                $this->_logger->info('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.$subscriber->getChangeStatusAt());
+            } else {
+                $this->_logger->info('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.print_r($subscriber->getChangeStatusAt()));
             }
 
             $state = $this->_state->getAreaCode();
