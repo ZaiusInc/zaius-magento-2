@@ -5,10 +5,14 @@ namespace Zaius\Engage\Observer;
 use Magento\Framework\App\State;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Store\Model\StoreManager;
+use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data as Helper;
+use ZaiusSDK\ZaiusException;
 
 /**
  * Class NewsletterSubscriberSaveObserver
@@ -34,30 +38,39 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
     protected $_client;
 
     /**
+     * @var Logger
+     */
+    private $_logger;
+
+    /**
      * NewsletterSubscriberSaveObserver constructor.
      * @param State $state
      * @param StoreManager $storeManager
      * @param Helper $helper
      * @param Client $client
+     * @param Logger $logger
      */
     public function __construct(
         State $state,
         StoreManager $storeManager,
         Helper $helper,
-        Client $client
+        Client $client,
+        Logger $logger
     )
     {
         $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
+        $this->_logger = $logger;
     }
 
     /**
      * @param Observer $observer
      * @return $this|void
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @throws ZaiusException
      */
     public function execute(Observer $observer)
     {
