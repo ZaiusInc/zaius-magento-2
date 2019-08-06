@@ -56,8 +56,7 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
         Helper $helper,
         Client $client,
         Logger $logger
-    )
-    {
+    ) {
         $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
