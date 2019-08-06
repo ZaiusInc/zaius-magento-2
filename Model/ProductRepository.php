@@ -8,6 +8,8 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
@@ -67,11 +69,17 @@ class ProductRepository implements ProductRepositoryInterface
     protected $_extraProductAttributes;
 
     /**
+     * @var Configurable
+     */
+    private $_productConfigurable;
+
+    /**
      * ProductRepository constructor.
      * @param StoreManagerInterface $storeManager
      * @param ProductCollectionFactory $productCollectionFactory
      * @param ProductInterfaceFactory $productFactory
      * @param StockRegistryInterface $stockRegistry
+     * @param Configurable $productConfigurable
      * @param ProductHelper $productHelper
      * @param Data $helper
      * @param Logger $logger
@@ -81,6 +89,7 @@ class ProductRepository implements ProductRepositoryInterface
         ProductCollectionFactory $productCollectionFactory,
         ProductInterfaceFactory $productFactory,
         StockRegistryInterface $stockRegistry,
+        Configurable $productConfigurable,
         ProductHelper $productHelper,
         Data $helper,
         Logger $logger
@@ -89,6 +98,7 @@ class ProductRepository implements ProductRepositoryInterface
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->_productFactory = $productFactory;
         $this->_stockRegistry = $stockRegistry;
+        $this->_productConfigurable = $productConfigurable;
         $this->_productHelper = $productHelper;
         $this->_helper = $helper;
         $this->_logger = $logger;
@@ -98,7 +108,7 @@ class ProductRepository implements ProductRepositoryInterface
      * @param int|null $limit
      * @param int|null $offset
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getList($limit = null, $offset = null)
     {
@@ -139,14 +149,19 @@ class ProductRepository implements ProductRepositoryInterface
 
     /**
      * @param string $event
-     * @param \Magento\Catalog\Model\Product $product
+     * @param Product $product
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getProductEventData($event, $product)
     {
+        $productId = $this->_helper->getProductId($product);
+        $parentIds = $this->_productConfigurable->getParentIdsByChild($productId);
+        $parentProductId = isset($parentIds[0]) ? $parentIds[0] : $productId;
+
         $productData = [
-            'product_id' => $this->_helper->getProductId($product),
+            'product_id' => $productId,
+            'parent_product_id' => $parentProductId,
             'name' => $product->getName(),
             'brand' => $product->getData('brand'),
             'sku' => $product->getSku(),
@@ -155,8 +170,9 @@ class ProductRepository implements ProductRepositoryInterface
             'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
             'price' => trim($product->getPrice()),
             'image_url' => $this->_productHelper->getImageUrl($product),
-            'url_key' => $product->getData('url_key'),
+            'url_key' => $product->getData('url_key')
         ];
+
         if ($product->getData('special_price')) {
             $productData['special_price'] = trim($product->getData('special_price'));
             $productData['special_price_from_date'] = strtotime($product->getData('special_from_date')) ?: null;
@@ -182,7 +198,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     /**
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     protected function _getExtraProductAttributes()
     {
