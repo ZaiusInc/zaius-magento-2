@@ -9,8 +9,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
  * Class Sdk
  * @package Zaius\Engage\Helper
  */
-class Sdk
-    extends AbstractHelper
+class Sdk extends AbstractHelper
 {
     /**
      * @var \Magento\Framework\App\Filesystem\DirectoryList
@@ -26,13 +25,11 @@ class Sdk
      * @param \Magento\Framework\App\Filesystem\DirectoryList $directoryList
      * @param DeploymentConfig $deploymentConfig
      */
-    public function __construct
-    (
+    public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         DeploymentConfig $deploymentConfig
-    )
-    {
+    ) {
         $this->_directoryList = $directoryList;
         $this->_deploymentConfig = $deploymentConfig;
         parent::__construct($context);
