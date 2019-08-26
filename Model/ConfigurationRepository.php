@@ -63,8 +63,7 @@ class ConfigurationRepository implements ConfigurationInterface
         LocalesRepository $localesRepository,
         Helper $helper,
         Logger $logger
-    )
-    {
+    ) {
         $this->_productMetadata = $productMetadata;
         $this->_cacheTypes = $cacheTypes;
         $this->_scopeConfig = $scopeConfig;
@@ -120,9 +119,9 @@ class ConfigurationRepository implements ConfigurationInterface
 
             $storeConfig = $this->_scopeConfig->getValue('zaius_engage', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode);
             $inStoreConfigArray = $this->_scopeConfig->getValue(
-                    'zaius_engage/config/zaius_tracker_id',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                    $storeCode
+                'zaius_engage/config/zaius_tracker_id',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeCode
                 ) === $trackingID;
 
             if ($trackingID === null || $inStoreConfigArray) {
