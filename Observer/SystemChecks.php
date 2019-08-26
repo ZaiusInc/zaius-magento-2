@@ -22,8 +22,7 @@ use Zaius\Engage\Model\Feed;
  * Class SystemChecks
  * @package Zaius\Engage\Observer
  */
-class SystemChecks
-    implements ObserverInterface
+class SystemChecks implements ObserverInterface
 {
     /**
      * @var Feed
@@ -40,8 +39,7 @@ class SystemChecks
         Session $backendSession,
         ManagerInterface $messageManager,
         Feed $feed
-    )
-    {
+    ) {
         $this->_backendSession = $backendSession;
         $this->_messageManager = $messageManager;
         $this->_feed = $feed;

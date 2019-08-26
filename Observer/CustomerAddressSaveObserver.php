@@ -15,8 +15,7 @@ use Zaius\Engage\Api\CustomerRepositoryInterface;
  * Class CustomerAddressSaveObserver
  * @package Zaius\Engage\Observer
  */
-class CustomerAddressSaveObserver
-    implements ObserverInterface
+class CustomerAddressSaveObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -47,8 +46,7 @@ class CustomerAddressSaveObserver
         Helper $helper,
         ClientInterface $client,
         CustomerRepositoryInterface $customerRepository
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;

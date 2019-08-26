@@ -14,8 +14,7 @@ use Zaius\Engage\Helper\Data as Helper;
  * Class NewsletterSubscriberSaveObserver
  * @package Zaius\Engage\Observer
  */
-class NewsletterSubscriberSaveObserver
-    implements ObserverInterface
+class NewsletterSubscriberSaveObserver implements ObserverInterface
 {
     /**
      * @var State
@@ -46,8 +45,7 @@ class NewsletterSubscriberSaveObserver
         StoreManager $storeManager,
         Helper $helper,
         Client $client
-    )
-    {
+    ) {
         $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;

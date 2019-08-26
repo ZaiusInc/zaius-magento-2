@@ -19,8 +19,7 @@ use Zaius\Engage\Helper\Data;
  * Class PageViewObserver
  * @package Zaius\Engage\Observer
  */
-class PageViewObserver
-    implements ObserverInterface
+class PageViewObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -61,8 +60,7 @@ class PageViewObserver
         RequestInterface $request,
         Registry $registry,
         LayoutInterface $layout
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_request = $request;
