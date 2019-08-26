@@ -61,7 +61,7 @@ class OrderPlaceAfterObserver implements ObserverInterface
     {
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
-        if ($this->_helper->getStatus($order->getStore()) && $this->_helper->getIsTrackingOrdersOnFrontend($order->getStore()) && $this->_storeManager->getStore()->getId() != 0) {
+        if ($this->_helper->getStatus($order->getStore()) && $this->_storeManager->getStore()->getId() != 0) {
             $orderEventData = $this->_orderRepository->getOrderEventData($order);
             $this->_helper->addEventToSession($orderEventData);
         }

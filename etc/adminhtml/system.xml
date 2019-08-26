@@ -12,64 +12,74 @@
 
             <group id="status" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Zaius Engage Status</label>
-                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="status" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="version" translate="label" type="label" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="version" translate="label" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Version</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Version</frontend_model>
                     <comment>
                         Zaius Engage Version
                     </comment>
                 </field>
-                <field id="composer" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="composer" translate="label comment" type="label" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Composer Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
                     <comment>
                         Checks if Composer is installed.
                     </comment>
                 </field>
-                <field id="sdk" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="sdk" translate="label comment" type="label" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>SDK Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
                     <comment>
                         Checks if the Zaius SDK is installed.
                     </comment>
                 </field>
-            </group>
-
-            <group id="config" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Configuration</label>
-                <field id="zaius_tracker_id" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="zaius_tracker_id" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Zaius Tracker ID</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="*/*/status">1</field>
+                    </depends>
                 </field>
-                <field id="zaius_private_api" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="zaius_private_api" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Zaius Private API Key</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="*/*/status">1</field>
+                    </depends>
                 </field>
-                <field id="amazon_active" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            </group>
+
+            <group id="amazon" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Amazon S3</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled Amazon S3</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="amazon_s3_key" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="s3_key" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Amazon S3 Key</label>
+                    <validate>required-entry</validate>
                     <depends>
-                        <field id="*/*/amazon_active">1</field>
+                        <field id="*/*/active">1</field>
                     </depends>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3" target="_blank">Integrations</a> in your Zaius Account. ]]>
                     </comment>
                 </field>
-                <field id="amazon_s3_secret" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="s3_secret" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Amazon S3 Secret</label>
+                    <validate>required-entry</validate>
                     <depends>
-                        <field id="*/*/amazon_active">1</field>
+                        <field id="*/*/active">1</field>
                     </depends>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/integrations?activeTab=amazon_s3" target="_blank">Integrations</a> in your Zaius Account. ]]>
@@ -91,7 +101,7 @@
                         Specify a Newsletter List ID.
                     </comment>
                 </field>
-                <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="0" showInWebsite="0" showInStore="0">
                     <label>Track Orders on Frontend</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
