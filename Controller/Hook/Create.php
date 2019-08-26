@@ -100,7 +100,6 @@ class Create extends AbstractHook
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Zaius\Engage\Helper\Data $data,
         \Magento\Framework\App\Action\Context $context,
-
         FormKey $formKey,
         CartRepositoryInterface $cart,
         CheckoutSession $session,
@@ -108,8 +107,7 @@ class Create extends AbstractHook
         \Zaius\Engage\Cookie\ZaiusCartMode $cookie,
         \Zaius\Engage\Logger\Logger $logger,
         \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableType
-    )
-    {
+    ) {
         parent::__construct($resultJsonFactory, $data, $context);
 
         $this->_cookieManager = $cookieManager;
@@ -175,11 +173,13 @@ class Create extends AbstractHook
                         $this->_cookie->set('overwritten');
                     }
                     $quote->removeAllItems();
+                    // no break
                 case 'append':
                     //causes the platform to add the cart string to the pre-existing cart
                     if ($quoteCount && $cookie !== 'overwritten') {
                         $this->_cookie->set('appended');
                     }
+                    // no break
                 default:
                     $cartArray = explode(',', $zaiusCart);
                     foreach ($cartArray as $cartItem) {
@@ -218,7 +218,6 @@ class Create extends AbstractHook
                             }
                             //load is depreciated, maybe just move getID to if?
                             //$product = $this->_product->create()->getId($k);
-
                         }
                     }
                     $cart = $this->_cart->save($quote);
