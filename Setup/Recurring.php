@@ -36,8 +36,7 @@ class Recurring implements InstallSchemaInterface
     public function __construct(
         ModuleListInterface $list,
         ModuleResourceInterface $resource
-    )
-    {
+    ) {
         $this->_list = $list;
         $this->_resource = $resource;
     }
