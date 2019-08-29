@@ -10,13 +10,13 @@
             <tab>zaius</tab>
             <resource>Zaius_Engage::zaius_engage</resource>
 
-            <group id="status" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="status" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Zaius Engage Status</label>
                 <field id="status" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enabled?</label>
+                    <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="version" translate="label" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="version" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Version</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Version</frontend_model>
                     <comment>
@@ -59,7 +59,7 @@
                 </field>
             </group>
 
-            <group id="amazon" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="amazon" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Amazon S3</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled Amazon S3</label>
@@ -87,7 +87,7 @@
                 </field>
             </group>
 
-            <group id="settings" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Settings</label>
                 <field id="global_id_prefix" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Global ID Prefix</label>
@@ -120,20 +120,26 @@
                     <comment>Number of seconds to wait before timing out the connection to Zaius.</comment>
                 </field>
             </group>
-
-            <group id="schema_update" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="batch_updates" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Batch Updates</label>
+                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="schema_update" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Schema Update</label>
                 <field id="schema_update" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Update Schema?</label>
+                    <label>Update Schema</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\SchemaUpdateButton</frontend_model>
                 </field>
             </group>
 
-            <group id="zaius_localizations" type="text" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+            <group id="zaius_localizations" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Zaius Localizations</label>
                 <comment>Localizations are currently in beta. Please consult with your Zaius Customer Success Manager prior to enabling this feature</comment>
                 <field id="locale_toggle" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Enabled?</label>
+                    <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
