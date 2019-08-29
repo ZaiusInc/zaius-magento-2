@@ -2,9 +2,13 @@
 
 namespace Zaius\Engage\Model;
 
+use Magento\Catalog\Model\Product;
+use Magento\Customer\Model\Customer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\HTTP\Client\CurlFactory;
 use Magento\Framework\Json\Encoder;
+use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ClientInterface;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
@@ -17,6 +21,7 @@ use ZaiusSDK\ZaiusException;
 
 /**
  * Class Client
+ *
  * @package Zaius\Engage\Model
  */
 class Client implements ClientInterface
@@ -73,16 +78,17 @@ class Client implements ClientInterface
 
     /**
      * Client constructor.
-     * @param StoreManagerInterface $storeManager
-     * @param Data $helper
-     * @param CurlFactory $curlFactory
+     *
+     * @param StoreManagerInterface       $storeManager
+     * @param Data                        $helper
+     * @param CurlFactory                 $curlFactory
      * @param CustomerRepositoryInterface $customerRepository
-     * @param OrderRepositoryInterface $orderRepository
-     * @param ProductRepositoryInterface $productRepository
-     * @param Logger $logger
-     * @param Sdk $sdk
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Encoder $encoder
+     * @param OrderRepositoryInterface    $orderRepository
+     * @param ProductRepositoryInterface  $productRepository
+     * @param Logger                      $logger
+     * @param Sdk                         $sdk
+     * @param ScopeConfigInterface        $scopeConfig
+     * @param Encoder                     $encoder
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -109,7 +115,7 @@ class Client implements ClientInterface
     }
 
     /**
-     * @param mixed $object
+     * @param mixed  $object
      * @param string $url
      * @return $this
      * @throws ZaiusException
@@ -126,7 +132,7 @@ class Client implements ClientInterface
     /**
      * @param mixed $entity
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @throws ZaiusException
      */
     public function postEntity($entity)
@@ -137,30 +143,30 @@ class Client implements ClientInterface
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
         switch ($entity['type']) {
-            case 'product':
-                if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
-                    $s3Client = $zaiusClient->getS3Client(
-                        $this->_helper->getZaiusTrackerId(),
-                        $this->_helper->getAmazonS3Key(),
-                        $this->_helper->getAmazonS3Secret()
-                    );
-                    $s3Client->uploadProducts($entity);
-                }
-                $zaiusClient->postProduct($entity['data'], $this->isBatchUpdate());
-                break;
-            case 'customer':
-                if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
-                    $s3Client = $zaiusClient->getS3Client(
-                        $this->_helper->getZaiusTrackerId(),
-                        $this->_helper->getAmazonS3Key(),
-                        $this->_helper->getAmazonS3Secret()
-                    );
-                    $s3Client->uploadCustomers($entity);
-                }
-                $zaiusClient->postCustomer($entity['data'], $this->isBatchUpdate());
-                break;
-            default:
-                return $this->_post($entity, $this->getApiBaseUrl() . '/entities');
+        case 'product':
+            if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
+                $s3Client = $zaiusClient->getS3Client(
+                    $this->_helper->getZaiusTrackerId(),
+                    $this->_helper->getAmazonS3Key(),
+                    $this->_helper->getAmazonS3Secret()
+                );
+                $s3Client->uploadProducts($entity);
+            }
+            $zaiusClient->postProduct($entity['data'], $this->isBatchUpdate());
+            break;
+        case 'customer':
+            if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
+                $s3Client = $zaiusClient->getS3Client(
+                    $this->_helper->getZaiusTrackerId(),
+                    $this->_helper->getAmazonS3Key(),
+                    $this->_helper->getAmazonS3Secret()
+                );
+                $s3Client->uploadCustomers($entity);
+            }
+            $zaiusClient->postCustomer($entity['data'], $this->isBatchUpdate());
+            break;
+        default:
+            return $this->_post($entity, $this->getApiBaseUrl() . '/entities');
         }
     }
 
@@ -189,7 +195,7 @@ class Client implements ClientInterface
     /**
      * @param mixed $event
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @throws ZaiusException
      */
     public function postEvent($event)
@@ -200,53 +206,53 @@ class Client implements ClientInterface
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
         switch ($event['type']) {
-            case 'list':
-                if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
-                    $s3Client = $zaiusClient->getS3Client(
-                        $this->_helper->getZaiusTrackerId(),
-                        $this->_helper->getAmazonS3Key(),
-                        $this->_helper->getAmazonS3Secret()
-                    );
-                    $s3Client->uploadEvents($event);
-                }
-                $zaiusClient->postEvent($event, $this->isBatchUpdate());
-                //$zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
-                break;
-            case 'product':
-                if ($this->isBatchUpdate()) {
-                    $event = self::transformForBatchEvent($event);
-                }
-                if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
-                    $s3Client = $zaiusClient->getS3Client(
-                        $this->_helper->getZaiusTrackerId(),
-                        $this->_helper->getAmazonS3Key(),
-                        $this->_helper->getAmazonS3Secret()
-                    );
-                    $s3Client->uploadEvents($event);
-                }
-                $zaiusClient->postEvent($event, $this->isBatchUpdate());
-                break;
-            case 'order':
-                if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
-                    $s3Client = $zaiusClient->getS3Client(
-                        $this->_helper->getZaiusTrackerId(),
-                        $this->_helper->getAmazonS3Key(),
-                        $this->_helper->getAmazonS3Secret()
-                    );
-                    $s3Client->uploadOrders($event);
-                }
-                $zaiusClient->postEvent($event, $this->isBatchUpdate());
-                break;
-            default:
-                return $this->_post($event, $this->getApiBaseUrl() . '/events', $this->isBatchUpdate());
+        case 'list':
+            if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
+                $s3Client = $zaiusClient->getS3Client(
+                    $this->_helper->getZaiusTrackerId(),
+                    $this->_helper->getAmazonS3Key(),
+                    $this->_helper->getAmazonS3Secret()
+                );
+                $s3Client->uploadEvents($event);
+            }
+            $zaiusClient->postEvent($event, $this->isBatchUpdate());
+            //$zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
+            break;
+        case 'product':
+            if ($this->isBatchUpdate()) {
+                $event = self::transformForBatchEvent($event);
+            }
+            if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
+                $s3Client = $zaiusClient->getS3Client(
+                    $this->_helper->getZaiusTrackerId(),
+                    $this->_helper->getAmazonS3Key(),
+                    $this->_helper->getAmazonS3Secret()
+                );
+                $s3Client->uploadEvents($event);
+            }
+            $zaiusClient->postEvent($event, $this->isBatchUpdate());
+            break;
+        case 'order':
+            if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
+                $s3Client = $zaiusClient->getS3Client(
+                    $this->_helper->getZaiusTrackerId(),
+                    $this->_helper->getAmazonS3Key(),
+                    $this->_helper->getAmazonS3Secret()
+                );
+                $s3Client->uploadOrders($event);
+            }
+            $zaiusClient->postEvent($event, $this->isBatchUpdate());
+            break;
+        default:
+            return $this->_post($event, $this->getApiBaseUrl() . '/events', $this->isBatchUpdate());
         }
     }
 
     /**
-     * @param \Magento\Customer\Model\Customer $customer
+     * @param Customer $customer
      * @param null $eventName
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @throws ZaiusException
      */
     public function postCustomer($customer, $eventName = null)
@@ -255,10 +261,10 @@ class Client implements ClientInterface
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
-     * @param string $eventType
+     * @param Order $order
+     * @param string                     $eventType
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @throws ZaiusException
      */
     public function postOrder($order, $eventType = 'purchase')
@@ -267,8 +273,8 @@ class Client implements ClientInterface
     }
 
     /**
-     * @param string $event
-     * @param \Magento\Catalog\Model\Product $product
+     * @param string                         $event
+     * @param Product $product
      * @return array|null
      * @throws ZaiusException
      */
