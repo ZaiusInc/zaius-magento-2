@@ -54,6 +54,8 @@ class CustomerRegisterObserver implements ObserverInterface
             $customer = $observer->getEvent()->getCustomer();
             $data['action'] = 'register';
             $data['zaius_engage_version'] = $this->_helper->getVersion();
+            $data['customer_id'] = $customer->getId();
+            $data['customer_email'] = $customer->getEmail();
             $this->_helper->addEventToSession([
                 'type' => 'customer',
                 'data' => $data
