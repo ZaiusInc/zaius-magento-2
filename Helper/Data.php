@@ -20,6 +20,7 @@ use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Model\Session;
+use ZaiusSDK\ZaiusException;
 
 /**
  * Class Data
@@ -522,31 +523,50 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Send an event immediately or add to the queue
+     *
+     * @param      $event
+     * @param bool $queue
+     *
+     * @return bool|mixed
+     */
+    public function sendEvent($event, $queue = false){
+        /** @var \ZaiusSDK\ZaiusClient $this */
+        $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
+        $event = Client::transformForBatchEvent($event);
+        if (!isset($event['identifiers'])) {
+            $vuid = $this->getVuid();
+            $zm64_id = $this->getZM64_ID();
+            $zaiusAliasCookies = $this->getZaiusAliasCookies();
+            $event['identifiers'] = array_filter(compact('vuid', 'zm64_id'));
+            if (is_array($zaiusAliasCookies)) {
+                foreach ($zaiusAliasCookies as $field => $value) {
+                    $event['identifiers'][$field] = $value;
+                }
+            }
+        }
+        try {
+            return $zaiusClient->postEvent($event, $queue);
+        } catch (ZaiusException $e) {
+            return $this->_logger->error($e);
+        }
+    }
+
+    /**
+     * Add an event to the session to process via JS
+     *
      * @param mixed $event
+     *
      * @return $this;
-     * @throws \ZaiusSDK\ZaiusException
      */
     public function addEventToSession($event)
     {
         $event['data'] += $this->getDataSourceFields();
         if ($this->isBatchUpdate()) {
-            $zaiusClient = $this->_sdk->getSdkClient();
-            if (null === $zaiusClient) {
-                return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
-            }
-            $event = Client::transformForBatchEvent($event);
-            if (!isset($event['identifiers'])) {
-                $vuid = $this->getVuid();
-                $zm64_id = $this->getZM64_ID();
-                $zaiusAliasCookies = $this->getZaiusAliasCookies();
-                $event['identifiers'] = array_filter(compact('vuid', 'zm64_id'));
-                if (is_array($zaiusAliasCookies)) {
-                    foreach ($zaiusAliasCookies as $field => $value) {
-                        $event['identifiers'][$field] = $value;
-                    }
-                }
-            }
-            $zaiusClient->postEvent($event, true);
+            $this->sendEvent($event, true);
         } else {
             $events = $this->_session->getEvents();
             if (!$events) {
