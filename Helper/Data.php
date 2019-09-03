@@ -572,35 +572,52 @@ class Data extends AbstractHelper
         $this->_registry->register(self::EVENTS_REGISTRY_KEY, $events);
     }
 
+    /**
+     * Send an event immediately or add to the queue
+     *
+     * @param      $event
+     * @param bool $queue
+     *
+     * @return bool|mixed
+     * @throws \ZaiusSDK\ZaiusException
+     */
+    public function sendEvent($event, $queue = false){
+        /** @var \ZaiusSDK\ZaiusClient $this */
+        $zaiusClient = $this->_sdk->getSdkClient();
+        if (null === $zaiusClient) {
+            return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
+        }
+        $event = Client::transformForBatchEvent($event);
+        if (!isset($event['identifiers'])) {
+            $vuid = $this->getVuid();
+            $zm64_id = $this->getZM64_ID();
+            $zaiusAliasCookies = $this->getZaiusAliasCookies();
+            $event['identifiers'] = array_filter(compact('vuid', 'zm64_id'));
+            if (is_array($zaiusAliasCookies)) {
+                foreach ($zaiusAliasCookies as $field => $value) {
+                    $event['identifiers'][$field] = $value;
+                }
+            }
+        }
+        try {
+            return $zaiusClient->postEvent($event, $queue);
+        } catch (ZaiusException $e) {
+            return $this->_logger->error($e);
+        }
+    }
 
     /**
-     * @param $event
+     * Add an event to the session to process via JS
      *
-     * @return mixed
-     * @throws NoSuchEntityException
-     * @throws ZaiusException
+     * @param mixed $event
+     *
+     * @return $this;
      */
     public function addEventToSession($event)
     {
         $event['data'] += $this->getDataSourceFields();
         if ($this->isBatchUpdate()) {
-            $zaiusClient = $this->_sdk->getSdkClient();
-            if (null === $zaiusClient) {
-                return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
-            }
-            $event = Client::transformForBatchEvent($event);
-            if (!isset($event['identifiers'])) {
-                $vuid = $this->getVuid();
-                $zm64_id = $this->getZM64_ID();
-                $zaiusAliasCookies = $this->getZaiusAliasCookies();
-                $event['identifiers'] = array_filter(compact('vuid', 'zm64_id'));
-                if (is_array($zaiusAliasCookies)) {
-                    foreach ($zaiusAliasCookies as $field => $value) {
-                        $event['identifiers'][$field] = $value;
-                    }
-                }
-            }
-            $zaiusClient->postEvent($event, true);
+            $this->sendEvent($event, true);
         } else {
             $events = $this->_session->getEvents();
             if (!$events) {
@@ -642,7 +659,6 @@ class Data extends AbstractHelper
 
         return $productId;
     }
-
 
     /**
      * @param null $store
