@@ -290,6 +290,8 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Check if the cart is valid
+     * 
      * @param $quote
      * @return bool
      */
