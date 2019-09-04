@@ -22,26 +22,23 @@ By far the quickest and easiest way to install and maintain the Zaius connector 
 2. Install the Zaius Magento 2 package.
 3. Finally, make sure the package is up-to-date.
 
-Note: as we continue validating the robustness of the module, you will need to specify your willingness to use the release candidates of both the module and the underlying PHP SDK:
+Now that stable releases are available, you may **remove** these previously-required lines from your `<MAGENTO_ROOT>/composer.json` file:
 
-* Edit your `<MAGENTO_ROOT>/composer.json` file:
+> ~~"minimum-stability" "RC",~~  
+~~"prefer-stable": true~~
 
-```bash
-"minimum-stability" "RC",
-"prefer-stable": true
-```
 
-* Add the required packages:
+* Add the required packages. This particular branch is a beta release, so you must specify the specific version:
 
 ```bash
-composer require zaius/zaius-magento-2:^1.0
+composer require zaius/zaius-magento-2:1.0.1@beta
 composer install
 composer update zaius/*
 ```
 
 ### Alternative install: ZIP
 
-* Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
+* Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/release/1.0.1-beta.1.zip
 * Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
 
 The Zaius PHP SDK is required, and must be installed separately if you've chosen to install via ZIP archive.
@@ -172,11 +169,11 @@ After installing the module and setting up the API user, all configuration is do
 
 **SDK Installed?**: Checks if the [Zaius PHP SDK](https://github.com/ZaiusInc/zaius-php-sdk) is installed. The SDK is **REQUIRED** by the Zaius Engage Connector, and installed automatically with Composer.
 
-#### Configuration
-
 **Zaius Tracker ID**: Configuration field for the Zaius client Tracker ID. Found at [API Management](https://app.zaius.com/app#/api_management) in the Zaius client Account.
 
 **Zaius Private API Key**: Configuration field for the Zaius Private API Key. Found at [API Management](https://app.zaius.com/app#/api_management) in the Zaius client Account. This is **REQUIRED** for [Batch Updates](Batch Updates) to work.
+
+#### Amazon S3
 
 **Enable Amazon S3**: Enable or disable the Amazon S3 Upload functionality.
 
@@ -186,11 +183,21 @@ After installing the module and setting up the API user, all configuration is do
 
 #### Settings
 
+**Global ID Prefix**: If provided, this prefix will be added to all product, customer, and order IDs sent from the corresponding store view. This is rarely needed, but may be helpful in complicated multi-store configurations. Typically your Zaius CSM will recommend this if your setup will benefit.
+
+**Zaius Newsletter List ID**: When an end user subscribes to, or unsubscribes from, the Magento newsletter on this store view, the subscription will be synced with the provided list within Zaius.
+
 **Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes, or only the minimum. If your product feed has fields which are not yet captured in Zaius, you will likely need to turn this on and create a corresponding custom field. The Zaius support team can assist.
 
-**Track Orders on Frontend**: Enable or disable the functionality to track orders on the frontend of the website. Disabled by default as backend order tracking is far more reliable.
-
 **Timeout**: Specify a number of seconds to wait before timing out the connection to Zaius.
+
+#### Batch Updates
+
+**Enabled**: Whether or not to perform catch-up syncs of products, customers, and/or orders as a fallback. Not typically needed and not thoroughly tested; please contact Zaius Support if you feel the need so we can advise, and monitor if needed.
+
+#### Schema Update
+
+**Update Schema**: When this button is clicked, Magento will use the provided API keys (in the Zaius Engage Status section) to assess your objects and fields within Zaius, and will create any fields which are needed for the Magento integration's core functionality.
 
 #### Zaius Localizations
 
