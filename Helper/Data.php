@@ -227,13 +227,9 @@ class Data extends AbstractHelper
      * @param Store|int|null $store
      *
      * @return bool
-     * @throws NoSuchEntityException
      */
     public function getAmazonS3Key($store = null)
     {
-        if ($store === null) {
-            $store = $this->_storeManager->getStore();
-        }
         return $this->scopeConfig->getValue('zaius_engage/amazon/s3_key', 'store', $store);
     }
 
@@ -581,8 +577,9 @@ class Data extends AbstractHelper
      * @return bool|mixed
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function sendEvent($event, $queue = false){
-        /** @var \ZaiusSDK\ZaiusClient $this */
+    public function sendEvent($event, $queue = false)
+    {
+        /** @var ZaiusClient $zaiusClient */
         $zaiusClient = $this->_sdk->getSdkClient();
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
@@ -612,6 +609,8 @@ class Data extends AbstractHelper
      * @param mixed $event
      *
      * @return $this;
+     * @throws NoSuchEntityException
+     * @throws ZaiusException
      */
     public function addEventToSession($event)
     {
