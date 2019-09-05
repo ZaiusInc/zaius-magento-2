@@ -85,7 +85,7 @@ class NewsletterSubscriberSaveObserver
             $event['data']['list_id'] = $this->_helper->getNewsletterListId();
             $event['data']['email'] = $subscriber->getSubscriberEmail();
             $event['data']['subscribed'] = $subscribed;
-            $event['data']['store_id'] = $subscriber->getStoreId();
+            $event['data']['magento_store'] = $subscriber->getStoreId();
             $event['data']['ts'] = strtotime($subscriber->getChangeStatusAt());
             $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
 
