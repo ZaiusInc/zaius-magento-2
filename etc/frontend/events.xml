@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="layout_generate_blocks_after">
-        <observer name="zaius_engage_layout" instance="Zaius\Engage\Observer\PageViewObserver"/>
-    </event>
     <event name="checkout_cart_add_product_complete">
         <observer name="zaius_engage_add_to_cart" instance="Zaius\Engage\Observer\CartAddObserver"/>
     </event>
