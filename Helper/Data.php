@@ -291,7 +291,7 @@ class Data extends AbstractHelper
 
     /**
      * Check if the cart is valid
-     * 
+     *
      * @param $quote
      * @return bool
      */
@@ -355,6 +355,8 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Prepare Zaius cart URL
+     * 
      * @param $baseUrl
      *
      * @return string
