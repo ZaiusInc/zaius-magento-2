@@ -101,7 +101,7 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
             $event['data']['store_id'] = $subscriber->getStoreId();
             $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
 
-            if (($ts = strtotime($subscriber->getChangeStatusAt())) !== false) {<<<<<<< bugfix/ZAIR-158
+            if (($ts = strtotime($subscriber->getChangeStatusAt())) !== false) {
                 $event['data']['ts'] = $ts;
             } else {
                 $this->_logger->warning('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.print_r($subscriber->getChangeStatusAt()));
