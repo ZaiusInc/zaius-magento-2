@@ -28,8 +28,7 @@ class Sdk extends \Magento\Config\Block\System\Config\Form\Field
         \Magento\Backend\Block\Template\Context $context,
         \Zaius\Engage\Helper\Data $helperData,
         \Zaius\Engage\Helper\Sdk $helperSdk
-    )
-    {
+    ) {
         $this->helperData = $helperData;
         $this->helperSdk = $helperSdk;
         parent::__construct($context);

@@ -18,8 +18,7 @@ use Zaius\Engage\Observer\CartRemoveObserver;
  * Class CartUpdateObserver
  * @package Zaius\Engage\Observer
  */
-class CartUpdateObserver
-    implements ObserverInterface
+class CartUpdateObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -68,8 +67,7 @@ class CartUpdateObserver
         Logger $logger,
         CartAddObserver $cartAddObserver,
         CartRemoveObserver $cartRemoveObserver
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
@@ -85,7 +83,6 @@ class CartUpdateObserver
      */
     public function execute(Observer $observer)
     {
-
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
             $items = $observer->getCart()->getQuote()->getItems();
             $info = $observer->getInfo()->getData();

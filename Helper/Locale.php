@@ -63,18 +63,20 @@ class Locale extends AbstractHelper
      * @param $websiteId
      * @return mixed
      */
-    public function getLangCodeFromWebsite($websiteId) {
-        return $this->scopeConfig->getValue('general/locale/code','websites',$websiteId);
+    public function getLangCodeFromWebsite($websiteId)
+    {
+        return $this->scopeConfig->getValue('general/locale/code', 'websites', $websiteId);
     }
 
     /**
      * @param $websiteId
      * @return string
      */
-    public function getWebsiteCode($websiteId) {
+    public function getWebsiteCode($websiteId)
+    {
         $websites = $this->storeManager->getWebsites(true);
-        foreach($websites as $website) {
-            if($website->getId() == $websiteId) {
+        foreach ($websites as $website) {
+            if ($website->getId() == $websiteId) {
                 return $website->getCode();
             }
         }

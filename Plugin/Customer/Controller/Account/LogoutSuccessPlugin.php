@@ -27,8 +27,7 @@ class LogoutSuccessPlugin
      */
     public function __construct(
         Data $helper
-    )
-    {
+    ) {
         $this->_helper = $helper;
     }
 

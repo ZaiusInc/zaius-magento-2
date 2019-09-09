@@ -63,8 +63,7 @@ class ConfigurationRepository implements ConfigurationInterface
         LocalesRepository $localesRepository,
         Helper $helper,
         Logger $logger
-    )
-    {
+    ) {
         $this->_productMetadata = $productMetadata;
         $this->_cacheTypes = $cacheTypes;
         $this->_scopeConfig = $scopeConfig;

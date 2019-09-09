@@ -2,7 +2,6 @@
 
 namespace Zaius\Engage\Controller\Hook;
 
-
 /**
  * Class AbstractHook
  * @package Zaius\Engage\Controller\Hook
@@ -29,8 +28,7 @@ abstract class AbstractHook extends \Magento\Framework\App\Action\Action
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Zaius\Engage\Helper\Data $data,
         \Magento\Framework\App\Action\Context $context
-    )
-    {
+    ) {
         $this->_resultJsonFactory = $resultJsonFactory;
         $this->_data = $data;
         return parent::__construct($context);
@@ -64,5 +62,4 @@ abstract class AbstractHook extends \Magento\Framework\App\Action\Action
 
         return $this->_resultJsonFactory->create()->setData($data);
     }
-
 }

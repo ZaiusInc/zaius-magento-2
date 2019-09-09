@@ -14,8 +14,7 @@ use Zaius\Engage\Helper\Data;
  * Class OrderSaveAfterObserver
  * @package Zaius\Engage\Observer
  */
-class OrderSaveAfterObserver
-    implements ObserverInterface
+class OrderSaveAfterObserver implements ObserverInterface
 {
     /**
      * @var Data
@@ -46,8 +45,7 @@ class OrderSaveAfterObserver
         OrderRepositoryInterface $orderRepository,
         Data $helper,
         Client $client
-    )
-    {
+    ) {
         $this->_helper = $helper;
         $this->_storeManager = $storeManager;
         $this->_orderRepository = $orderRepository;
@@ -63,7 +61,7 @@ class OrderSaveAfterObserver
     {
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
-        if ($this->_helper->getStatus($order->getStore()) && (!$this->_helper->getIsTrackingOrdersOnFrontend($order->getStore()) || $this->_storeManager->getStore()->getId() == 0)) {
+        if ($this->_helper->getStatus($order->getStore()) && $this->_storeManager->getStore()->getId() == 0) {
             $this->_client->postOrder($order);
         }
         return $this;

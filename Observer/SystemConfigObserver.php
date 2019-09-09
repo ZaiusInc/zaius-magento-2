@@ -13,8 +13,7 @@ use Zaius\Engage\Model\SchemaRepository;
  * Class SystemConfigObserver
  * @package Zaius\Engage\Observer
  */
-class SystemConfigObserver
-    implements ObserverInterface
+class SystemConfigObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -45,8 +44,7 @@ class SystemConfigObserver
         Data $helper,
         Logger $logger,
         SchemaRepository $schemaRepository
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_logger = $logger;

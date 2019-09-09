@@ -26,8 +26,7 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Zaius\Engage\Helper\Data $helper
-    )
-    {
+    ) {
         $this->_helper = $helper;
         parent::__construct($context);
     }
