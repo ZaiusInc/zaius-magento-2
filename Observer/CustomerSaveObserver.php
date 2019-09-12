@@ -10,13 +10,11 @@ use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data;
 
-
 /**
  * Class CustomerSaveObserver
  * @package Zaius\Engage\Observer
  */
-class CustomerSaveObserver
-    implements ObserverInterface
+class CustomerSaveObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -47,8 +45,7 @@ class CustomerSaveObserver
         Data $helper,
         Client $client,
         CustomerRepositoryInterface $customerRepository
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;

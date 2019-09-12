@@ -15,8 +15,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
  * Class CartClearObserver
  * @package Zaius\Engage\Observer
  */
-class CartClearObserver
-    implements ObserverInterface
+class CartClearObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -41,8 +40,7 @@ class CartClearObserver
         StoreManagerInterface $storeManager,
         Data $helper,
         CheckoutSession $checkoutSession
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_checkoutSession = $checkoutSession;
