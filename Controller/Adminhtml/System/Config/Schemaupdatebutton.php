@@ -33,8 +33,7 @@ class Schemaupdatebutton extends Action
         Context $context,
         SchemaRepository $schemaRepository,
         Logger $logger
-    )
-    {
+    ) {
         $this->_schemaRepository = $schemaRepository;
         $this->logger = $logger;
         parent::__construct($context);

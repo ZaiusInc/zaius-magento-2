@@ -12,8 +12,7 @@ use Zaius\Engage\Helper\Data;
  * Class CustomerLogoutObserver
  * @package Zaius\Engage\Observer
  */
-class CustomerLogoutObserver
-    implements ObserverInterface
+class CustomerLogoutObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -38,8 +37,7 @@ class CustomerLogoutObserver
         StoreManagerInterface $storeManager,
         CustomerRepositoryInterface $customerRepository,
         Data $helper
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_customerRepository = $customerRepository;

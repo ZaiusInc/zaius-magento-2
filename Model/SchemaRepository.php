@@ -344,9 +344,16 @@ class SchemaRepository
         foreach ($magentoSchema as $magento) {
             foreach ($currentSchema as $current) {
                 $match = false;
-                if ($magento['name'] === $current['name']) {
-                    $match = true;
-                    break;
+                if(
+                    is_array($magento)
+                    && is_array($current)
+                    && array_key_exists('name', $magento)
+                    && array_key_exists('name', $current
+                    )){
+                    if ($magento['name'] === $current['name']) {
+                        $match = true;
+                        break;
+                    }
                 }
             }
             if (!$match) {

@@ -12,8 +12,7 @@ use Zaius\Engage\Helper\Data;
  * Class CustomerLoginObserver
  * @package Zaius\Engage\Observer
  */
-class CustomerLoginObserver
-    implements ObserverInterface
+class CustomerLoginObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -38,8 +37,7 @@ class CustomerLoginObserver
         StoreManagerInterface $storeManager,
         CustomerRepositoryInterface $customerRepository,
         Data $helper
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_customerRepository = $customerRepository;
@@ -56,6 +54,8 @@ class CustomerLoginObserver
             $customer = $observer->getEvent()->getCustomer();
             $data['action'] = 'login';
             $data['zaius_engage_version'] = $this->_helper->getVersion();
+            $data['customer_id'] = $customer->getId();
+            $data['customer_email'] = $customer->getEmail();
             $this->_helper->addEventToSession([
                 'type' => 'customer',
                 'data' => $data
