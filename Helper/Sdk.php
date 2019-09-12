@@ -42,8 +42,7 @@ class Sdk extends AbstractHelper
         Context $context,
         DirectoryList $directoryList,
         DeploymentConfig $deploymentConfig
-    )
-    {
+    ) {
         $this->_directoryList = $directoryList;
         $this->_deploymentConfig = $deploymentConfig;
         parent::__construct($context);

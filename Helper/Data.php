@@ -167,6 +167,9 @@ class Data extends AbstractHelper
      */
     public function getStatus($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->isSetFlag('zaius_engage/status/status', 'store', $store);
     }
 
@@ -184,6 +187,9 @@ class Data extends AbstractHelper
      */
     public function getZaiusTrackerId($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->getValue('zaius_engage/status/zaius_tracker_id', 'store', $store);
     }
 
@@ -193,6 +199,9 @@ class Data extends AbstractHelper
      */
     public function getZaiusPrivateKey($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->getValue('zaius_engage/status/zaius_private_api', 'store', $store);
     }
 
@@ -202,6 +211,9 @@ class Data extends AbstractHelper
      */
     public function getAmazonS3Status($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->isSetFlag('zaius_engage/amazon/active', 'store', $store);
     }
 
@@ -211,6 +223,9 @@ class Data extends AbstractHelper
      */
     public function getAmazonS3Key($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->getValue('zaius_engage/amazon/s3_key', 'store', $store);
     }
 
@@ -220,6 +235,9 @@ class Data extends AbstractHelper
      */
     public function getAmazonS3Secret($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->getValue('zaius_engage/amazon/s3_secret', 'store', $store);
     }
 
@@ -229,6 +247,9 @@ class Data extends AbstractHelper
      */
     public function getIsCollectAllProductAttributes($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->isSetFlag('zaius_engage/settings/is_collect_all_product_attributes', 'store', $store);
     }
 
@@ -238,6 +259,9 @@ class Data extends AbstractHelper
      */
     public function getIsTrackingOrdersOnFrontend($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->isSetFlag('zaius_engage/settings/is_tracking_orders_on_frontend', 'store', $store);
     }
 
@@ -247,6 +271,9 @@ class Data extends AbstractHelper
      */
     public function getTimeout($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return intval($this->scopeConfig->getValue('zaius_engage/settings/timeout', 'store', $store));
     }
 
@@ -621,6 +648,9 @@ class Data extends AbstractHelper
      */
     public function getGlobalIDPrefix($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         return $this->scopeConfig->getValue('zaius_engage/settings/global_id_prefix', 'store', $store);
     }
 
@@ -643,6 +673,9 @@ class Data extends AbstractHelper
      */
     public function getNewsletterListId($store = null)
     {
+        if ($store === null) {
+            $store = $this->_storeManager->getStore();
+        }
         $listId = $this->scopeConfig->getValue('zaius_engage/settings/newsletter_list_id', 'store', $store);
         if (empty($listId)) {
             $listId = 'newsletter';

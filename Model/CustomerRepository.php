@@ -121,9 +121,9 @@ class CustomerRepository implements CustomerRepositoryInterface
                 's.customer_id=e.entity_id',
                 ['subscriber_status']
             )->joinLeft(
-            ['billing' => 'customer_address_entity'],
-            'e.default_billing=billing.entity_id',
-            [
+                ['billing' => 'customer_address_entity'],
+                'e.default_billing=billing.entity_id',
+                [
                 'billing_street' => 'street',
                 'billing_city' => 'city',
                 'billing_region' => 'region',
@@ -168,7 +168,7 @@ class CustomerRepository implements CustomerRepositoryInterface
         $addressType = null;
         if ($isFullCustomerObject && $customer->getData('default_shipping')) {
             $addressType = 'shipping';
-        } else if ($isFullCustomerObject && $customer->getData('default_billing')) {
+        } elseif ($isFullCustomerObject && $customer->getData('default_billing')) {
             $addressType = 'billing';
         }
         if (isset($addressType)) {
@@ -181,7 +181,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             $customerData['country'] = $customer->getData("${addressType}_country_id");
             $customerData['phone'] = $customer->getData("${addressType}_telephone");
             $customerData['image_url'] = $customer->getData('image_url');
-        } else if ($eventName === self::ADDRESS_EVENT) {
+        } elseif ($eventName === self::ADDRESS_EVENT) {
             $params = $this->_request->getParams();
             if (!empty($params['region_id']) && is_numeric($params['region_id'])) {
                 $state = $this->_regionFactory->create()->load($params['region_id'])->getCode();
@@ -195,7 +195,7 @@ class CustomerRepository implements CustomerRepositoryInterface
         }
         if ($isFullCustomerObject && $customer->getData('gender') == 1) {
             $customerData['gender'] = 'M';
-        } else if ($isFullCustomerObject && $customer->getData('gender') == 2) {
+        } elseif ($isFullCustomerObject && $customer->getData('gender') == 2) {
             $customerData['gender'] = 'F';
         }
         //creating vuid index

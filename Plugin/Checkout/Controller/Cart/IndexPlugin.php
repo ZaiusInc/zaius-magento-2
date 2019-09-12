@@ -41,8 +41,7 @@ class IndexPlugin
         QuoteRepository $quoteRepository,
         Data $helper,
         Cart $cart
-    )
-    {
+    ) {
         $this->_quoteRepository = $quoteRepository;
         $this->_helper = $helper;
         $this->_cart = $cart;

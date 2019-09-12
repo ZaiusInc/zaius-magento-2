@@ -14,8 +14,7 @@ use Zaius\Engage\Helper\Data as Helper;
  * Class OrderPlaceAfterObserver
  * @package Zaius\Engage\Observer
  */
-class OrderPlaceAfterObserver
-    implements ObserverInterface
+class OrderPlaceAfterObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -46,8 +45,7 @@ class OrderPlaceAfterObserver
         OrderRepositoryInterface $orderRepository,
         Helper $helper,
         Client $client
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_orderRepository = $orderRepository;
         $this->_helper = $helper;

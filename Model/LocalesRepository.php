@@ -46,8 +46,7 @@ class LocalesRepository implements LocalesInterface
         CurrencyFactory $currencyFactory,
         Resolver $localeResolver,
         TranslatedLists $localeOptions
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
         $this->currencyFactory = $currencyFactory;

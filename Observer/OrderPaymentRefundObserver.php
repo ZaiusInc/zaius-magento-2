@@ -12,8 +12,7 @@ use Zaius\Engage\Helper\Data as Helper;
  * Class OrderPaymentRefundObserver
  * @package Zaius\Engage\Observer
  */
-class OrderPaymentRefundObserver
-    implements ObserverInterface
+class OrderPaymentRefundObserver implements ObserverInterface
 {
     /**
      * @var Helper
@@ -32,8 +31,7 @@ class OrderPaymentRefundObserver
     public function __construct(
         Helper $helper,
         Client $client
-    )
-    {
+    ) {
         $this->_helper = $helper;
         $this->_client = $client;
     }
