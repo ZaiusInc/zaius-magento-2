@@ -2,33 +2,30 @@
 
 namespace Zaius\Engage\Block\System\Config;
 
-use Magento\Backend\Block\Template\Context;
-use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Zaius\Engage\Helper\Data;
 
 /**
  * Class Version
  * @package Zaius\Engage\Block\System\Config
  */
-class Version extends Field
+class Version extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
      * @var EXTENSION_URL
      */
     const EXTENSION_URL = 'https://help.zaius.com/engage';
     /**
-     * @var Data $helper
+     * @var \Zaius\Engage\Helper\Data $helper
      */
     protected $_helper;
 
     /**
-     * @param Context $context
-     * @param Data    $helper
+     * @param   \Magento\Backend\Block\Template\Context $context
+     * @param   \Zaius\Engage\Helper\Data $helper
      */
     public function __construct(
-        Context $context,
-        Data $helper
+        \Magento\Backend\Block\Template\Context $context,
+        \Zaius\Engage\Helper\Data $helper
     ) {
         $this->_helper = $helper;
         parent::__construct($context);

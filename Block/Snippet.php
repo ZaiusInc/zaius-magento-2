@@ -2,7 +2,6 @@
 
 namespace Zaius\Engage\Block;
 
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Json\Encoder as JsonEncoder;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
@@ -15,22 +14,18 @@ use Zaius\Engage\Model\Session;
  */
 class Snippet extends Template
 {
-
     /**
      * @var Data
      */
     protected $_helper;
-
     /**
      * @var Session
      */
     protected $_session;
-
     /**
      * @var Registry
      */
     protected $_registry;
-
     /**
      * @var JsonEncoder
      */
@@ -38,13 +33,12 @@ class Snippet extends Template
 
     /**
      * Snippet constructor.
-     *
-     * @param Data             $helper
-     * @param Session          $session
-     * @param Registry         $registry
-     * @param JsonEncoder      $jsonEncoder
+     * @param Data $helper
+     * @param Session $session
+     * @param Registry $registry
+     * @param JsonEncoder $jsonEncoder
      * @param Template\Context $context
-     * @param array            $data
+     * @param array $data
      */
     public function __construct(
         Data $helper,
@@ -58,11 +52,13 @@ class Snippet extends Template
         $this->_session = $session;
         $this->_registry = $registry;
         $this->_jsonEncoder = $jsonEncoder;
+        $this->setTemplate('Zaius_Engage::snippet.phtml');
         parent::__construct($context, $data);
     }
 
     /**
-     * @inheritDoc
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function toHtml()
     {
@@ -73,8 +69,6 @@ class Snippet extends Template
     }
 
     /**
-     * Get the Zaius CacheKeyInfo
-     *
      * @return array
      */
     public function getCacheKeyInfo()
@@ -85,38 +79,19 @@ class Snippet extends Template
     }
 
     /**
-     * Get the Zaius Tracker ID
-     *
      * @return string
-     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getTrackingID()
     {
         return $this->_helper->getZaiusTrackerId($this->_storeManager->getStore());
     }
 
-
     /**
-     * Getting the default pageview event
-     *
-     * @return array
+     * @return mixed
      */
     public function getEvents()
     {
-        $events = $this->getPageViewEvent();
-        return $events;
-    }
-
-
-    /**
-     * Get the pageview event
-     * and some other events recorded in sessions
-     *
-     * @return array
-     */
-    protected function getPageViewEvent()
-    {
-        //ToDo: Check the session requests and remove
         $events = $this->_session->getEvents(true);
         if (!is_array($events)) {
             $events = [];
@@ -137,6 +112,28 @@ class Snippet extends Template
             array_unshift($events, $pvEvent);
         }
 
+        $registryEvents = $this->_registry->registry(Data::EVENTS_REGISTRY_KEY);
+        if (is_array($registryEvents) && count($registryEvents)) {
+            foreach ($registryEvents as $registryEvent) {
+                $events[] = $registryEvent;
+            }
+        }
+
         return $events;
+    }
+
+    /**
+     * @param mixed $event
+     * @return string
+     */
+    public function getEventJs($event)
+    {
+        if ($event['type'] == 'anonymize') {
+            return 'zaius.anonymize();';
+        }
+        if (isset($event['data']) && isset($event['data']['data_source_details'])) {
+            $event['data']['data_source_details'] .= 'Sent via Zaius web SDK;';
+        }
+        return "zaius.event('" . $event['type'] . "', " . $this->_jsonEncoder->encode($event['data']) . ");";
     }
 }
