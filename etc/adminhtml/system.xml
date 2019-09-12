@@ -21,7 +21,7 @@
                     <frontend_model>Zaius\Engage\Block\System\Config\Version</frontend_model>
                     <comment>Zaius Engage Version</comment>
                 </field>
-                <field id="log_errors" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="error_summary" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Error Summary</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\ErrorsSummary</frontend_model>
                 </field>
