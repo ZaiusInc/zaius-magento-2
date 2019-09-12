@@ -22,19 +22,18 @@ By far the quickest and easiest way to install and maintain the Zaius connector 
 2. Install the Zaius Magento 2 package.
 3. Finally, make sure the package is up-to-date.
 
-Note: as we continue validating the robustness of the module, you will need to specify your willingness to use the release candidates of both the module and the underlying PHP SDK:
+> *Note for users who have installed previous RC versions*  
+>  
+> Now that stable releases are available, you may **remove** these previously-required lines from your `<MAGENTO_ROOT>/composer.json` file:  
+>  
+>  ~~"minimum-stability" "RC",~~  
+>  ~~"prefer-stable": true~~  
 
-* Edit your `<MAGENTO_ROOT>/composer.json` file:
+
+* Add the required packages.
 
 ```bash
-"minimum-stability" "RC",
-"prefer-stable": true
-```
-
-* Add the required packages:
-
-```bash
-composer require zaius/zaius-magento-2:^1.0
+composer require zaius/zaius-magento-2
 composer install
 composer update zaius/*
 ```
