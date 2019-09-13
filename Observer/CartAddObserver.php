@@ -17,8 +17,7 @@ use Zaius\Engage\Logger\Logger;
  * Class CartAddObserver
  * @package Zaius\Engage\Observer
  */
-class CartAddObserver
-    implements ObserverInterface
+class CartAddObserver implements ObserverInterface
 {
     /**
      * @var UPDATE_ITEM_OPTIONS
@@ -66,8 +65,7 @@ class CartAddObserver
         Client $client,
         CheckoutSession $checkoutSession,
         Logger $logger
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_productRepository = $productRepository;
         $this->_helper = $helper;
@@ -86,21 +84,20 @@ class CartAddObserver
     public function execute(Observer $observer, $product = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
-
             $eventName = $observer->getEvent()->getName();
 
             /** @var Quote $quote */
             $quote = $this->_checkoutSession->getQuote();
 
             // ZAI-44: First add_to_cart events were not properly being processed, due to the created_at timestamp
-            // not being present in the data model yet at time of instantiation. 
-            // The data model is refreshed here to ensure that the cart_hash can be properly calculated. 
+            // not being present in the data model yet at time of instantiation.
+            // The data model is refreshed here to ensure that the cart_hash can be properly calculated.
             // Patch by nick@trellis.co
             if (empty($quote->getCreatedAt())) {
                 $quote = $quote->load($quote->getId());
             }
             $action = 'update_qty';
-            if (is_null($product)){
+            if (is_null($product)) {
                 /** @var Product $product */
                 $product = $observer->getEvent()->getData('product');
                 if ($eventName === self::UPDATE_ITEM_OPTIONS) {
