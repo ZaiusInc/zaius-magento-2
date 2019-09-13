@@ -21,6 +21,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\Config\Source\UnsuscribeRescindEmailConsent;
 use Zaius\Engage\Model\Session;
 use ZaiusSDK\ZaiusException;
 
@@ -709,6 +710,50 @@ class Data extends AbstractHelper
         }
         $this->_logger->info(json_encode($listId));
         return $listId;
+    }
+
+    /**
+     * @param null $store
+     * @return boolean
+     */
+    public function getUnsuscribeRescindList($store = null)
+    {
+        $unsuscribeRescindValue = $this->scopeConfig->getValue('zaius_engage/settings/unsuscribe_rescind_email_consent',
+            'store', $store);
+
+        switch ($unsuscribeRescindValue) {
+            case UnsuscribeRescindEmailConsent::UNSUSCRIBE_YES:
+                return true;
+                break;
+            case UnsuscribeRescindEmailConsent::UNSUSCRIBE_NO:
+                return false;
+                break;
+            case UnsuscribeRescindEmailConsent::UNSUSCRIBE_AUTO:
+                return $this->getUnsuscribeRescindAutoValue($store);
+        }
+    }
+
+    private function getUnsuscribeRescindAutoValue($currentStore) {
+        $stores = $this->_storeManager->getStores();
+
+        $currentTrackerId = $this->getZaiusTrackerId($currentStore);
+        $currentListId = $this->getNewsletterListId($currentStore);
+
+        // Validate trackers id for each store
+        foreach ($stores as $store) {
+             if( $this->getZaiusTrackerId($store->getId()) != $currentTrackerId ) {
+                 return false; // Auto is OFF
+             }
+        }
+
+        // If trackers id are the same, then validate list ids.
+        foreach ($stores as $store) {
+            if( $this->getNewsletterListId($store->getId()) != $currentListId ) {
+                return false; // Auto is OFF
+            }
+        }
+
+        return true; // Auto is ON
     }
 
     /**

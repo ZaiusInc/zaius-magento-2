@@ -101,6 +101,13 @@
                         Specify a Newsletter List ID.
                     </comment>
                 </field>
+                <field id="unsuscribe_rescind_email_consent" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Unsubscribes rescind email consent</label>
+                    <source_model>Zaius\Engage\Model\Config\Source\UnsuscribeRescindEmailConsent</source_model>
+                    <comment>
+                        Unsubscribes rescind email consent
+                    </comment>
+                </field>
                 <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="0" showInWebsite="0" showInStore="0">
                     <label>Track Orders on Frontend</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
