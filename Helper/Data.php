@@ -21,6 +21,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\Config\Source\UnsuscribeRescindEmailConsent;
 use Zaius\Engage\Model\Session;
 use ZaiusSDK\ZaiusClient;
 use ZaiusSDK\ZaiusException;
@@ -164,6 +165,7 @@ class Data extends AbstractHelper
      * @param Store|int|null $store
      *
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getStatus($store = null)
     {
@@ -183,7 +185,9 @@ class Data extends AbstractHelper
 
     /**
      * @param Store|int|null $store
+     *
      * @return string
+     * @throws NoSuchEntityException
      */
     public function getZaiusTrackerId($store = null)
     {
@@ -195,7 +199,9 @@ class Data extends AbstractHelper
 
     /**
      * @param Store|int|null $store
+     *
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getZaiusPrivateKey($store = null)
     {
@@ -207,7 +213,9 @@ class Data extends AbstractHelper
 
     /**
      * @param Store|int|null $store
+     *
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getAmazonS3Status($store = null)
     {
@@ -219,19 +227,19 @@ class Data extends AbstractHelper
 
     /**
      * @param Store|int|null $store
+     *
      * @return bool
      */
     public function getAmazonS3Key($store = null)
     {
-        if ($store === null) {
-            $store = $this->_storeManager->getStore();
-        }
         return $this->scopeConfig->getValue('zaius_engage/amazon/s3_key', 'store', $store);
     }
 
     /**
      * @param Store|int|null $store
+     *
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getAmazonS3Secret($store = null)
     {
@@ -242,8 +250,10 @@ class Data extends AbstractHelper
     }
 
     /**
-     * '@param Store|int|null $store
+     * @param Store|int|null $store
+     *
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getIsCollectAllProductAttributes($store = null)
     {
@@ -255,7 +265,9 @@ class Data extends AbstractHelper
 
     /**
      * @param Store|int|null $store
+     *
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function getIsTrackingOrdersOnFrontend($store = null)
     {
@@ -266,8 +278,10 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param Store|int|null $store
+     * @param null $store
+     *
      * @return int
+     * @throws NoSuchEntityException
      */
     public function getTimeout($store = null)
     {
@@ -278,6 +292,8 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Check if the cart is valid
+     *
      * @param $quote
      * @return bool
      */
@@ -341,8 +357,12 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Prepare Zaius cart URL
+     *
      * @param $baseUrl
+     *
      * @return string
+     * @throws NoSuchEntityException
      */
     public function prepareZaiusCartUrl($baseUrl)
     {
@@ -561,6 +581,7 @@ class Data extends AbstractHelper
      * @param bool $queue
      *
      * @return bool|mixed
+     * @throws \ZaiusSDK\ZaiusException
      */
     public function sendEvent($event, $queue = false)
     {
@@ -594,6 +615,8 @@ class Data extends AbstractHelper
      * @param mixed $event
      *
      * @return $this;
+     * @throws NoSuchEntityException
+     * @throws ZaiusException
      */
     public function addEventToSession($event)
     {
@@ -644,7 +667,9 @@ class Data extends AbstractHelper
 
     /**
      * @param null $store
+     *
      * @return mixed
+     * @throws NoSuchEntityException
      */
     public function getGlobalIDPrefix($store = null)
     {
@@ -656,7 +681,9 @@ class Data extends AbstractHelper
 
     /**
      * @param $idToPrefix
+     *
      * @return string
+     * @throws NoSuchEntityException
      */
     public function applyGlobalIDPrefix($idToPrefix)
     {
@@ -669,7 +696,9 @@ class Data extends AbstractHelper
 
     /**
      * @param null $store
+     *
      * @return mixed|string
+     * @throws NoSuchEntityException
      */
     public function getNewsletterListId($store = null)
     {
@@ -682,6 +711,50 @@ class Data extends AbstractHelper
         }
         $this->_logger->info(json_encode($listId));
         return $listId;
+    }
+
+    /**
+     * @param null $store
+     * @return boolean
+     */
+    public function getUnsuscribeRescindList($store = null)
+    {
+        $unsuscribeRescindValue = $this->scopeConfig->getValue('zaius_engage/settings/unsuscribe_rescind_email_consent',
+            'store', $store);
+
+        switch ($unsuscribeRescindValue) {
+            case UnsuscribeRescindEmailConsent::UNSUSCRIBE_YES:
+                return true;
+                break;
+            case UnsuscribeRescindEmailConsent::UNSUSCRIBE_NO:
+                return false;
+                break;
+            case UnsuscribeRescindEmailConsent::UNSUSCRIBE_AUTO:
+                return $this->getUnsuscribeRescindAutoValue($store);
+        }
+    }
+
+    private function getUnsuscribeRescindAutoValue($currentStore) {
+        $stores = $this->_storeManager->getStores();
+
+        $currentTrackerId = $this->getZaiusTrackerId($currentStore);
+        $currentListId = $this->getNewsletterListId($currentStore);
+
+        // Validate trackers id for each store
+        foreach ($stores as $store) {
+             if( $this->getZaiusTrackerId($store->getId()) != $currentTrackerId ) {
+                 return false; // Auto is OFF
+             }
+        }
+
+        // If trackers id are the same, then validate list ids.
+        foreach ($stores as $store) {
+            if( $this->getNewsletterListId($store->getId()) != $currentListId ) {
+                return false; // Auto is OFF
+            }
+        }
+
+        return true; // Auto is ON
     }
 
     /**

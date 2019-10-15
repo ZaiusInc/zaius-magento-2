@@ -90,19 +90,22 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
                     return $this;
             }
 
+
+
             $event = array();
             $event['type'] = 'list';
             $event['action'] = $action;
             $event['data']['list_id'] = $this->_helper->getNewsletterListId();
             $event['data']['email'] = $subscriber->getSubscriberEmail();
             $event['data']['subscribed'] = $subscribed;
-            $event['data']['store_id'] = $subscriber->getStoreId();
+            $event['data']['magento_store'] = $subscriber->getStoreId();
+            $event['data']['ts'] = time();
             $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
 
             if (($ts = strtotime($subscriber->getChangeStatusAt())) !== false) {
                 $event['data']['ts'] = $ts;
             } else {
-                $this->_logger->warning('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.print_r($subscriber->getChangeStatusAt()));
+                $this->_logger->info('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.print_r($subscriber->getChangeStatusAt()));
             }
 
             $state = $this->_state->getAreaCode();
@@ -118,10 +121,15 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
 
             if ($subscriber->isStatusChanged()) {
                 $this->_client->postEvent($event);
-                $event['data']['list_id'] = 'zaius_all';
-                $this->_client->postEvent($event);
+
+                if($subscribed || (!$subscribed &&  $this->_helper->getUnsuscribeRescindList($subscriber->getStoreId()))) {
+                    $event['data']['list_id'] = 'zaius_all';
+                    $this->_client->postEvent($event);
+                }
+
             }
         }
         return $this;
     }
+
 }

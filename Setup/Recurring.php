@@ -80,7 +80,6 @@ class Recurring implements InstallSchemaInterface
         $this->changeConfigPosition($setup, 'zaius_engage/config/amazon_s3_key', 'zaius_engage/amazon/s3_key', true);
         $this->changeConfigPosition($setup, 'zaius_engage/config/amazon_s3_secret', 'zaius_engage/amazon/s3_secret', true);
 
-
         $update->endSetup();
     }
 
@@ -113,6 +112,7 @@ class Recurring implements InstallSchemaInterface
 
     /**
      * Save a new configuration into the core_config_data
+     * 
      * @param $path
      * @param $value
      * @param string $scope
