@@ -19,23 +19,21 @@
                 <field id="version" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Version</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Version</frontend_model>
-                    <comment>
-                        Zaius Engage Version
-                    </comment>
+                    <comment>Zaius Engage Version</comment>
+                </field>
+                <field id="error_summary" translate="label comment" type="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Error Summary</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\ErrorsSummary</frontend_model>
                 </field>
                 <field id="composer" translate="label comment" type="label" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Composer Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
-                    <comment>
-                        Checks if Composer is installed.
-                    </comment>
+                    <comment>Checks if Composer is installed.</comment>
                 </field>
                 <field id="sdk" translate="label comment" type="label" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>SDK Installed?</label>
                     <frontend_model>Zaius\Engage\Block\System\Config\Sdk</frontend_model>
-                    <comment>
-                        Checks if the Zaius SDK is installed.
-                    </comment>
+                    <comment>Checks if the Zaius SDK is installed.</comment>
                 </field>
                 <field id="alert" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Zaius Tracker ID</label>
@@ -101,15 +99,11 @@
                 <label>Settings</label>
                 <field id="global_id_prefix" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Global ID Prefix</label>
-                    <comment>
-                        Specify a Global ID Prefix.
-                    </comment>
+                    <comment>Specify a Global ID Prefix.</comment>
                 </field>
                 <field id="newsletter_list_id" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Zaius Newsletter List ID</label>
-                    <comment>
-                        Specify a Newsletter List ID.
-                    </comment>
+                    <comment>Specify a Newsletter List ID.</comment>
                 </field>
                 <field id="unsuscribe_rescind_email_consent" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Unsubscribes rescind email consent</label>
@@ -121,16 +115,12 @@
                 <field id="is_tracking_orders_on_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="0" showInWebsite="0" showInStore="0">
                     <label>Track Orders on Frontend</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        Choose if you want to track orders.
-                    </comment>
+                    <comment>Choose if you want to track orders.</comment>
                 </field>
                 <field id="is_collect_all_product_attributes" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Collect All Product Attributes</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        Choose if you want to collect all product attributes, or only the minimum.
-                    </comment>
+                    <comment>Choose if you want to collect all product attributes, or only the minimum.</comment>
                 </field>
                 <field id="timeout" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Timeout</label>

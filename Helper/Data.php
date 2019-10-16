@@ -23,6 +23,7 @@ use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Model\Config\Source\UnsuscribeRescindEmailConsent;
 use Zaius\Engage\Model\Session;
+use ZaiusSDK\ZaiusClient;
 use ZaiusSDK\ZaiusException;
 
 /**
@@ -357,7 +358,7 @@ class Data extends AbstractHelper
 
     /**
      * Prepare Zaius cart URL
-     * 
+     *
      * @param $baseUrl
      *
      * @return string

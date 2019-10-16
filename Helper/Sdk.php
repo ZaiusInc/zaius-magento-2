@@ -3,7 +3,12 @@
 namespace Zaius\Engage\Helper;
 
 use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\Store;
+use ZaiusSDK\ZaiusClient;
+use ZaiusSDK\Log\DJJob;
 
 /**
  * Class Sdk
@@ -12,30 +17,51 @@ use Magento\Framework\App\Helper\AbstractHelper;
 class Sdk extends AbstractHelper
 {
     /**
-     * @var \Magento\Framework\App\Filesystem\DirectoryList
+     * @var DirectoryList
      */
     protected $_directoryList;
 
     /** @var DeploymentConfig */
     protected $_deploymentConfig;
 
+    protected $zaiusClient;
+    /**
+     * @var DJJob
+     */
+    private $_ddjob;
+
     /**
      * Sdk constructor.
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Framework\App\Filesystem\DirectoryList $directoryList
+     *
+     * @param Context          $context
+     * @param DirectoryList    $directoryList
      * @param DeploymentConfig $deploymentConfig
      */
-    public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+    public function __construct
+    (
+        Context $context,
+        DirectoryList $directoryList,
         DeploymentConfig $deploymentConfig
     ) {
         $this->_directoryList = $directoryList;
         $this->_deploymentConfig = $deploymentConfig;
         parent::__construct($context);
+        $this->_ddjob = new DJJob($this->getSdkClient());
     }
 
     /**
+     * Return all the error summary
+     *
+     * @return string
+     */
+    public function getSdkLog(){
+        $errorSummary = json_decode($this->_ddjob->getErrorsSummaryJson());
+        return $errorSummary;
+    }
+
+    /**
+     * Is Composer Installed
+     *
      * @return bool
      */
     public function isComposerInstalled()
@@ -50,6 +76,8 @@ class Sdk extends AbstractHelper
     }
 
     /**
+     * Is SDK Installed
+     *
      * @return bool
      */
     public function isSdkInstalled()
@@ -59,6 +87,8 @@ class Sdk extends AbstractHelper
     }
 
     /**
+     * Get SDK Path
+     *
      * @return string
      */
     public function getSdkPath()
@@ -68,7 +98,11 @@ class Sdk extends AbstractHelper
     }
 
     /**
-     * @return \ZaiusSDK\ZaiusClient
+     * Get the SDK Client
+     *
+     * @param null $store
+     *
+     * @return ZaiusClient
      */
     public function getSdkClient($store = null)
     {
@@ -78,22 +112,22 @@ class Sdk extends AbstractHelper
             $zaiusClient = null;
             return $zaiusClient;
         }
-        $zaiusClient = new \ZaiusSDK\ZaiusClient($apiKey, $privateKey);
-
+        $zaiusClient = new ZaiusClient($apiKey, $privateKey);
         $zaiusClient->setQueueDatabaseCredentials([
             'driver' => 'mysql',
             'host' => $this->_deploymentConfig->get('db/connection/default/host'),
-            'db_name' => $this->_deploymentConfig->get('db/connection/default/dbname'),
+            'dbname' => $this->_deploymentConfig->get('db/connection/default/dbname'),
             'user' => $this->_deploymentConfig->get('db/connection/default/username'),
             'password' => $this->_deploymentConfig->get('db/connection/default/password'),
             'port' => $this->_deploymentConfig->get('db/connection/default/port'),
-        ], $this->_deploymentConfig->get('db/connection/default/dbname') . '.zaius_job');
-
+        ], 'zaius_job');
         return $zaiusClient;
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * Get Zaius Tracker ID
+     *
+     * @param Store|int|null $store
      * @return string
      */
     public function getZaiusTrackerId($store = null)
@@ -102,7 +136,9 @@ class Sdk extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Store\Model\Store|int|null $store
+     * Get Zaius Private Key
+     *
+     * @param Store|int|null $store
      * @return bool
      */
     public function getZaiusPrivateKey($store = null)
