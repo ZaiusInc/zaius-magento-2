@@ -2,16 +2,19 @@
 
 namespace Zaius\Engage\Block\System\Config;
 
+use Magento\Backend\Block\Template\Context;
+use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Zaius\Engage\Helper\Data;
 
 /**
  * Class Sdk
  * @package Zaius\Engage\Block\System\Config
  */
-class Sdk extends \Magento\Config\Block\System\Config\Form\Field
+class Sdk extends Field
 {
     /**
-     * @var \Zaius\Engage\Helper\Data $helperData
+     * @var Data $helperData
      */
     protected $helperData;
     /**
@@ -20,16 +23,15 @@ class Sdk extends \Magento\Config\Block\System\Config\Form\Field
     protected $helperSdk;
 
     /**
-     * @param   \Magento\Backend\Block\Template\Context $context
-     * @param   \Zaius\Engage\Helper\Data $helperData
+     * @param Context                    $context
+     * @param Data                       $helperData
      * @param   \Zaius\Engage\Helper\Sdk $helperSdk
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Zaius\Engage\Helper\Data $helperData,
+        Context $context,
+        Data $helperData,
         \Zaius\Engage\Helper\Sdk $helperSdk
-    )
-    {
+    ) {
         $this->helperData = $helperData;
         $this->helperSdk = $helperSdk;
         parent::__construct($context);

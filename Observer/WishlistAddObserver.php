@@ -12,8 +12,7 @@ use Zaius\Engage\Helper\Data;
  * Class WishlistAddObserver
  * @package Zaius\Engage\Observer
  */
-class WishlistAddObserver
-    implements ObserverInterface
+class WishlistAddObserver implements ObserverInterface
 {
     /**
      * @var StoreManagerInterface
@@ -32,8 +31,7 @@ class WishlistAddObserver
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper
-    )
-    {
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
     }
