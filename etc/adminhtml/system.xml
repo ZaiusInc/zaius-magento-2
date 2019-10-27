@@ -55,11 +55,12 @@
                         <field id="*/*/status">1</field>
                     </depends>
                 </field>
-                <field id="zaius_private_api" translate="label comment" type="text" sortOrder="70" showInDefault="0" showInWebsite="0" showInStore="1">
+                <field id="zaius_private_api" translate="label comment" type="obscure" sortOrder="70" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Zaius Private API Key</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
                     </comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <validate>required-entry</validate>
                     <depends>
                         <field id="*/*/status">1</field>
