@@ -5,6 +5,7 @@ namespace Zaius\Engage\Block\System\Config;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class SchemaUpdateButton
@@ -66,7 +67,7 @@ class SchemaUpdateButton extends Field
      * Generate button html
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getButtonHtml()
     {

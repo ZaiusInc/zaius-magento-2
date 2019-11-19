@@ -3,7 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="before.body.end">
-            <block class="Zaius\Engage\Block\Snippet" name="zaius.engage.snippet"
+            <block class="Zaius\Engage\Block\Snippet\Category" name="zaius.engage.snippet"
                    template="Zaius_Engage::snippet.phtml"/>
         </referenceContainer>
     </body>
