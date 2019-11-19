@@ -22,23 +22,25 @@ By far the quickest and easiest way to install and maintain the Zaius connector 
 2. Install the Zaius Magento 2 package.
 3. Finally, make sure the package is up-to-date.
 
-Now that stable releases are available, you may **remove** these previously-required lines from your `<MAGENTO_ROOT>/composer.json` file:
+> *Note for users who have installed previous RC versions*  
+>  
+> Now that stable releases are available, you may **remove** these previously-required lines from your `<MAGENTO_ROOT>/composer.json` file:  
+>  
+>  ~~"minimum-stability" "RC",~~  
+>  ~~"prefer-stable": true~~  
 
-> ~~"minimum-stability" "RC",~~  
-~~"prefer-stable": true~~
 
-
-* Add the required packages. This particular branch is a beta release, so you must specify the specific version:
+* Add the required packages.
 
 ```bash
-composer require zaius/zaius-magento-2:1.0.1@beta
+composer require zaius/zaius-magento-2
 composer install
 composer update zaius/*
 ```
 
 ### Alternative install: ZIP
 
-* Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/release/1.0.1-beta.1.zip
+* Download the Zaius Magento 2 module archive from Git: https://github.com/ZaiusInc/zaius-magento-2/archive/master.zip
 * Extract the contents of the ZIP file to <MAGENTO_ROOT>/app/code/Zaius/Engage/<extract_here>.
 
 The Zaius PHP SDK is required, and must be installed separately if you've chosen to install via ZIP archive.
@@ -190,10 +192,6 @@ After installing the module and setting up the API user, all configuration is do
 **Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes defined in the default attribute set, or only the Zaius-curated minimum. If your product feed has fields which are not yet captured in Zaius, you will likely need to turn this on, ensure that field is added to the default attribute set, and create a corresponding custom field in Zaius. For more detail, see ["Collecting additional product attributes"](#collecting-additional-product-attributes)
 
 **Timeout**: Specify a number of seconds to wait before timing out the connection to Zaius.
-
-#### Batch Updates
-
-**Enabled**: Whether or not to perform catch-up syncs of products, customers, and/or orders as a fallback. Not typically needed and not thoroughly tested; please contact Zaius Support if you feel the need so we can advise, and monitor if needed.
 
 #### Schema Update
 
