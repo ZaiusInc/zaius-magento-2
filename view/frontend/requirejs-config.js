@@ -5,7 +5,7 @@ var config = {
         }
     },
     paths: {
-        'zaius-min': '//d1igp3oop3iho5.cloudfront.net/v2/piUzfdlpdHM-rtbS6OpeCQ/zaius-min'
+        'zaius-min': '//d1igp3oop3iho5.cloudfront.net/v2/zaius-min'
     },
     deps: ["Zaius_Engage/js/ads"]
 };
