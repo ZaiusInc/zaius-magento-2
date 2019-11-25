@@ -57,9 +57,15 @@ class CustomerLogoutObserver
             $data = $this->_customerRepository->getCustomerEventData($customer);
             $data['action'] = 'logout';
             $data['zaius_engage_version'] = $this->_helper->getVersion();
-            $this->_helper->addEventToSession([
+            $this->_helper->sendEvent([
                 'type' => 'customer',
                 'data' => $data
+            ]);
+            $this->_helper->sendEvent([
+                'type' => 'anonymize',
+                'data' => [
+                    'zaius_engage_version' => $data['zaius_engage_version']
+                ]
             ]);
         }
         return $this;
