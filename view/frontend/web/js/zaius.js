@@ -1,7 +1,16 @@
 if (document.getElementById('bwiPHWlgeUcE')) {
-    define(['jquery', 'underscore', 'zaius-min', 'domReady!'], function ($, _) {
+    define(['jquery', 'underscore', 'domReady!'], function ($, _) {
         'use strict';
         return function (config) {
+
+            (function () {
+                var e = document.createElement("script");
+                e.type = "text/javascript";
+                e.async = true;
+                e.src = ("https:" === document.location.protocol ? "https://" : "http://") + config.js;
+                var t = document.getElementsByTagName("script")[0];
+                t.parentNode.insertBefore(e, t)
+            })();
 
             var zaius = window['zaius'] || (window['zaius'] = []);
             zaius.methods = [
