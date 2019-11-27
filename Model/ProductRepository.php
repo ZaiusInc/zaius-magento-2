@@ -156,12 +156,9 @@ class ProductRepository implements ProductRepositoryInterface
     public function getProductEventData($event, $product)
     {
         $productId = $this->_helper->getProductId($product);
-        $parentIds = $this->_productConfigurable->getParentIdsByChild($productId);
-        $parentProductId = isset($parentIds[0]) ? $parentIds[0] : $productId;
 
         $productData = [
             'product_id' => $productId,
-            'parent_product_id' => $parentProductId,
             'name' => $product->getName(),
             'brand' => $product->getData('brand'),
             'sku' => $product->getSku(),
@@ -170,8 +167,14 @@ class ProductRepository implements ProductRepositoryInterface
             'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
             'price' => trim($product->getPrice()),
             'image_url' => $this->_productHelper->getImageUrl($product),
-            'url_key' => $product->getData('url_key')
+            'url_key' => $product->getData('url_key'),
         ];
+
+        $parentProductId = $this->_productConfigurable->getParentIdsByChild($productId);
+
+        if (isset($parentProductId[0])) {
+            $productData['parent_product_id'] = $parentProductId[0];
+        }
 
         if ($product->getData('special_price')) {
             $productData['special_price'] = trim($product->getData('special_price'));

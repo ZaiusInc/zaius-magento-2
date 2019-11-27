@@ -3,4 +3,7 @@
     <type name="Magento\Checkout\Controller\Cart\Index">
         <plugin name="zaius_engage" type="Zaius\Engage\Plugin\Checkout\Controller\Cart\IndexPlugin" sortOrder="0" />
     </type>
+    <type name="Magento\Customer\Controller\Account\LogoutSuccess">
+        <plugin name="zaius_engage" type="Zaius\Engage\Plugin\Customer\Controller\Account\LogoutSuccessPlugin" sortOrder="0" />
+    </type>
 </config>

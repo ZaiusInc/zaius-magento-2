@@ -5,20 +5,17 @@ namespace Zaius\Engage\Observer;
 use Magento\Framework\App\State;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Store\Model\StoreManager;
-use Zaius\Engage\Logger\Logger;
 use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data as Helper;
-use ZaiusSDK\ZaiusException;
 
 /**
  * Class NewsletterSubscriberSaveObserver
  * @package Zaius\Engage\Observer
  */
-class NewsletterSubscriberSaveObserver implements ObserverInterface
+class NewsletterSubscriberSaveObserver
+    implements ObserverInterface
 {
     /**
      * @var State
@@ -38,38 +35,30 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
     protected $_client;
 
     /**
-     * @var Logger
-     */
-    private $_logger;
-
-    /**
      * NewsletterSubscriberSaveObserver constructor.
      * @param State $state
      * @param StoreManager $storeManager
      * @param Helper $helper
      * @param Client $client
-     * @param Logger $logger
      */
     public function __construct(
         State $state,
         StoreManager $storeManager,
         Helper $helper,
-        Client $client,
-        Logger $logger
-    ) {
+        Client $client
+    )
+    {
         $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
-        $this->_logger = $logger;
     }
 
     /**
      * @param Observer $observer
      * @return $this|void
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     * @throws ZaiusException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute(Observer $observer)
     {
@@ -90,23 +79,15 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
                     return $this;
             }
 
-
-
             $event = array();
             $event['type'] = 'list';
             $event['action'] = $action;
             $event['data']['list_id'] = $this->_helper->getNewsletterListId();
             $event['data']['email'] = $subscriber->getSubscriberEmail();
             $event['data']['subscribed'] = $subscribed;
-            $event['data']['magento_store'] = $subscriber->getStoreId();
-            $event['data']['ts'] = time();
+            $event['data']['store_id'] = $subscriber->getStoreId();
+            $event['data']['ts'] = strtotime($subscriber->getChangeStatusAt());
             $event['data']['zaius_engage_version'] = $this->_helper->getVersion();
-
-            if (($ts = strtotime($subscriber->getChangeStatusAt())) !== false) {
-                $event['data']['ts'] = $ts;
-            } else {
-                $this->_logger->warning('Wrong timestamp reported by  Zaius\Engage\Observer\NewsletterSubscriberSaveObserver class, the getChangeStatusAt() method returned: '.print_r($subscriber->getChangeStatusAt()));
-            }
 
             $state = $this->_state->getAreaCode();
 
@@ -121,15 +102,10 @@ class NewsletterSubscriberSaveObserver implements ObserverInterface
 
             if ($subscriber->isStatusChanged()) {
                 $this->_client->postEvent($event);
-
-                if($subscribed || (!$subscribed &&  $this->_helper->getUnsuscribeRescindList($subscriber->getStoreId()))) {
-                    $event['data']['list_id'] = 'zaius_all';
-                    $this->_client->postEvent($event);
-                }
-
+                $event['data']['list_id'] = 'zaius_all';
+                $this->_client->postEvent($event);
             }
         }
         return $this;
     }
-
 }
