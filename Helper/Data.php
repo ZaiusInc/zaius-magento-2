@@ -546,7 +546,12 @@ class Data extends AbstractHelper
                     }
                 }
             }
-            $zaiusClient->postEvent($event, true);
+            try {
+                $zaiusClient->postEvent($event, true);
+            } catch (\Exception $e) {
+                $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+                return $this;
+            }
         } else {
             $events = $this->_session->getEvents();
             if (!$events) {
