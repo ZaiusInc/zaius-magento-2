@@ -12,9 +12,10 @@ interface CustomerRepositoryInterface
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param null $trackingID
      * @return mixed
      */
-    public function getList($limit = null, $offset = null);
+    public function getList($limit = null, $offset = null, $trackingID = null);
 
     /**
      * @return \Magento\Customer\Model\ResourceModel\Customer\Collection
