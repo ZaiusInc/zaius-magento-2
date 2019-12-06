@@ -173,6 +173,9 @@ class CustomerRepository implements CustomerRepositoryInterface
         }
         if (isset($addressType)) {
             $streetParts = preg_split('/\r\n|\r|\n/', ($customer->getData("${addressType}_street") ? $customer->getData("${addressType}_street") : ''));
+            $updatedAddress = $customer->getData('updated_address');
+            $customerData['first_name'] = ($updatedAddress) ? $updatedAddress->getData('firstname') : $customer->getFirstname();
+            $customerData['last_name'] = ($updatedAddress) ? $updatedAddress->getData('lastname') : $customer->getLastname();
             $customerData['street1'] = $streetParts[0];
             $customerData['street2'] = count($streetParts) > 1 ? $streetParts[1] : '';
             $customerData['city'] = $customer->getData("${addressType}_city");
