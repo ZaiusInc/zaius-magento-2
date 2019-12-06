@@ -12,7 +12,7 @@ interface ProductRepositoryInterface
     /**
      * @param int|null $limit
      * @param int|null $offset
-     * @param null $trackingID
+     * @param string|null $trackingID
      * @return mixed
      */
     public function getList($limit = null, $offset = null, $trackingID = null);
