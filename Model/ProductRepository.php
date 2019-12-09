@@ -72,6 +72,10 @@ class ProductRepository implements ProductRepositoryInterface
      * @var Configurable
      */
     private $_productConfigurable;
+    /**
+     * @var TrackScopeManager
+     */
+    private $trackScopeManager;
 
     /**
      * ProductRepository constructor.
@@ -83,6 +87,7 @@ class ProductRepository implements ProductRepositoryInterface
      * @param ProductHelper $productHelper
      * @param Data $helper
      * @param Logger $logger
+     * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -92,7 +97,8 @@ class ProductRepository implements ProductRepositoryInterface
         Configurable $productConfigurable,
         ProductHelper $productHelper,
         Data $helper,
-        Logger $logger
+        Logger $logger,
+        TrackScopeManager $trackScopeManager
     ) {
         $this->_storeManager = $storeManager;
         $this->_productCollectionFactory = $productCollectionFactory;
@@ -102,18 +108,26 @@ class ProductRepository implements ProductRepositoryInterface
         $this->_productHelper = $productHelper;
         $this->_helper = $helper;
         $this->_logger = $logger;
+        $this->trackScopeManager = $trackScopeManager;
     }
 
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param string|null $trackingID
      * @return mixed
-     * @throws NoSuchEntityException
      */
-    public function getList($limit = null, $offset = null)
+    public function getList($limit = null, $offset = null, $trackingID = null)
     {
         /** @var ProductCollection $products */
         $products = $this->_productCollectionFactory->create();
+
+        try {
+            $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
+            $products->addStoreFilter($storeId);
+        } catch (\Exception $e) {
+        }
+
         $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key'])
             ->setOrder('entity_id', 'asc');
         if ($this->_helper->getIsCollectAllProductAttributes($this->_storeManager->getStore())) {

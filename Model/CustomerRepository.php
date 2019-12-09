@@ -48,6 +48,10 @@ class CustomerRepository implements CustomerRepositoryInterface
      * @var Locale
      */
     protected $_localeHelper;
+    /**
+     * @var TrackScopeManager
+     */
+    private $trackScopeManager;
 
     /**
      * CustomerRepository constructor.
@@ -57,6 +61,7 @@ class CustomerRepository implements CustomerRepositoryInterface
      * @param Data $helper
      * @param Locale $localeHelper
      * @param Logger $logger
+     * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
         RequestInterface $request,
@@ -64,7 +69,8 @@ class CustomerRepository implements CustomerRepositoryInterface
         CustomerCollectionFactory $customerCollectionFactory,
         Data $helper,
         Locale $localeHelper,
-        Logger $logger
+        Logger $logger,
+        TrackScopeManager $trackScopeManager
     ) {
         $this->_request = $request;
         $this->_regionFactory = $regionFactory;
@@ -72,16 +78,25 @@ class CustomerRepository implements CustomerRepositoryInterface
         $this->_helper = $helper;
         $this->_logger = $logger;
         $this->_localeHelper = $localeHelper;
+        $this->trackScopeManager = $trackScopeManager;
     }
 
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param string|null $trackingID
      * @return mixed
      */
-    public function getList($limit = null, $offset = null)
+    public function getList($limit = null, $offset = null, $trackingID = null)
     {
         $customers = $this->getCustomerCollection();
+
+        try {
+            $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
+            $customers->addFieldToFilter('store_id', $storeId);
+        } catch (\Exception $e) {
+        }
+
         if (isset($limit)) {
             $customers->getSelect()
                 ->limit($limit, $offset);
