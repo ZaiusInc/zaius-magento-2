@@ -179,6 +179,9 @@ class Data extends AbstractHelper
      */
     public function getZaiusTrackerId($store = null)
     {
+        if (!$store) {
+            $store = $this->_storeManager->getStore()->getId();
+        }
         return $this->scopeConfig->getValue('zaius_engage/status/zaius_tracker_id', 'store', $store);
     }
 
@@ -188,6 +191,9 @@ class Data extends AbstractHelper
      */
     public function getZaiusPrivateKey($store = null)
     {
+        if (!$store) {
+            $store = $this->_storeManager->getStore()->getId();
+        }
         return $this->scopeConfig->getValue('zaius_engage/status/zaius_private_api', 'store', $store);
     }
 
