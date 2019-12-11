@@ -8,7 +8,7 @@
         var syncSpan = jQuery('#sync_span');
 
         function sync() {
-            params = {};
+            params = {'store': '<?=$block->getStoreId()?>'};
 
             new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
                 loaderArea: false,

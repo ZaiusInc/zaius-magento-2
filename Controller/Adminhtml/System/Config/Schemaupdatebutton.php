@@ -46,8 +46,9 @@ class Schemaupdatebutton extends Action
     public function execute()
     {
         try {
+            $store = $this->getRequest()->getParam('store');
             $this->logger->info('zaius:batch_update manual button preparing execution.');
-            $this->_schemaRepository->upsertObjects();
+            $this->_schemaRepository->upsertObjects($store);
             $this->logger->info('zaius:batch_update manual button execution complete.');
         } catch (\Exception $e) {
             $this->logger->critical($e);

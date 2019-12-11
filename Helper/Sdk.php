@@ -80,6 +80,7 @@ class Sdk
     }
 
     /**
+     * @param int $store
      * @return \ZaiusSDK\ZaiusClient
      */
     public function getSdkClient($store = null)

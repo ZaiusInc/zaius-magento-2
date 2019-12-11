@@ -317,14 +317,15 @@ class Client implements ClientInterface
     }
 
     /**
+     * @param $store string
      * @param $objectName string
      * @return mixed
      * @throws ZaiusException
      */
-    public function getObjectFields($objectName)
+    public function getObjectFields($objectName, $store = null)
     {
         $this->_logger->info(__METHOD__);
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
@@ -332,19 +333,20 @@ class Client implements ClientInterface
     }
 
     /**
+     * @param $store string
      * @param $objectName string
      * @param $fieldArray array
      * @return mixed|void
      * @throws ZaiusException
      */
-    public function createObjectField($objectName, $fieldArray = [])
+    public function createObjectField($objectName, $fieldArray = [], $store = null)
     {
         $this->_logger->info(__METHOD__);
         if (empty($fieldArray)) {
             $this->_logger->info('$fieldArray empty.');
             return;
         }
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }

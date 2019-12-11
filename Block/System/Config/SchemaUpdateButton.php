@@ -81,4 +81,14 @@ class SchemaUpdateButton extends Field
 
         return $button->toHtml();
     }
+
+    /**
+     * Get store identifier
+     *
+     * @return  int
+     */
+    public function getStoreId()
+    {
+        return $this->getRequest()->getParam('store') ?? $this->_storeManager->getStore()->getId();
+    }
 }
