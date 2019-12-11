@@ -8,7 +8,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Helper\Data as Helper;
-use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\ProductScopeManager;
 use ZaiusSDK\ZaiusException;
 
 /**
@@ -26,24 +26,24 @@ class ProductSaveObserver implements ObserverInterface
      */
     protected $_helper;
     /**
-     * @var Client
+     * @var ProductScopeManager
      */
-    protected $_client;
+    private $productScopeManager;
 
     /**
      * ProductSaveObserver constructor.
      * @param StoreManagerInterface $storeManager
      * @param Helper $helper
-     * @param Client $client
+     * @param ProductScopeManager $productScopeManager
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         Helper $helper,
-        Client $client
+        ProductScopeManager $productScopeManager
     ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
-        $this->_client = $client;
+        $this->productScopeManager = $productScopeManager;
     }
 
     /**
@@ -56,7 +56,7 @@ class ProductSaveObserver implements ObserverInterface
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
             /** @var Product $product */
             $product = $observer->getEvent()->getData('product');
-            $this->_client->postProduct('catalog_product_save_after', $product);
+            $this->productScopeManager->sync($product);
         }
     }
 }

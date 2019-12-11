@@ -299,12 +299,13 @@ class Client implements ClientInterface
     /**
      * @param string $event
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $store
      * @return array|null
      * @throws ZaiusException
      */
-    public function postProduct($event, $product)
+    public function postProduct($event, $product, $store = null)
     {
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }

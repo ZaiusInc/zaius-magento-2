@@ -56,4 +56,19 @@ class TrackScopeManager
         }
         throw new \Exception("No tracker id {$configValue} was not found");
     }
+
+    /**
+     * @return array
+     */
+    public function getAllTrackingIds()
+    {
+        $trackingIds = [];
+        foreach ($this->storeManager->getStores() as $key => $store) {
+            $configValue = $this->getConfig($store);
+            if (!in_array($configValue, $trackingIds)) {
+                $trackingIds[] = $configValue;
+            }
+        }
+        return $trackingIds;
+    }
 }
