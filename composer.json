@@ -6,7 +6,7 @@
   "version": "1.0.4",
   "require": {
     "php": ">=5.5",
-    "zaius/zaius-php-sdk": "^1.0"
+    "zaius/zaius-php-sdk": "dev-master"
   },
   "autoload": {
     "files": [
