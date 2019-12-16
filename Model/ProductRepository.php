@@ -207,6 +207,7 @@ class ProductRepository implements ProductRepositoryInterface
         }
         $productData += $this->_helper->getDataSourceFields();
         $this->_logger->info("Event: $event");
+        $this->_logger->info("Event: $event " . json_encode($productData['product_id']));
         return $productData;
     }
 

@@ -11,6 +11,7 @@ use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
 use ZaiusSDK\ZaiusException;
@@ -57,6 +58,7 @@ class Client implements ClientInterface
     /**
      * @var Logger
      */
+    protected $_localeHelper;
     protected $_logger;
     /**
      * @var Sdk
@@ -91,6 +93,7 @@ class Client implements ClientInterface
         CustomerRepositoryInterface $customerRepository,
         OrderRepositoryInterface $orderRepository,
         ProductRepositoryInterface $productRepository,
+        LocaleHelper $localeHelper,
         Logger $logger,
         Sdk $sdk,
         ScopeConfigInterface $scopeConfig,
@@ -102,6 +105,7 @@ class Client implements ClientInterface
         $this->_customerRepository = $customerRepository;
         $this->_orderRepository = $orderRepository;
         $this->_productRepository = $productRepository;
+        $this->_localeHelper = $localeHelper;
         $this->_logger = $logger;
         $this->_sdk = $sdk;
         $this->_encoder = $encoder;
@@ -380,7 +384,7 @@ class Client implements ClientInterface
     /**
      * @param $list
      * @param null $store
-     * @throws ZaiusException
+     * @return mixed
      */
     public function createList($list, $store = null)
     {
@@ -393,8 +397,48 @@ class Client implements ClientInterface
     }
 
     /**
-     * @return mixed
+     * @param $event
+     * @param $response
+     * @param null $start
+     * @param null $finish
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
+    public function postS3Import($event, $response, $start = null, $finish = null)
+    {
+        $zaiusClient = $this->_sdk->getSdkClient();
+        $s3Client = $zaiusClient->getS3Client(
+            $this->_helper->getZaiusTrackerId(),
+            $this->_helper->getAmazonS3Key(),
+            $this->_helper->getAmazonS3Secret()
+        );
+        $website = $this->_storeManager->getWebsite($this->_storeManager->getStore()->getId())->getCode();
+        $storeView = $this->_storeManager->getStore()->getCode();
+        $prefix = $event . 's.';
+        $prefix .= $website . '.';
+        //todo add localization prefix
+        $prefix .= $this->_localeHelper->isLocalesEnabled() ? $storeView . '.' : '';
+        if ($start !== null && $finish !== null) {
+            $prefix .= $start . '-' . $finish . '.';
+        }
+        $this->_logger->info('$prefix: ' . $prefix);
+        switch ($event) {
+            case 'customer':
+                $s3Client->uploadCustomers($response, false, $prefix);
+                break;
+            case 'order':
+                $s3Client->uploadOrders($response, false, $prefix);
+                break;
+            case 'product':
+                $s3Client->uploadProducts($response, false, $prefix);
+                break;
+            case 'subscriber':
+                $s3Client->uploadEvents($response, false, $prefix);
+                break;
+        }
+    }
+
     protected function isBatchUpdate()
     {
         return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);
