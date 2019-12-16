@@ -1,14 +1,14 @@
-<?php /* @var $block \Zaius\Engage\Block\System\Config\SchemaUpdateButton */ ?>
+<?php /* @var $block \Zaius\Engage\Block\System\Config\BulkUpdatesButton */ ?>
 <script>
     require([
         'jquery',
         'prototype',
     ], function (jQuery) {
 
-        var syncSpan = jQuery('#schema_span');
+        var syncSpan = jQuery('#bulk_span');
 
         function sync() {
-            params = {'store': '<?=$block->getStoreId()?>'};
+            params = {};
 
             new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
                 loaderArea: false,
@@ -17,7 +17,7 @@
                 onCreate: function () {
                     syncSpan.find('.synced').hide();
                     syncSpan.find('.syncing').show();
-                    jQuery('#schema_message_span').text('');
+                    jQuery('#bulk_message_span').text('');
                 },
                 onSuccess: function (response) {
 
@@ -32,21 +32,21 @@
                         resultText = 'Success!';
                         syncSpan.find('.synced').show();
                     }
-                    jQuery('#schema_message_span').text(resultText);
+                    jQuery('#bulk_message_span').text(resultText);
                 }
             });
         }
 
-        jQuery('#schema_btn').click(function () {
+        jQuery('#bulk_btn').click(function () {
             sync();
         });
     });
 </script>
 <?php echo $block->getButtonHtml() ?>
-<span class="sync-indicator" id="schema_span">
+<span class="sync-indicator" id="bulk_span">
     <img class="syncing" hidden="hidden" alt="Syncing" style="margin:0 5px"
          src="<?php echo $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
     <img class="synced" hidden="hidden" alt="Synced" style="margin:-3px 5px"
          src="<?php echo $block->getViewFileUrl('images/rule_component_apply.gif') ?>"/>
-    <span id="schema_message_span"></span>
+    <span id="bulk_message_span"></span>
 </span>

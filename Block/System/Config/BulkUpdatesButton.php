@@ -6,16 +6,13 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-/**
- * Class SchemaUpdateButton
- * @package Zaius\Engage\Block\System\Config
- */
-class SchemaUpdateButton extends Field
+class BulkUpdatesButton
+    extends Field
 {
     /**
      * @var string
      */
-    protected $_template = 'Zaius_Engage::system/config/schema_button.phtml';
+    protected $_template = 'Zaius_Engage::system/config/bulk_button.phtml';
 
     /**
      * @param Context $context
@@ -59,7 +56,7 @@ class SchemaUpdateButton extends Field
      */
     public function getAjaxUrl()
     {
-        return $this->getUrl('zaius/system_config/schemaupdatebutton'); // controller url
+        return $this->getUrl('zaius/system_config/bulkupdatesbutton'); // controller url
     }
 
     /**
@@ -74,21 +71,11 @@ class SchemaUpdateButton extends Field
             'Magento\Backend\Block\Widget\Button'
         )->setData(
             [
-                'id' => 'schema_btn',
-                'label' => __('Schema Update'),
+                'id' => 'bulk_btn',
+                'label' => __('Initiate'),
             ]
         );
 
         return $button->toHtml();
-    }
-
-    /**
-     * Get store identifier
-     *
-     * @return  int
-     */
-    public function getStoreId()
-    {
-        return $this->getRequest()->getParam('store') ?? $this->_storeManager->getStore()->getId();
     }
 }
