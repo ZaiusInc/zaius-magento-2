@@ -71,4 +71,52 @@ class TrackScopeManager
         }
         return $trackingIds;
     }
+
+    /**
+     * @return array
+     */
+    public function getStoriesWithDuplicatedTrackingId()
+    {
+        $rawArray = $this->getDuplicatedTrackingIdsByStore();
+        $dupes = array();
+        natcasesort($rawArray);
+        reset($rawArray);
+        $old_key   = NULL;
+        $old_value = NULL;
+        foreach ($rawArray as $key => $value) {
+            if ($value === NULL) { continue; }
+            if (strcasecmp($old_value, $value) === 0) {
+                $dupes[$old_key] = $old_value;
+                $dupes[$key]     = $value;
+            }
+            $old_value = $value;
+            $old_key   = $key;
+        }
+        return $dupes;
+    }
+
+    /**
+     * @param $storeId
+     * @return string
+     */
+    public function getStoreCode($storeId)
+    {
+        $store = $this->storeManager->getStore($storeId);
+        return ($store)
+            ? $store->getCode()
+            : "";
+    }
+
+    /**
+     * @return array
+     */
+    private function getDuplicatedTrackingIdsByStore()
+    {
+        $trackingIds = [];
+        foreach ($this->storeManager->getStores() as $key => $store) {
+            $configValue = $this->getConfig($store);
+            $trackingIds[$store->getId()] = $configValue;
+        }
+        return $trackingIds;
+    }
 }
