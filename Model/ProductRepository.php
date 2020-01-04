@@ -140,7 +140,7 @@ class ProductRepository implements ProductRepositoryInterface
         $result = [];
         $suppressions = 0;
 
-        $duplicatedTrackingIds = $this->trackScopeManager->getStoriesWithDuplicatedTrackingId();
+        $duplicatedTrackingIds = $this->trackScopeManager->getStoresWithDuplicatedTrackingId();
         /** @var Product $product */
         foreach ($products as $product) {
             if (is_null($product->getId())) {

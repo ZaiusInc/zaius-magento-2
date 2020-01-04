@@ -42,7 +42,7 @@ class ProductScopeManager
      */
     public function sync($product)
     {
-        $duplicatedTrackingIds = $this->trackScopeManager->getStoriesWithDuplicatedTrackingId();
+        $duplicatedTrackingIds = $this->trackScopeManager->getStoresWithDuplicatedTrackingId();
         foreach ($this->trackScopeManager->getAllTrackingIds() as $trackingId) {
             try {
                 $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingId);

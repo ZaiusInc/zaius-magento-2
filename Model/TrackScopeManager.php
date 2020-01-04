@@ -75,7 +75,7 @@ class TrackScopeManager
     /**
      * @return array
      */
-    public function getStoriesWithDuplicatedTrackingId()
+    public function getStoresWithDuplicatedTrackingId()
     {
         $rawArray = $this->getDuplicatedTrackingIdsByStore();
         $dupes = array();
