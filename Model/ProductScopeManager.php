@@ -42,10 +42,24 @@ class ProductScopeManager
      */
     public function sync($product)
     {
+        $duplicatedTrackingIds = $this->trackScopeManager->getStoresWithDuplicatedTrackingId();
         foreach ($this->trackScopeManager->getAllTrackingIds() as $trackingId) {
             try {
                 $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingId);
                 $scopeProduct = $this->productRepository->getById($product->getId(), false, $storeId);
+
+                if (sizeof($product->getStoreIds()) > 1 && in_array($trackingId, $duplicatedTrackingIds)) {
+                    foreach ($duplicatedTrackingIds as $storeId => $duplicatedTrackingId) {
+                        $scopeProduct->setData('has_view_variants', true);
+                        $scopeProduct->setData('generic_product_id', $scopeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($storeId));
+                        $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
+                    }
+
+                    $scopeProduct->setData('has_view_variants', true);
+                    $scopeProduct->setData('generic_product_id', $scopeProduct->getId());
+                    $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
+                    continue;
+                }
                 $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
             } catch (\Exception $e) {
                 $this->logger->warning(sprintf("Error trying to load product %s", $e->getMessage()));
