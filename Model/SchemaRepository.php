@@ -283,14 +283,15 @@ class SchemaRepository
     }
 
     /**
+     * @param $store string
      * @return mixed
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function getOrdersFields()
+    public function getOrdersFields($store)
     {
         $this->_logger->info(__METHOD__);
         $ordersObject = 'orders';
-        return $this->_client->getObjectFields($ordersObject);
+        return $this->_client->getObjectFields($ordersObject, $store);
     }
 
     /**
@@ -301,7 +302,7 @@ class SchemaRepository
     {
         $this->_logger->info(__METHOD__);
         $ordersObject = 'orders';
-        $currentSchema = $this->getOrdersFields();
+        $currentSchema = $this->getOrdersFields($store);
         $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
         $magentoSchema = $this->setUniversalFields();
         $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
