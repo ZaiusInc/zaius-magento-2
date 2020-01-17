@@ -60,6 +60,10 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
+
+        if ($trackingID === null) {
+            return [];
+        }
         /** @var OrderCollection $orders */
         $orders = $this->_orderCollectionFactory->create();
 
@@ -67,6 +71,7 @@ class OrderRepository implements OrderRepositoryInterface
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $orders->addFieldToFilter('store_id', $storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         $orders->setOrder('entity_id', 'asc');

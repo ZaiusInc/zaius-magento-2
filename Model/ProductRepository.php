@@ -120,13 +120,17 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
-        /** @var ProductCollection $products */
+        if ($trackingID === null) {
+            return [];
+        }
+            /** @var ProductCollection $products */
         $products = $this->_productCollectionFactory->create();
 
         try {
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $products->addStoreFilter($storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key'])
