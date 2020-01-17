@@ -97,6 +97,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $customers->addFieldToFilter('store_id', $storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         if (isset($limit)) {

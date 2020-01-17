@@ -129,6 +129,7 @@ class ProductRepository implements ProductRepositoryInterface
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $products->addStoreFilter($storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key'])
