@@ -89,8 +89,10 @@ class CustomerRepository implements CustomerRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
+        if ($trackingID === null) {
+            return [];
+        }
         $customers = $this->getCustomerCollection();
-
         try {
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $customers->addFieldToFilter('store_id', $storeId);

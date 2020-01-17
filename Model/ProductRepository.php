@@ -119,7 +119,10 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
-        /** @var ProductCollection $products */
+        if ($trackingID === null) {
+            return [];
+        }
+            /** @var ProductCollection $products */
         $products = $this->_productCollectionFactory->create();
 
         try {

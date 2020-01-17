@@ -60,6 +60,10 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
+
+        if ($trackingID === null) {
+            return [];
+        }
         /** @var OrderCollection $orders */
         $orders = $this->_orderCollectionFactory->create();
 
