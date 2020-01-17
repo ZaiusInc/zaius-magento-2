@@ -7,4 +7,7 @@
     <event name="admin_system_config_changed_section_zaius_engage">
         <observer name="zaius_engage_changed_section" instance="Zaius\Engage\Observer\SystemConfigObserver"/>
     </event>
+    <event name="sales_order_place_after">
+        <observer name="zaius_engage_sales_order_place_after" instance="Zaius\Engage\Observer\AdminOrderPlaceAfterObserver"/>
+    </event>
 </config>
