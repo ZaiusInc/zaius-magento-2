@@ -207,14 +207,15 @@ class Client implements ClientInterface
 
     /**
      * @param mixed $event
+     * @param int $storeId
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws ZaiusException
      */
-    public function postEvent($event)
+    public function postEvent($event, $storeId = null)
     {
         $event['data'] += $this->_helper->getDataSourceFields();
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($storeId);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }

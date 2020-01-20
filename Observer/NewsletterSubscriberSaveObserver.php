@@ -70,10 +70,9 @@ class NewsletterSubscriberSaveObserver
      */
     public function execute(Observer $observer)
     {
-        $store = $this->_storeManager->getStore();
-        if ($this->_helper->getStatus($store)) {
-            /** @var Subscriber $subscriber */
-            $subscriber = $observer->getEvent()->getData('data_object');
+        /** @var Subscriber $subscriber */
+        $subscriber = $observer->getEvent()->getData('data_object');
+        if ($this->_helper->getStatus($subscriber->getStoreId())) {
             switch ($subscriber->getSubscriberStatus()) {
                 case Subscriber::STATUS_SUBSCRIBED:
                     $action = 'subscribe';
@@ -109,11 +108,11 @@ class NewsletterSubscriberSaveObserver
             }
 
             $event['data']['ts'] = ($event['data']['ts']) ? $event['data']['ts'] : $this->timezone->scopeTimeStamp();
-            $event['identifiers']['vuid'] = $event['identifiers']['vuid'] ?? $subscriber->getSubscriberEmail();
+            $event['identifiers']['email'] = $subscriber->getSubscriberEmail();
 
-            $this->_client->postEvent($event);
+            $this->_client->postEvent($event, $subscriber->getStoreId());
             $event['data']['list_id'] = 'zaius_all';
-            $this->_client->postEvent($event);
+            $this->_client->postEvent($event, $subscriber->getStoreId());
         }
         return $this;
     }
