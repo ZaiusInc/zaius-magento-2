@@ -84,49 +84,52 @@ class SchemaRepository
     }
 
     /**
+     * @param int $store
      * @return mixed
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function getCustomersFields()
+    public function getCustomersFields($store = null)
     {
         $this->_logger->info(__METHOD__);
         $customerObject = 'customers';
-        return $this->_client->getObjectFields($customerObject);
+        return $this->_client->getObjectFields($customerObject, $store);
     }
 
     /**
+     * @param $store string
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function setCustomersFields()
+    public function setCustomersFields($store = null)
     {
         $this->_logger->info(__METHOD__);
         $customerObject = 'customers';
-        $currentSchema = $this->getCustomersFields();
+        $currentSchema = $this->getCustomersFields($store);
         $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
         $magentoSchema = $this->setUniversalFields();
         $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
         $delta = $this->processDelta($magentoSchema, $currentSchema);
-        $this->_client->createObjectField($customerObject, $delta);
+        $this->_client->createObjectField($customerObject, $delta, $store);
     }
 
     /**
+     * @param $store string
      * @return mixed
      */
-    public function getProductsFields()
+    public function getProductsFields($store = null)
     {
         $this->_logger->info(__METHOD__);
         $productsObject = 'products';
-        return $this->_client->getObjectFields($productsObject);
+        return $this->_client->getObjectFields($productsObject, $store);
     }
 
     /**
-     *
+     * @param $store string
      */
-    public function setProductsFields()
+    public function setProductsFields($store = null)
     {
         $this->_logger->info(__METHOD__);
         $productsObject = 'products';
-        $currentSchema = $this->getProductsFields();
+        $currentSchema = $this->getProductsFields($store);
         $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
         $magentoSchema = $this->setUniversalFields();
         $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
@@ -206,27 +209,28 @@ class SchemaRepository
         $delta = $this->processDelta($magentoSchema, $currentSchema);
         $this->_logger->info('$delta: ' . json_encode($delta));
         $this->_logger->info('magentoSchema_push: ' . json_encode($magentoSchema));
-        $this->_client->createObjectField($productsObject, $delta);
+        $this->_client->createObjectField($productsObject, $delta, $store);
     }
 
     /**
+     * @param $store string
      * @return mixed
      */
-    public function getEventsFields()
+    public function getEventsFields($store = null)
     {
         $this->_logger->info(__METHOD__);
         $eventsObject = 'events';
-        return $this->_client->getObjectFields($eventsObject);
+        return $this->_client->getObjectFields($eventsObject, $store);
     }
 
     /**
-     *
+     * @param $store string
      */
-    public function setEventsFields()
+    public function setEventsFields($store)
     {
         $this->_logger->info(__METHOD__);
         $eventsObject = 'events';
-        $currentSchema = $this->getEventsFields();
+        $currentSchema = $this->getEventsFields($store);
         $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
         $magentoSchema = $this->setUniversalFields();
         $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
@@ -275,33 +279,35 @@ class SchemaRepository
         $delta = $this->processDelta($magentoSchema, $currentSchema);
         $this->_logger->info('$delta: ' . json_encode($delta));
         $this->_logger->info('magentoSchema_push: ' . json_encode($magentoSchema));
-        $this->_client->createObjectField($eventsObject, $delta);
+        $this->_client->createObjectField($eventsObject, $delta, $store);
     }
 
     /**
+     * @param $store string
      * @return mixed
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function getOrdersFields()
+    public function getOrdersFields($store)
     {
         $this->_logger->info(__METHOD__);
         $ordersObject = 'orders';
-        return $this->_client->getObjectFields($ordersObject);
+        return $this->_client->getObjectFields($ordersObject, $store);
     }
 
     /**
+     * @param $store string
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function setOrdersFields()
+    public function setOrdersFields($store)
     {
         $this->_logger->info(__METHOD__);
         $ordersObject = 'orders';
-        $currentSchema = $this->getOrdersFields();
+        $currentSchema = $this->getOrdersFields($store);
         $this->_logger->info('currentSchema: ' . json_encode($currentSchema));
         $magentoSchema = $this->setUniversalFields();
         $this->_logger->info('magentoSchema: ' . json_encode($magentoSchema));
         $delta = $this->processDelta($magentoSchema, $currentSchema);
-        $this->_client->createObjectField($ordersObject, $delta);
+        $this->_client->createObjectField($ordersObject, $delta, $store);
     }
 
     /**
@@ -315,6 +321,7 @@ class SchemaRepository
 
     /**
      * @param null $store
+     * @return array
      */
     public function setList($store = null)
     {
@@ -357,17 +364,18 @@ class SchemaRepository
     }
 
     /**
+     * @param $store string
      * @throws \ZaiusSDK\ZaiusException
      */
     public function upsertObjects($store = null)
     {
-        $this->setCustomersFields();
+        $this->setCustomersFields($store);
 
-        $this->setProductsFields();
+        $this->setProductsFields($store);
 
-        $this->setEventsFields();
+        $this->setEventsFields($store);
 
-        $this->setOrdersFields();
+        $this->setOrdersFields($store);
 
         $this->setList($store);
     }

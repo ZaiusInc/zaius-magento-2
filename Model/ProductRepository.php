@@ -10,6 +10,7 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductColl
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
@@ -72,6 +73,10 @@ class ProductRepository implements ProductRepositoryInterface
      * @var Configurable
      */
     private $_productConfigurable;
+    /**
+     * @var TrackScopeManager
+     */
+    private $trackScopeManager;
 
     /**
      * ProductRepository constructor.
@@ -83,6 +88,7 @@ class ProductRepository implements ProductRepositoryInterface
      * @param ProductHelper $productHelper
      * @param Data $helper
      * @param Logger $logger
+     * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -92,7 +98,8 @@ class ProductRepository implements ProductRepositoryInterface
         Configurable $productConfigurable,
         ProductHelper $productHelper,
         Data $helper,
-        Logger $logger
+        Logger $logger,
+        TrackScopeManager $trackScopeManager
     ) {
         $this->_storeManager = $storeManager;
         $this->_productCollectionFactory = $productCollectionFactory;
@@ -102,18 +109,30 @@ class ProductRepository implements ProductRepositoryInterface
         $this->_productHelper = $productHelper;
         $this->_helper = $helper;
         $this->_logger = $logger;
+        $this->trackScopeManager = $trackScopeManager;
     }
 
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param string|null $trackingID
      * @return mixed
-     * @throws NoSuchEntityException
      */
-    public function getList($limit = null, $offset = null)
+    public function getList($limit = null, $offset = null, $trackingID = null)
     {
-        /** @var ProductCollection $products */
+        if ($trackingID === null) {
+            return [];
+        }
+            /** @var ProductCollection $products */
         $products = $this->_productCollectionFactory->create();
+
+        try {
+            $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
+            $products->addStoreFilter($storeId);
+        } catch (\Exception $e) {
+            return [];
+        }
+
         $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key'])
             ->setOrder('entity_id', 'asc');
         if ($this->_helper->getIsCollectAllProductAttributes($this->_storeManager->getStore())) {
@@ -124,6 +143,8 @@ class ProductRepository implements ProductRepositoryInterface
         }
         $result = [];
         $suppressions = 0;
+
+        $duplicatedTrackingIds = $this->trackScopeManager->getStoresWithDuplicatedTrackingId();
         /** @var Product $product */
         foreach ($products as $product) {
             if (is_null($product->getId())) {
@@ -134,6 +155,27 @@ class ProductRepository implements ProductRepositoryInterface
                 // missing field
                 $this->_logger->warning("ZAIUS: Null field: product_id.");
             } else {
+
+                if (sizeof($product->getStoreIds()) > 1 && in_array($product->getStoreId(), array_keys($duplicatedTrackingIds))) {
+                    $storeIds = $product->getStoreIds();
+                    $storeIds[] = Store::DEFAULT_STORE_ID;
+                    foreach ($storeIds as $productStoreId) {
+                        $collection = $this->_productCollectionFactory->create();
+                        $collection->setStoreId($productStoreId);
+                        $collection->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key']);
+                        $collection->addIdFilter($product->getId());
+
+                        $storeProduct = $collection->getFirstItem();
+
+                        if ((int)$productStoreId != Store::DEFAULT_STORE_ID) {
+                            $newId = $storeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($productStoreId);
+                            $storeProduct->setId($newId);
+                        }
+                        $result[] = $this->getProductEventData('product', $storeProduct);
+                    }
+                    continue;
+                }
+
                 $result[] = $this->getProductEventData('product', $product);
             }
         }
@@ -156,9 +198,12 @@ class ProductRepository implements ProductRepositoryInterface
     public function getProductEventData($event, $product)
     {
         $productId = $this->_helper->getProductId($product);
+        $parentIds = $this->_productConfigurable->getParentIdsByChild($productId);
+        $parentProductId = isset($parentIds[0]) ? $parentIds[0] : $productId;
 
         $productData = [
             'product_id' => $productId,
+            'parent_product_id' => $parentProductId,
             'name' => $product->getName(),
             'brand' => $product->getData('brand'),
             'sku' => $product->getSku(),
@@ -167,14 +212,8 @@ class ProductRepository implements ProductRepositoryInterface
             'category' => $this->_helper->getCurrentOrDeepestCategoryAsString($product),
             'price' => trim($product->getPrice()),
             'image_url' => $this->_productHelper->getImageUrl($product),
-            'url_key' => $product->getData('url_key'),
+            'url_key' => $product->getData('url_key')
         ];
-
-        $parentProductId = $this->_productConfigurable->getParentIdsByChild($productId);
-
-        if (isset($parentProductId[0])) {
-            $productData['parent_product_id'] = $parentProductId[0];
-        }
 
         if ($product->getData('special_price')) {
             $productData['special_price'] = trim($product->getData('special_price'));
@@ -194,8 +233,18 @@ class ProductRepository implements ProductRepositoryInterface
         if (!$product->getImage()) {
             $this->_logger->error('ZAIUS: Unable to retrieve product image_url');
         }
+
+        if ($genericProductId = $product->getData('generic_product_id')) {
+            $productData['generic_product_id'] = $genericProductId;
+        }
+
+        if ($hasVariants = $product->getData('has_view_variants')) {
+            $productData['has_view_variants'] = $hasVariants;
+        }
+
         $productData += $this->_helper->getDataSourceFields();
         $this->_logger->info("Event: $event");
+        $this->_logger->info("Event: $event " . json_encode($productData['product_id']));
         return $productData;
     }
 

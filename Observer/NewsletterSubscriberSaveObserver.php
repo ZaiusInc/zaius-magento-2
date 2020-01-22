@@ -5,6 +5,7 @@ namespace Zaius\Engage\Observer;
 use Magento\Framework\App\State;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Newsletter\Model\Subscriber;
 use Magento\Store\Model\StoreManager;
 use Zaius\Engage\Model\Client;
@@ -33,6 +34,10 @@ class NewsletterSubscriberSaveObserver
      * @var Client
      */
     protected $_client;
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
 
     /**
      * NewsletterSubscriberSaveObserver constructor.
@@ -40,18 +45,21 @@ class NewsletterSubscriberSaveObserver
      * @param StoreManager $storeManager
      * @param Helper $helper
      * @param Client $client
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         State $state,
         StoreManager $storeManager,
         Helper $helper,
-        Client $client
+        Client $client,
+        TimezoneInterface $timezone
     )
     {
         $this->_state = $state;
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -62,10 +70,9 @@ class NewsletterSubscriberSaveObserver
      */
     public function execute(Observer $observer)
     {
-        $store = $this->_storeManager->getStore();
-        if ($this->_helper->getStatus($store)) {
-            /** @var Subscriber $subscriber */
-            $subscriber = $observer->getEvent()->getData('data_object');
+        /** @var Subscriber $subscriber */
+        $subscriber = $observer->getEvent()->getData('data_object');
+        if ($this->_helper->getStatus($subscriber->getStoreId())) {
             switch ($subscriber->getSubscriberStatus()) {
                 case Subscriber::STATUS_SUBSCRIBED:
                     $action = 'subscribe';
@@ -100,11 +107,12 @@ class NewsletterSubscriberSaveObserver
                 }
             }
 
-            if ($subscriber->isStatusChanged()) {
-                $this->_client->postEvent($event);
-                $event['data']['list_id'] = 'zaius_all';
-                $this->_client->postEvent($event);
-            }
+            $event['data']['ts'] = ($event['data']['ts']) ? $event['data']['ts'] : $this->timezone->scopeTimeStamp();
+            $event['identifiers']['email'] = $subscriber->getSubscriberEmail();
+
+            $this->_client->postEvent($event, $subscriber->getStoreId());
+            $event['data']['list_id'] = 'zaius_all';
+            $this->_client->postEvent($event, $subscriber->getStoreId());
         }
         return $this;
     }

@@ -12,9 +12,10 @@ interface OrderRepositoryInterface
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param string|null $trackingID
      * @return mixed
      */
-    public function getList($limit = null, $offset = null);
+    public function getList($limit = null, $offset = null, $trackingID = null);
 
     /**
      * @param \Magento\Sales\Model\Order $order

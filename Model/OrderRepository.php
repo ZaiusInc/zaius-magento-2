@@ -34,6 +34,10 @@ class OrderRepository implements OrderRepositoryInterface
      * @var StoreManagerInterface
      */
     private $storeManager;
+     /*
+     * @var TrackScopeManager
+     */
+    private $trackScopeManager;
 
     /**
      * OrderRepository constructor.
@@ -41,29 +45,44 @@ class OrderRepository implements OrderRepositoryInterface
      * @param Data $helper
      * @param Logger $logger
      * @param StoreManagerInterface $storeManager
+     * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         Data $helper,
         Logger $logger,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        TrackScopeManager $trackScopeManager
     ) {
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_helper = $helper;
         $this->_logger = $logger;
         $this->storeManager = $storeManager;
+        $this->trackScopeManager = $trackScopeManager;
     }
 
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param string|null $trackingID
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getList($limit = null, $offset = null)
+    public function getList($limit = null, $offset = null, $trackingID = null)
     {
+
+        if ($trackingID === null) {
+            return [];
+        }
         /** @var OrderCollection $orders */
         $orders = $this->_orderCollectionFactory->create();
+
+        try {
+            $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
+            $orders->addFieldToFilter('store_id', $storeId);
+        } catch (\Exception $e) {
+            return [];
+        }
+
         $orders->setOrder('entity_id', 'asc');
         if (isset($limit)) {
             $orders->getSelect()->limit($limit, $offset);

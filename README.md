@@ -22,19 +22,18 @@ By far the quickest and easiest way to install and maintain the Zaius connector 
 2. Install the Zaius Magento 2 package.
 3. Finally, make sure the package is up-to-date.
 
-Note: as we continue validating the robustness of the module, you will need to specify your willingness to use the release candidates of both the module and the underlying PHP SDK:
+> *Note for users who have installed previous RC versions*  
+>  
+> Now that stable releases are available, you may **remove** these previously-required lines from your `<MAGENTO_ROOT>/composer.json` file:  
+>  
+>  ~~"minimum-stability" "RC",~~  
+>  ~~"prefer-stable": true~~  
 
-* Edit your `<MAGENTO_ROOT>/composer.json` file:
+
+* Add the required packages.
 
 ```bash
-"minimum-stability" "RC",
-"prefer-stable": true
-```
-
-* Add the required packages:
-
-```bash
-composer require zaius/zaius-magento-2:^1.0
+composer require zaius/zaius-magento-2
 composer install
 composer update zaius/*
 ```
@@ -172,11 +171,11 @@ After installing the module and setting up the API user, all configuration is do
 
 **SDK Installed?**: Checks if the [Zaius PHP SDK](https://github.com/ZaiusInc/zaius-php-sdk) is installed. The SDK is **REQUIRED** by the Zaius Engage Connector, and installed automatically with Composer.
 
-#### Configuration
-
 **Zaius Tracker ID**: Configuration field for the Zaius client Tracker ID. Found at [API Management](https://app.zaius.com/app#/api_management) in the Zaius client Account.
 
 **Zaius Private API Key**: Configuration field for the Zaius Private API Key. Found at [API Management](https://app.zaius.com/app#/api_management) in the Zaius client Account. This is **REQUIRED** for [Batch Updates](Batch Updates) to work.
+
+#### Amazon S3
 
 **Enable Amazon S3**: Enable or disable the Amazon S3 Upload functionality.
 
@@ -186,20 +185,70 @@ After installing the module and setting up the API user, all configuration is do
 
 #### Settings
 
-**Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes, or only the minimum. If your product feed has fields which are not yet captured in Zaius, you will likely need to turn this on and create a corresponding custom field. The Zaius support team can assist.
+**Global ID Prefix**: If provided, this prefix will be added to all product, customer, and order IDs sent from the corresponding store view. This is rarely needed, but may be helpful in complicated multi-store configurations. Typically your Zaius CSM will recommend this if your setup will benefit.
 
-**Track Orders on Frontend**: Enable or disable the functionality to track orders on the frontend of the website. Disabled by default as backend order tracking is far more reliable.
+**Zaius Newsletter List ID**: When an end user subscribes to, or unsubscribes from, the Magento newsletter on this store view, the subscription will be synced with the provided list within Zaius.
+
+**Collect All Product Attributes**: Enable or disable the functionality to collect all product attributes defined in the default attribute set, or only the Zaius-curated minimum. If your product feed has fields which are not yet captured in Zaius, you will likely need to turn this on, ensure that field is added to the default attribute set, and create a corresponding custom field in Zaius. For more detail, see ["Collecting additional product attributes"](#collecting-additional-product-attributes)
 
 **Timeout**: Specify a number of seconds to wait before timing out the connection to Zaius.
+
+#### Schema Update
+
+**Update Schema**: When this button is clicked, Magento will use the provided API keys (in the Zaius Engage Status section) to assess your objects and fields within Zaius, and will create any fields which are needed for the Magento integration's core functionality.
 
 #### Zaius Localizations
 
 **Enabled?**: Enable or disable the Zaius Localizations functionality. With Zaius Localizations functionality enabled, localized store_view data will be sent to Zaius. Please consult with your Zaius CSM before enabling.
 
+### Collecting additional product attributes
+
+The “Collect all product attributes” feature is limited to collecting all attributes in the “default” attribute set. This attribute set is user-configurable and therefore can include custom attributes, but if you are using multiple distinct attribute sets AND some products are still on the default, you might run into limitations. Specifically, if a custom attribute is a required field, but only for products which use a particular attribute set, adding this attribute to the default set would cause products which don’t have their own attribute set to require an irrelevant field. 
+
+If an attribute is required and cannot be added to the default attribute set, the missing attributes can be exported and uploaded as a separate CSV.
+
+If the “default” attribute set is NOT applied to any products, or if the desired attributes are required values, simply add the missing attributes to the default attribute set and enable "Colled all product attributes.
+
+#### Adjusting the Default Atrribute Set
+
+To add attributes to the Default attribute set, the user will need to log into the Magento admin. From here they should:
+
+1. Navigate to Stores > (Attributes section) Attribute Set
+2. Click the “Default” set (you can use the search bar to find it if needed)
+3. (Recommended, not required): in the middle “Groups” section, click “Add New” and create a new group called “Zaius Field Import”. This will allow you to group the attributes under a separate heading in the catalog which will be unexpanded and nonintrusive.
+4. In the right-hand “Unassigned Attributes” section, click and drag any missing attributes into the middle “Groups” section. If you did step 3, add the missing attribute to the “Zaius Field Import” group; otherwise, wherever makes sense to you.
+5. Click Save. The following steps are not strictly required, but seemed to refresh the connector’s view of the product feed in some environments:
+6. Navigate to Stores > (Attributes section) Product
+7. Find and click on any one of the previously missing attributes.
+8. Click the “Save Attribute” button (you need not make any changes).
+
+Finally, ask Zaius Support to reimport your product feed to ensure the new fields are populated for all existing products.
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/ZaiusInc/zaius-magento-2/tags). 
 
+### Release Notes
+
+1.0.4 - 2019-11-27: Stabilization fix
+* Reverted base back to 1.0.0 
+* Re-applied "Configurable products now report their own product ID as their parent_product_id (smoother use of parent_product fields in Zaius)."
+* Re-applied "Users reported incorrect references when multiple items were in a minicart and one of the items was updated. This has been addressed."
+* Fixed edge cases caused by Zaius SDK not loading: Add-to-carts and other cart updates no longer at risk of errors when Zaius cookies are undefined
+* Added better error handling for serverside errors
+
+1.0.3 UNSTABLE - 2019-11-22 Hotfix: Respect tracking IDs
+* This version should not be installed due to problems identified post-release.
+
+1.0.2 UNSTABLE - 2019-11-21 Hotfix: Remove checkout dependency on SDK 
+* This version should not be installed due to problems identified post-release.
+
+1.0.1 UNSTABLE - 2019-11-19 Bugfix: Parent Products and Minicarts
+* This version should not be installed due to problems identified post-release.
+* Configurable products now report their own product ID as their parent_product_id (smoother use of parent_product fields in Zaius).
+* Users reported incorrect references when multiple items were in a minicart and one of the items was updated. This has been addressed.
+
+1.0.0 - 2019-07-23 - Initial Release
 
 ## License
 

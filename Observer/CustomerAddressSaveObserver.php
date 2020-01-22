@@ -70,6 +70,7 @@ class CustomerAddressSaveObserver
             $customer = $this->_customerRepository->getCustomerCollection()
                 ->addFieldToFilter('entity_id', $address->getCustomer()->getId())
                 ->getFirstItem();
+            $customer->setData('updated_address', $address);
             $this->_client->postCustomer($customer, $eventName);
         }
         return $this;

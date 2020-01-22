@@ -62,6 +62,9 @@ class LocalesRepository implements LocalesInterface
     {
         $ret = [];
         foreach ($this->storeManager->getStores() as $store) {
+            $websiteId = $store->getWebsiteId();
+            $website = $this->storeManager->getWebsite($websiteId)->getCode();
+            $storeId = $store->getId();
             $storeCode = $store->getCode();
             $storeId = $store->getId();
             $storeName = $store->getName();
@@ -74,6 +77,7 @@ class LocalesRepository implements LocalesInterface
             $ret[$storeCode] = [
                 'label' => $localeName,
                 'base_url' => $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB),
+                'website_code' => $website,
                 'store_code' => $storeCode,
                 'store_id' => $storeId,
                 'store_name' => $storeName,
