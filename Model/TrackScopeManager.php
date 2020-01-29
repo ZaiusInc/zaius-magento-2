@@ -27,7 +27,6 @@ class TrackScopeManager
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager
-
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;

@@ -29,25 +29,24 @@ class CustomerManager
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         TrackScopeManager $trackScopeManager,
-        Client $client,
         StoreManager $storeManager
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->trackScopeManager = $trackScopeManager;
-        $this->client = $client;
         $this->storeManager = $storeManager;
     }
 
     /**
      * @param $customer Customer
+     * @param $client
      */
-    public function sendCustomer($customer)
+    public function sendCustomer($customer, $client)
     {
         $websiteId = $this->isCustomerAccountShared() ? null : $customer->getWebsiteId();
         foreach ($this->trackScopeManager->getAllTrackingIds($websiteId) as $trackingId) {
             try {
                 $store = $this->trackScopeManager->getStoreIdByConfigValue($trackingId);
-                $this->client->postCustomer($customer, $store);
+                $client->client->postCustomer($customer, $store);
             } catch (\Exception $e) {
             }
         }

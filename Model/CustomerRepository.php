@@ -7,6 +7,7 @@ use Magento\Customer\Model\ResourceModel\Customer\Collection as CustomerCollecti
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Directory\Model\RegionFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\Store\Model\StoreManager;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Locale;
@@ -48,6 +49,18 @@ class CustomerRepository implements CustomerRepositoryInterface
      * @var Locale
      */
     protected $_localeHelper;
+    /**
+     * @var CustomerManager
+     */
+    private $customerManager;
+    /**
+     * @var StoreManager
+     */
+    private $storeManager;
+    /**
+     * @var TrackScopeManager
+     */
+    private $trackScopeManager;
 
     /**
      * CustomerRepository constructor.
@@ -57,6 +70,9 @@ class CustomerRepository implements CustomerRepositoryInterface
      * @param Data $helper
      * @param Locale $localeHelper
      * @param Logger $logger
+     * @param CustomerManager $customerManager
+     * @param StoreManager $storeManager
+     * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
         RequestInterface $request,
@@ -64,7 +80,10 @@ class CustomerRepository implements CustomerRepositoryInterface
         CustomerCollectionFactory $customerCollectionFactory,
         Data $helper,
         Locale $localeHelper,
-        Logger $logger
+        Logger $logger,
+        CustomerManager $customerManager,
+        StoreManager $storeManager,
+        TrackScopeManager $trackScopeManager
     ) {
         $this->_request = $request;
         $this->_regionFactory = $regionFactory;
@@ -72,16 +91,37 @@ class CustomerRepository implements CustomerRepositoryInterface
         $this->_helper = $helper;
         $this->_logger = $logger;
         $this->_localeHelper = $localeHelper;
+        $this->customerManager = $customerManager;
+        $this->storeManager = $storeManager;
+        $this->trackScopeManager = $trackScopeManager;
     }
 
     /**
      * @param int|null $limit
      * @param int|null $offset
+     * @param string|null $trackingID
      * @return mixed
      */
-    public function getList($limit = null, $offset = null)
+    public function getList($limit = null, $offset = null, $trackingID = null)
     {
+        if ($trackingID === null) {
+            return [];
+        }
         $customers = $this->getCustomerCollection();
+        try {
+            $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
+
+            if (!$this->customerManager->isCustomerAccountShared()) {
+                $customers->addFieldToFilter('store_id', $storeId);
+
+            } else {
+                $store = $this->storeManager->getStore($storeId);
+                $customers->addFieldToFilter('website_id', $store->getWebsiteId());
+            }
+        } catch (\Exception $e) {
+            return [];
+        }
+
         if (isset($limit)) {
             $customers->getSelect()
                 ->limit($limit, $offset);
@@ -173,6 +213,9 @@ class CustomerRepository implements CustomerRepositoryInterface
         }
         if (isset($addressType)) {
             $streetParts = preg_split('/\r\n|\r|\n/', ($customer->getData("${addressType}_street") ? $customer->getData("${addressType}_street") : ''));
+            $updatedAddress = $customer->getData('updated_address');
+            $customerData['first_name'] = ($updatedAddress) ? $updatedAddress->getData('firstname') : $customer->getFirstname();
+            $customerData['last_name'] = ($updatedAddress) ? $updatedAddress->getData('lastname') : $customer->getLastname();
             $customerData['street1'] = $streetParts[0];
             $customerData['street2'] = count($streetParts) > 1 ? $streetParts[1] : '';
             $customerData['city'] = $customer->getData("${addressType}_city");
