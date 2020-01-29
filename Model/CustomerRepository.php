@@ -113,7 +113,6 @@ class CustomerRepository implements CustomerRepositoryInterface
 
             if (!$this->customerManager->isCustomerAccountShared()) {
                 $customers->addFieldToFilter('store_id', $storeId);
-
             } else {
                 $store = $this->storeManager->getStore($storeId);
                 $customers->addFieldToFilter('website_id', $store->getWebsiteId());

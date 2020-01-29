@@ -3,7 +3,10 @@
 namespace Zaius\Engage\Helper;
 
 use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Sdk
@@ -13,28 +16,34 @@ class Sdk
     extends AbstractHelper
 {
     /**
-     * @var \Magento\Framework\App\Filesystem\DirectoryList
+     * @var DirectoryList
      */
     protected $_directoryList;
 
     /** @var DeploymentConfig */
     protected $_deploymentConfig;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * Sdk constructor.
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Framework\App\Filesystem\DirectoryList $directoryList
+     * @param Context $context
+     * @param DirectoryList $directoryList
      * @param DeploymentConfig $deploymentConfig
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct
     (
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
-        DeploymentConfig $deploymentConfig
-    )
-    {
+        Context $context,
+        DirectoryList $directoryList,
+        DeploymentConfig $deploymentConfig,
+        StoreManagerInterface $storeManager
+    ) {
         $this->_directoryList = $directoryList;
         $this->_deploymentConfig = $deploymentConfig;
+        $this->storeManager = $storeManager;
         parent::__construct($context);
     }
 
@@ -71,10 +80,14 @@ class Sdk
     }
 
     /**
+     * @param int $store
      * @return \ZaiusSDK\ZaiusClient
      */
     public function getSdkClient($store = null)
     {
+        if (!$store) {
+            $store = $this->storeManager->getStore();
+        }
         $apiKey = $this->getZaiusTrackerId($store);
         $privateKey = $this->getZaiusPrivateKey($store);
         if (!$apiKey || !$privateKey) {
@@ -101,6 +114,9 @@ class Sdk
      */
     public function getZaiusTrackerId($store = null)
     {
+        if (!$store) {
+            $store = $this->storeManager->getStore()->getId();
+        }
         return $this->scopeConfig->getValue('zaius_engage/status/zaius_tracker_id', 'store', $store);
     }
 
@@ -110,6 +126,9 @@ class Sdk
      */
     public function getZaiusPrivateKey($store = null)
     {
+        if (!$store) {
+            $store = $this->storeManager->getStore()->getId();
+        }
         return $this->scopeConfig->getValue('zaius_engage/status/zaius_private_api', 'store', $store);
     }
 }

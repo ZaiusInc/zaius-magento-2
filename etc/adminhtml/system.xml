@@ -37,7 +37,17 @@
                         Checks if the Zaius SDK is installed.
                     </comment>
                 </field>
-                <field id="zaius_tracker_id" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="alert" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Zaius Tracker ID</label>
+                    <comment><![CDATA[
+                Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
+                    </comment>
+                    <frontend_model>Zaius\Engage\Block\System\Config\Alert</frontend_model>
+                    <depends>
+                        <field id="*/*/status">1</field>
+                    </depends>
+                </field>
+                <field id="zaius_tracker_id" translate="label comment" type="text" sortOrder="60" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Zaius Tracker ID</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
@@ -47,7 +57,7 @@
                         <field id="*/*/status">1</field>
                     </depends>
                 </field>
-                <field id="zaius_private_api" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="zaius_private_api" translate="label comment" type="text" sortOrder="70" showInDefault="0" showInWebsite="0" showInStore="1">
                     <label>Zaius Private API Key</label>
                     <comment><![CDATA[
                 Found at: <a href="https://app.zaius.com/app?scope=731#/api_management" target="_blank">API Management</a> in your Zaius Account. ]]>
@@ -138,6 +148,35 @@
                 </field>
             </group>
 
+            <group id="bulk_imports" type="text" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Zaius Bulk Imports</label>
+                <comment>Bulk Imports are currently in beta. Please consult with your Zaius Customer Success Manager prior to enabling this feature.</comment>
+                <field id="status" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enabled?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="state" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Current State of Bulk Updates</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\BulkUpdatesState</frontend_model>
+                    <depends>
+                        <field id="*/bulk_imports/status">1</field>
+                    </depends>
+                </field>
+                <field id="datatypes" translate="label" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Data Types</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\Datatypes</frontend_model>
+                    <depends>
+                        <field id="*/bulk_imports/status">1</field>
+                    </depends>
+                </field>
+                <field id="bulk_update" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Bulk Updates</label>
+                    <frontend_model>Zaius\Engage\Block\System\Config\BulkUpdatesButton</frontend_model>
+                    <depends>
+                        <field id="*/bulk_imports/status">1</field>
+                    </depends>
+                </field>
+            </group>
         </section>
     </system>
 </config>

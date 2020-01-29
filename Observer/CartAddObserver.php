@@ -126,7 +126,8 @@ class CartAddObserver
             $vuid = $this->_helper->getVuid();
             $zm64_id = $this->_helper->getZM64_ID();
             $zaiusAliasCookies = $this->_helper->getZaiusAliasCookies();
-            $identifiers = array_filter(compact('vuid', 'zm64_id'));
+            $zaiusAliasCartId = $quote->getId();
+            $identifiers = array_filter(compact('vuid', 'zm64_id', 'zaiusAliasCartId'));
 //            if (count($zaiusAliasCookies)) {
 //                foreach ($zaiusAliasCookies as $field => $value) {
 //                    $identifiers[$field] = $value;

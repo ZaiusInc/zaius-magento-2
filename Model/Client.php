@@ -11,6 +11,7 @@ use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Helper\Sdk;
 use Zaius\Engage\Logger\Logger;
 use ZaiusSDK\ZaiusException;
@@ -57,6 +58,7 @@ class Client implements ClientInterface
     /**
      * @var Logger
      */
+    protected $_localeHelper;
     protected $_logger;
     /**
      * @var Sdk
@@ -91,6 +93,7 @@ class Client implements ClientInterface
         CustomerRepositoryInterface $customerRepository,
         OrderRepositoryInterface $orderRepository,
         ProductRepositoryInterface $productRepository,
+        LocaleHelper $localeHelper,
         Logger $logger,
         Sdk $sdk,
         ScopeConfigInterface $scopeConfig,
@@ -102,6 +105,7 @@ class Client implements ClientInterface
         $this->_customerRepository = $customerRepository;
         $this->_orderRepository = $orderRepository;
         $this->_productRepository = $productRepository;
+        $this->_localeHelper = $localeHelper;
         $this->_logger = $logger;
         $this->_sdk = $sdk;
         $this->_encoder = $encoder;
@@ -120,7 +124,12 @@ class Client implements ClientInterface
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
-        return $zaiusClient->call($object, 'POST', $url, $this->isBatchUpdate());
+        try {
+            return $zaiusClient->call($object, 'POST', $url, $this->isBatchUpdate());
+        } catch (\Exception $e) {
+            $this->_logger->error('Something happened while calling to Zaius' . $e->getMessage());
+            return $this;
+        }
     }
 
     /**
@@ -145,7 +154,12 @@ class Client implements ClientInterface
                     );
                     $s3Client->uploadProducts($entity);
                 }
-                $zaiusClient->postProduct($entity['data'], $this->isBatchUpdate());
+                try {
+                    $zaiusClient->postProduct($entity['data'], $this->isBatchUpdate());
+                } catch (\Exception $e) {
+                    $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+                    return $this;
+                }
                 break;
             case 'customer':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
@@ -156,7 +170,12 @@ class Client implements ClientInterface
                     );
                     $s3Client->uploadCustomers($entity);
                 }
-                $zaiusClient->postCustomer($entity['data'], $this->isBatchUpdate());
+                try {
+                    $zaiusClient->postCustomer($entity['data'], $this->isBatchUpdate());
+                } catch (\Exception $e) {
+                    $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+                    return $this;
+                }
                 break;
             default:
                 return $this->_post($entity, $this->getApiBaseUrl() . '/entities');
@@ -187,14 +206,16 @@ class Client implements ClientInterface
 
     /**
      * @param mixed $event
+     * @param mixed $storeId
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws ZaiusException
      */
-    public function postEvent($event)
+    public function postEvent($event, $storeId = null)
     {
         $event['data'] += $this->_helper->getDataSourceFields();
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $store = $storeId ?? $this->_storeManager->getStore()->getId();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
@@ -208,7 +229,12 @@ class Client implements ClientInterface
                     );
                     $s3Client->uploadEvents($event);
                 }
-                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                try {
+                    $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                } catch (\Exception $e) {
+                    $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+                    return $this;
+                }
                 //$zaiusClient->updateSubscription($event['data'], $this->isBatchUpdate());
                 break;
             case 'product':
@@ -223,7 +249,12 @@ class Client implements ClientInterface
                     );
                     $s3Client->uploadEvents($event);
                 }
-                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                try {
+                    $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                } catch (\Exception $e) {
+                    $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+                    return $this;
+                }
                 break;
             case 'order':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
@@ -234,7 +265,12 @@ class Client implements ClientInterface
                     );
                     $s3Client->uploadOrders($event);
                 }
-                $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                try {
+                    $zaiusClient->postEvent($event, $this->isBatchUpdate());
+                } catch (\Exception $e) {
+                    $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+                    return $this;
+                }
                 break;
             default:
                 return $this->_post($event, $this->getApiBaseUrl() . '/events', $this->isBatchUpdate());
@@ -261,33 +297,43 @@ class Client implements ClientInterface
      */
     public function postOrder($order, $eventType = 'purchase')
     {
-        return $this->postEvent($this->_orderRepository->getOrderEventData($order, $eventType, true));
+        return $this->postEvent(
+            $this->_orderRepository->getOrderEventData($order, $eventType, true),
+            $order->getStoreId()
+        );
     }
 
     /**
      * @param string $event
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $store
      * @return array|null
      * @throws ZaiusException
      */
-    public function postProduct($event, $product)
+    public function postProduct($event, $product, $store = null)
     {
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
-        return $zaiusClient->postProduct($this->_productRepository->getProductEventData($event, $product), $this->isBatchUpdate());
+        try {
+            return $zaiusClient->postProduct($this->_productRepository->getProductEventData($event, $product), $this->isBatchUpdate());
+        } catch (\Exception $e) {
+            $this->_logger->error('Something happened while posting to Zaius' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
+     * @param $store string
      * @param $objectName string
      * @return mixed
      * @throws ZaiusException
      */
-    public function getObjectFields($objectName)
+    public function getObjectFields($objectName, $store = null)
     {
         $this->_logger->info(__METHOD__);
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
@@ -295,19 +341,20 @@ class Client implements ClientInterface
     }
 
     /**
+     * @param $store string
      * @param $objectName string
      * @param $fieldArray array
      * @return mixed|void
      * @throws ZaiusException
      */
-    public function createObjectField($objectName, $fieldArray = [])
+    public function createObjectField($objectName, $fieldArray = [], $store = null)
     {
         $this->_logger->info(__METHOD__);
         if (empty($fieldArray)) {
             $this->_logger->info('$fieldArray empty.');
             return;
         }
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($store);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
@@ -340,7 +387,7 @@ class Client implements ClientInterface
     /**
      * @param $list
      * @param null $store
-     * @throws ZaiusException
+     * @return mixed
      */
     public function createList($list, $store = null)
     {
@@ -353,8 +400,48 @@ class Client implements ClientInterface
     }
 
     /**
-     * @return mixed
+     * @param $event
+     * @param $response
+     * @param null $start
+     * @param null $finish
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \ZaiusSDK\ZaiusException
      */
+    public function postS3Import($event, $response, $start = null, $finish = null)
+    {
+        $zaiusClient = $this->_sdk->getSdkClient();
+        $s3Client = $zaiusClient->getS3Client(
+            $this->_helper->getZaiusTrackerId(),
+            $this->_helper->getAmazonS3Key(),
+            $this->_helper->getAmazonS3Secret()
+        );
+        $website = $this->_storeManager->getWebsite($this->_storeManager->getStore()->getId())->getCode();
+        $storeView = $this->_storeManager->getStore()->getCode();
+        $prefix = $event . 's.';
+        $prefix .= $website . '.';
+        //todo add localization prefix
+        $prefix .= $this->_localeHelper->isLocalesEnabled() ? $storeView . '.' : '';
+        if ($start !== null && $finish !== null) {
+            $prefix .= $start . '-' . $finish . '.';
+        }
+        $this->_logger->info('$prefix: ' . $prefix);
+        switch ($event) {
+            case 'customer':
+                $s3Client->uploadCustomers($response, false, $prefix);
+                break;
+            case 'order':
+                $s3Client->uploadOrders($response, false, $prefix);
+                break;
+            case 'product':
+                $s3Client->uploadProducts($response, false, $prefix);
+                break;
+            case 'subscriber':
+                $s3Client->uploadEvents($response, false, $prefix);
+                break;
+        }
+    }
+
     protected function isBatchUpdate()
     {
         return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);
