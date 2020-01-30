@@ -7,6 +7,7 @@ use Magento\Customer\Model\ResourceModel\Customer\Collection as CustomerCollecti
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Directory\Model\RegionFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\Store\Model\StoreManager;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Helper\Locale;
@@ -49,6 +50,14 @@ class CustomerRepository implements CustomerRepositoryInterface
      */
     protected $_localeHelper;
     /**
+     * @var CustomerManager
+     */
+    private $customerManager;
+    /**
+     * @var StoreManager
+     */
+    private $storeManager;
+    /**
      * @var TrackScopeManager
      */
     private $trackScopeManager;
@@ -61,6 +70,8 @@ class CustomerRepository implements CustomerRepositoryInterface
      * @param Data $helper
      * @param Locale $localeHelper
      * @param Logger $logger
+     * @param CustomerManager $customerManager
+     * @param StoreManager $storeManager
      * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
@@ -70,6 +81,8 @@ class CustomerRepository implements CustomerRepositoryInterface
         Data $helper,
         Locale $localeHelper,
         Logger $logger,
+        CustomerManager $customerManager,
+        StoreManager $storeManager,
         TrackScopeManager $trackScopeManager
     ) {
         $this->_request = $request;
@@ -78,6 +91,8 @@ class CustomerRepository implements CustomerRepositoryInterface
         $this->_helper = $helper;
         $this->_logger = $logger;
         $this->_localeHelper = $localeHelper;
+        $this->customerManager = $customerManager;
+        $this->storeManager = $storeManager;
         $this->trackScopeManager = $trackScopeManager;
     }
 
@@ -95,7 +110,13 @@ class CustomerRepository implements CustomerRepositoryInterface
         $customers = $this->getCustomerCollection();
         try {
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
-            $customers->addFieldToFilter('store_id', $storeId);
+
+            if (!$this->customerManager->isCustomerAccountShared()) {
+                $customers->addFieldToFilter('store_id', $storeId);
+            } else {
+                $store = $this->storeManager->getStore($storeId);
+                $customers->addFieldToFilter('website_id', $store->getWebsiteId());
+            }
         } catch (\Exception $e) {
             return [];
         }

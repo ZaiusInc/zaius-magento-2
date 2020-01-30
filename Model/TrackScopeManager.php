@@ -27,7 +27,6 @@ class TrackScopeManager
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager
-
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -58,12 +57,16 @@ class TrackScopeManager
     }
 
     /**
+     * @param mixed $websiteId
      * @return array
      */
-    public function getAllTrackingIds()
+    public function getAllTrackingIds($websiteId = null)
     {
         $trackingIds = [];
         foreach ($this->storeManager->getStores() as $key => $store) {
+            if ($websiteId && $websiteId != $store->getWebsiteId()) {
+                continue;
+            }
             $configValue = $this->getConfig($store);
             if (!in_array($configValue, $trackingIds)) {
                 $trackingIds[] = $configValue;

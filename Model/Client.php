@@ -134,14 +134,13 @@ class Client implements ClientInterface
 
     /**
      * @param mixed $entity
+     * @param null $storeId
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws ZaiusException
      */
-    public function postEntity($entity)
+    public function postEntity($entity, $storeId = null)
     {
         $entity['data'] += $this->_helper->getDataSourceFields();
-        $zaiusClient = $this->_sdk->getSdkClient();
+        $zaiusClient = $this->_sdk->getSdkClient($storeId);
         if (null === $zaiusClient) {
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
@@ -165,9 +164,9 @@ class Client implements ClientInterface
             case 'customer':
                 if ($this->_helper->getAmazonS3Status($this->_storeManager->getStore())) {
                     $s3Client = $zaiusClient->getS3Client(
-                        $this->_helper->getZaiusTrackerId(),
-                        $this->_helper->getAmazonS3Key(),
-                        $this->_helper->getAmazonS3Secret()
+                        $this->_helper->getZaiusTrackerId($storeId),
+                        $this->_helper->getAmazonS3Key($storeId),
+                        $this->_helper->getAmazonS3Secret($storeId)
                     );
                     $s3Client->uploadCustomers($entity);
                 }
@@ -281,11 +280,10 @@ class Client implements ClientInterface
     /**
      * @param \Magento\Customer\Model\Customer $customer
      * @param null $eventName
+     * @param null $storeId
      * @return $this
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws ZaiusException
      */
-    public function postCustomer($customer, $eventName = null)
+    public function postCustomer($customer, $eventName = null, $storeId = null)
     {
         return $this->postEntity($this->_customerRepository->getCustomerEventData($customer, $eventName));
     }
