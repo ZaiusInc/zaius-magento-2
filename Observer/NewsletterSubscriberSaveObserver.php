@@ -90,7 +90,7 @@ class NewsletterSubscriberSaveObserver
             $event = array();
             $event['type'] = 'list';
             $event['action'] = $action;
-            $event['data']['list_id'] = $this->_helper->getNewsletterListId();
+            $event['data']['list_id'] = $this->_helper->getNewsletterListId($subscriber->getStoreId());
             $event['data']['email'] = $subscriber->getSubscriberEmail();
             $event['data']['subscribed'] = $subscribed;
             $event['data']['store_id'] = $subscriber->getStoreId();
@@ -111,9 +111,12 @@ class NewsletterSubscriberSaveObserver
             $event['data']['ts'] = ($event['data']['ts']) ? $event['data']['ts'] : $this->timezone->scopeTimeStamp();
             $event['identifiers']['vuid'] = $event['identifiers']['vuid'] ?? $subscriber->getSubscriberEmail();
 
-            $this->_client->postEvent($event);
-            $event['data']['list_id'] = 'zaius_all';
-            $this->_client->postEvent($event);
+            $this->_client->postEvent($event, $subscriber->getStoreId());
+
+            if ($action == 'subscribe') {
+                $event['data']['list_id'] = 'zaius_all';
+                $this->_client->postEvent($event, $subscriber->getStoreId());
+            }
         }
         return $this;
     }
