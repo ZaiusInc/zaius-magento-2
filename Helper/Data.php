@@ -537,14 +537,16 @@ class Data extends AbstractHelper
 
     /**
      * @param mixed $event
+     * @param mixed $storeId
      * @return $this;
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function addEventToSession($event)
+    public function addEventToSession($event, $storeId = null)
     {
+        $store = $storeId ?? $this->_storeManager->getStore()->getId();
         $event['data'] += $this->getDataSourceFields();
         if ($this->isBatchUpdate()) {
-            $zaiusClient = $this->_sdk->getSdkClient();
+            $zaiusClient = $this->_sdk->getSdkClient($store);
             if (null === $zaiusClient) {
                 return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
             }

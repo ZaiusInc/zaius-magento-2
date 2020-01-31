@@ -7,8 +7,9 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Customer\Model\Customer;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
-use Zaius\Engage\Model\Client;
 use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\CustomerManager;
 
 
 /**
@@ -27,32 +28,38 @@ class CustomerSaveObserver
      */
     protected $_helper;
     /**
-     * @var Client
-     */
-    protected $_client;
-    /**
      * @var CustomerRepositoryInterface
      */
     protected $_customerRepository;
+    /**
+     * @var CustomerManager
+     */
+    private $customerManager;
+    /**
+     * @var Client
+     */
+    private $client;
 
     /**
      * CustomerSaveObserver constructor.
      * @param StoreManagerInterface $storeManager
      * @param Data $helper
-     * @param Client $client
      * @param CustomerRepositoryInterface $customerRepository
+     * @param CustomerManager $customerManager
+     * @param Client $client
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         Data $helper,
-        Client $client,
-        CustomerRepositoryInterface $customerRepository
-    )
-    {
+        CustomerRepositoryInterface $customerRepository,
+        CustomerManager $customerManager,
+        Client $client
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
-        $this->_client = $client;
         $this->_customerRepository = $customerRepository;
+        $this->customerManager = $customerManager;
+        $this->client = $client;
     }
 
     /**
@@ -69,7 +76,7 @@ class CustomerSaveObserver
             $customer = $this->_customerRepository->getCustomerCollection()
                 ->addFieldToFilter('entity_id', $c->getId())
                 ->getFirstItem();
-            $this->_client->postCustomer($customer);
+            $this->customerManager->sendCustomer($customer, $this->client);
         }
         return $this;
     }

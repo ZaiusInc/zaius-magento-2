@@ -8,19 +8,15 @@ use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Model\Client;
-use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Helper\Data as Helper;
 
 /**
- * Class OrderSaveAfterObserver
+ * Class OrderPlaceAfterObserver
  * @package Zaius\Engage\Observer
  */
-class OrderSaveAfterObserver
+class AdminOrderPlaceAfterObserver
     implements ObserverInterface
 {
-    /**
-     * @var Data
-     */
-    protected $_helper;
     /**
      * @var StoreManagerInterface
      */
@@ -30,27 +26,31 @@ class OrderSaveAfterObserver
      */
     protected $_orderRepository;
     /**
+     * @var Helper
+     */
+    protected $_helper;
+    /**
      * @var Client
      */
     protected $_client;
 
     /**
-     * OrderSaveAfterObserver constructor.
+     * OrderPlaceAfterObserver constructor.
      * @param StoreManagerInterface $storeManager
      * @param OrderRepositoryInterface $orderRepository
-     * @param Data $helper
+     * @param Helper $helper
      * @param Client $client
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         OrderRepositoryInterface $orderRepository,
-        Data $helper,
+        Helper $helper,
         Client $client
     )
     {
-        $this->_helper = $helper;
         $this->_storeManager = $storeManager;
         $this->_orderRepository = $orderRepository;
+        $this->_helper = $helper;
         $this->_client = $client;
     }
 
@@ -63,7 +63,7 @@ class OrderSaveAfterObserver
     {
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
-        if ($order->canCancel() && $this->_helper->getStatus($order->getStore()) && (!$this->_helper->getIsTrackingOrdersOnFrontend($order->getStore()) || $this->_storeManager->getStore()->getId() == 0)) {
+        if ($this->_helper->getStatus($order->getStore())  && $this->_storeManager->getStore()->getId() != 0) {
             $this->_client->postOrder($order);
         }
         return $this;

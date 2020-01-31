@@ -5,6 +5,8 @@ namespace Zaius\Engage\Model;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\OrderRepositoryInterface;
 use Zaius\Engage\Helper\Data;
 use Zaius\Engage\Logger\Logger;
@@ -29,6 +31,10 @@ class OrderRepository implements OrderRepositoryInterface
      */
     protected $_logger;
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+     /*
      * @var TrackScopeManager
      */
     private $trackScopeManager;
@@ -38,17 +44,20 @@ class OrderRepository implements OrderRepositoryInterface
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param Data $helper
      * @param Logger $logger
+     * @param StoreManagerInterface $storeManager
      * @param TrackScopeManager $trackScopeManager
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         Data $helper,
         Logger $logger,
+        StoreManagerInterface $storeManager,
         TrackScopeManager $trackScopeManager
     ) {
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_helper = $helper;
         $this->_logger = $logger;
+        $this->storeManager = $storeManager;
         $this->trackScopeManager = $trackScopeManager;
     }
 
@@ -60,6 +69,10 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
+
+        if ($trackingID === null) {
+            return [];
+        }
         /** @var OrderCollection $orders */
         $orders = $this->_orderCollectionFactory->create();
 
@@ -67,6 +80,7 @@ class OrderRepository implements OrderRepositoryInterface
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $orders->addFieldToFilter('store_id', $storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         $orders->setOrder('entity_id', 'asc');
@@ -137,10 +151,12 @@ class OrderRepository implements OrderRepositoryInterface
         if ($order->getCreatedAt()) {
             $orderEventData['ts'] = strtotime($order->getCreatedAt());
         }
-        //if ($sendVuid) {
-        $identifiers['vuid'] = $this->_helper->getVuid();
-        //}
         $store = $order->getStore();
+        $identifiers = [];
+        $identifiers['vuid'] = ($this->storeManager->getDefaultStoreView()->getId() == $store->getId())
+            ? $this->_helper->getVuid()
+            : false;
+
         if ($store) {
             if ($store->getWebsite()) {
                 $orderEventData['magento_website'] = $store->getWebsite()->getName();
