@@ -40,6 +40,7 @@ class SubscriberRepository
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $subscribers->addFieldToFilter('store_id', $storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         if (isset($limit)) {
