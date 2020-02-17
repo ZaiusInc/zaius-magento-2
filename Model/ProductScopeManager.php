@@ -4,6 +4,8 @@ namespace Zaius\Engage\Model;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Paypal\Model\Pro;
+use Magento\Store\Model\Store;
 use Zaius\Engage\Logger\Logger;
 
 class ProductScopeManager
@@ -42,28 +44,46 @@ class ProductScopeManager
      */
     public function sync($product)
     {
-        $duplicatedTrackingIds = $this->trackScopeManager->getStoresWithDuplicatedTrackingId();
-        foreach ($this->trackScopeManager->getAllTrackingIds() as $trackingId) {
-            try {
-                $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingId);
-                $scopeProduct = $this->productRepository->getById($product->getId(), false, $storeId);
+        try {
+            $trackingIds = $this->getStoreByTrackingId($product);
+            $genericProductId = $product->getId();
+            foreach ($trackingIds as $trackingId => $storeIds) {
+                if (sizeof($storeIds) > 1) {
+                    foreach ($storeIds as $storeId) {
+                        $scopeProduct = $this->productRepository->getById($product->getId(), false, $storeId);
+                        $productId = $product->getId() . '-' . $this->trackScopeManager->getStoreCode($storeId);
 
-                if (sizeof($product->getStoreIds()) > 1 && in_array($trackingId, $duplicatedTrackingIds)) {
-                    foreach ($duplicatedTrackingIds as $storeId => $duplicatedTrackingId) {
                         $scopeProduct->setData('has_view_variants', true);
-                        $scopeProduct->setData('generic_product_id', $scopeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($storeId));
+                        $scopeProduct->setId($productId);
+                        $scopeProduct->setData('generic_product_id', $genericProductId);
                         $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
                     }
-
+                    //main product
+                    $scopeProduct = $this->productRepository->getById($product->getId(), false);
                     $scopeProduct->setData('has_view_variants', true);
                     $scopeProduct->setData('generic_product_id', $scopeProduct->getId());
-                    $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
+                    $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
                     continue;
                 }
-                $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
-            } catch (\Exception $e) {
-                $this->logger->warning(sprintf("Error trying to load product %s", $e->getMessage()));
+                $scopeProduct = $this->productRepository->getById($product->getId(), false, Store::DEFAULT_STORE_ID);
+                $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
             }
+        } catch (\Exception $e) {
+            $this->logger->warning(sprintf("Error trying to load product %s", $e->getMessage()));
         }
+    }
+
+    /**
+     * @param $product Product
+     * @return array
+     */
+    private function getStoreByTrackingId($product)
+    {
+        $tracks = [];
+        foreach ($product->getStoreIds() as $storeId) {
+            $trackId = $this->trackScopeManager->getConfig($storeId);
+            $tracks[$trackId][] = $storeId;
+        }
+        return $tracks;
     }
 }
