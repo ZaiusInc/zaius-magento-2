@@ -5,6 +5,7 @@ namespace Zaius\Engage\Model;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Paypal\Model\Pro;
+use Magento\Store\Model\Store;
 use Zaius\Engage\Logger\Logger;
 
 class ProductScopeManager
@@ -64,7 +65,7 @@ class ProductScopeManager
                     $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
                     continue;
                 }
-                $scopeProduct = $this->productRepository->getById($product->getId(), false, current($storeIds));
+                $scopeProduct = $this->productRepository->getById($product->getId(), false, Store::DEFAULT_STORE_ID);
                 $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
             }
         } catch (\Exception $e) {
