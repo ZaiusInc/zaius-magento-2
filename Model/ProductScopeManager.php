@@ -4,7 +4,9 @@ namespace Zaius\Engage\Model;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductFactory;
 use Magento\Paypal\Model\Pro;
+use Magento\Store\Model\Store;
 use Zaius\Engage\Logger\Logger;
 
 class ProductScopeManager
@@ -25,10 +27,15 @@ class ProductScopeManager
      * @var Logger
      */
     private $logger;
+    /**
+     * @var ProductFactory
+     */
+    private $productFactory;
 
     public function __construct(
         TrackScopeManager $trackScopeManager,
         ProductRepositoryInterface $productRepository,
+        ProductFactory $productFactory,
         Client $client,
         Logger $logger
     ) {
@@ -36,6 +43,7 @@ class ProductScopeManager
         $this->productRepository = $productRepository;
         $this->client = $client;
         $this->logger = $logger;
+        $this->productFactory = $productFactory;
     }
 
     /**
@@ -64,7 +72,7 @@ class ProductScopeManager
                     $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
                     continue;
                 }
-                $scopeProduct = $this->productRepository->getById($product->getId(), false, current($storeIds));
+                $scopeProduct =  $this->productFactory->create()->setStoreId(Store::DEFAULT_STORE_ID)->load($product->getId());
                 $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
             }
         } catch (\Exception $e) {

@@ -160,6 +160,12 @@ class ProductRepository implements ProductRepositoryInterface
                     $storeIds = $product->getStoreIds();
                     $storeIds[] = Store::DEFAULT_STORE_ID;
                     foreach ($storeIds as $productStoreId) {
+                        //ignore disabled store
+                        $store = $this->_storeManager->getStore($productStoreId);
+                        if (!$store->getIsActive()) {
+                            continue;
+                        }
+
                         $collection = $this->_productCollectionFactory->create();
                         $collection->setStoreId($productStoreId);
                         $collection->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key']);
