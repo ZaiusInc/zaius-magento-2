@@ -156,10 +156,16 @@ class ProductRepository implements ProductRepositoryInterface
                 $this->_logger->warning("ZAIUS: Null field: product_id.");
             } else {
 
-                if (sizeof($product->getStoreIds()) > 1 && in_array($product->getStoreId(), array_keys($duplicatedTrackingIds))) {
+                if (sizeof($product->getStoreIds()) > 1 && array_intersect($product->getStoreIds(), array_keys($duplicatedTrackingIds))) {
                     $storeIds = $product->getStoreIds();
                     $storeIds[] = Store::DEFAULT_STORE_ID;
                     foreach ($storeIds as $productStoreId) {
+                        //ignore disabled store
+                        $store = $this->_storeManager->getStore($productStoreId);
+                        if (!$store->getIsActive()) {
+                            continue;
+                        }
+
                         $collection = $this->_productCollectionFactory->create();
                         $collection->setStoreId($productStoreId);
                         $collection->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key']);
@@ -169,6 +175,8 @@ class ProductRepository implements ProductRepositoryInterface
 
                         if ((int)$productStoreId != Store::DEFAULT_STORE_ID) {
                             $newId = $storeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($productStoreId);
+                            $storeProduct->setData('generic_product_id', $storeProduct->getId());
+                            $storeProduct->setData('has_view_variants', true);
                             $storeProduct->setId($newId);
                         }
                         $result[] = $this->getProductEventData('product', $storeProduct);
