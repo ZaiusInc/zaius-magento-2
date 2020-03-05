@@ -54,26 +54,27 @@ class ProductScopeManager
         try {
             $trackingIds = $this->getStoreByTrackingId($product);
             $genericProductId = $product->getId();
+            $baseProduct = $this->productFactory->create()->setStoreId(Store::DEFAULT_STORE_ID)->load($product->getId());
             foreach ($trackingIds as $trackingId => $storeIds) {
                 if (sizeof($storeIds) > 1) {
                     foreach ($storeIds as $storeId) {
                         $scopeProduct = $this->productRepository->getById($product->getId(), false, $storeId);
-                        $productId = $product->getId() . '-' . $this->trackScopeManager->getStoreCode($storeId);
 
-                        $scopeProduct->setData('has_view_variants', true);
-                        $scopeProduct->setId($productId);
-                        $scopeProduct->setData('generic_product_id', $genericProductId);
-                        $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
+                        if ($this->hasVariants($baseProduct, $scopeProduct)) {
+                            $productId = $product->getId() . '-' . $this->trackScopeManager->getStoreCode($storeId);
+                            $scopeProduct->setData('has_view_variants', true);
+                            $scopeProduct->setId($productId);
+                            $scopeProduct->setData('generic_product_id', $genericProductId);
+                            $this->client->postProduct('catalog_product_save_after', $scopeProduct, $storeId);
+                        }
                     }
                     //main product
-                    $scopeProduct = $this->productRepository->getById($product->getId(), false);
-                    $scopeProduct->setData('has_view_variants', true);
-                    $scopeProduct->setData('generic_product_id', $scopeProduct->getId());
-                    $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
+                    $baseProduct->setData('has_view_variants', true);
+                    $baseProduct->setData('generic_product_id', $baseProduct->getId());
+                    $this->client->postProduct('catalog_product_save_after', $baseProduct, current($storeIds));
                     continue;
                 }
-                $scopeProduct =  $this->productFactory->create()->setStoreId(Store::DEFAULT_STORE_ID)->load($product->getId());
-                $this->client->postProduct('catalog_product_save_after', $scopeProduct, current($storeIds));
+                $this->client->postProduct('catalog_product_save_after', $baseProduct, current($storeIds));
             }
         } catch (\Exception $e) {
             $this->logger->warning(sprintf("Error trying to load product %s", $e->getMessage()));
@@ -92,5 +93,24 @@ class ProductScopeManager
             $tracks[$trackId][] = $storeId;
         }
         return $tracks;
+    }
+
+    /**
+     * @param $productBase
+     * @param $productStore
+     * @return bool
+     */
+    private function hasVariants($productBase, $productStore)
+    {
+        $hasVariants = false;
+        foreach ($productBase->getData() as $k => $value) {
+            if ($k === 'store_id') {
+                continue;
+            }
+            if ($productBase->getData($k) != $productStore->getData($k)) {
+                return true;
+            }
+        }
+        return $hasVariants;
     }
 }
