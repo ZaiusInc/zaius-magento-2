@@ -158,20 +158,15 @@ class ProductRepository implements ProductRepositoryInterface
 
                 if (sizeof($product->getStoreIds()) > 1 && array_intersect($product->getStoreIds(), array_keys($duplicatedTrackingIds))) {
                     $storeIds = $product->getStoreIds();
-                    $storeIds[] = Store::DEFAULT_STORE_ID;
+                    $baseProduct = $this->getStoreProduct(Store::DEFAULT_STORE_ID, $product);
+                    $result[] = $this->getProductEventData('product', $baseProduct);
+
                     foreach ($storeIds as $productStoreId) {
-                        //ignore disabled store
+                        $storeProduct = $this->getStoreProduct($productStoreId, $product);
                         $store = $this->_storeManager->getStore($productStoreId);
-                        if (!$store->getIsActive()) {
+                        if (!$store->getIsActive() || !$this->hasVariants($baseProduct, $storeProduct)) {
                             continue;
                         }
-
-                        $collection = $this->_productCollectionFactory->create();
-                        $collection->setStoreId($productStoreId);
-                        $collection->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key']);
-                        $collection->addIdFilter($product->getId());
-
-                        $storeProduct = $collection->getFirstItem();
 
                         if ((int)$productStoreId != Store::DEFAULT_STORE_ID) {
                             $newId = $storeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($productStoreId);
@@ -183,7 +178,6 @@ class ProductRepository implements ProductRepositoryInterface
                     }
                     continue;
                 }
-
                 $result[] = $this->getProductEventData('product', $product);
             }
         }
@@ -275,5 +269,50 @@ class ProductRepository implements ProductRepositoryInterface
             }
         }
         return $this->_extraProductAttributes;
+    }
+
+    /**
+     * @param $productBase
+     * @param $productStore
+     * @return bool
+     */
+    private function hasVariants($productBase, $productStore)
+    {
+        $hasVariants = false;
+        $productBaseData = $this->getProductEventData('product', $productBase);
+        $productStoreData = $this->getProductEventData('product', $productStore);
+        foreach ($productBaseData as $k => $value) {
+            if ($k === 'store_id') {
+                continue;
+            }
+            if ($productBaseData[$k] != $productStoreData[$k]) {
+                return true;
+            }
+        }
+        return $hasVariants;
+    }
+
+    /**
+     * @param $productStoreId
+     * @param $product
+     * @return mixed
+     */
+    private function getStoreProduct($productStoreId, $product)
+    {
+        $collection = $this->_productCollectionFactory->create();
+        $collection->setStoreId($productStoreId);
+        $collection->addAttributeToSelect([
+            'name',
+            'price',
+            'special_price',
+            'special_from_date',
+            'special_to_date',
+            'short_description',
+            'image',
+            'url_key'
+        ]);
+        $collection->addIdFilter($product->getId());
+        $storeProduct = $collection->getFirstItem();
+        return $storeProduct;
     }
 }

@@ -114,3 +114,4 @@ class ProductScopeManager
         return $hasVariants;
     }
 }
+
