@@ -159,8 +159,7 @@ class ProductRepository implements ProductRepositoryInterface
                 if (sizeof($product->getStoreIds()) > 1 && array_intersect($product->getStoreIds(), array_keys($duplicatedTrackingIds))) {
                     $storeIds = $product->getStoreIds();
                     $baseProduct = $this->getStoreProduct(Store::DEFAULT_STORE_ID, $product);
-                    $result[] = $this->getProductEventData('product', $baseProduct);
-
+                    $hasVariants = false;
                     foreach ($storeIds as $productStoreId) {
                         $storeProduct = $this->getStoreProduct($productStoreId, $product);
                         $store = $this->_storeManager->getStore($productStoreId);
@@ -169,15 +168,21 @@ class ProductRepository implements ProductRepositoryInterface
                         }
 
                         if ((int)$productStoreId != Store::DEFAULT_STORE_ID) {
+                            $hasVariants = true;
                             $newId = $storeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($productStoreId);
                             $storeProduct->setData('generic_product_id', $storeProduct->getId());
-                            $storeProduct->setData('has_view_variants', true);
                             $storeProduct->setId($newId);
                         }
+                        $storeProduct->setData('has_view_variants', $hasVariants);
                         $result[] = $this->getProductEventData('product', $storeProduct);
                     }
+                    $baseProduct->setData('has_view_variants', $hasVariants);
+                    $baseProduct->setData('generic_product_id', $baseProduct->getId());
+                    $result[] = $this->getProductEventData('product', $baseProduct);
                     continue;
                 }
+                $product->setData('has_view_variants', false);
+                $product->setData('generic_product_id', $product->getId());
                 $result[] = $this->getProductEventData('product', $product);
             }
         }
@@ -239,8 +244,8 @@ class ProductRepository implements ProductRepositoryInterface
         if ($genericProductId = $product->getData('generic_product_id')) {
             $productData['generic_product_id'] = $genericProductId;
         }
-
-        if ($hasVariants = $product->getData('has_view_variants')) {
+        $hasVariants = $product->getData('has_view_variants');
+        if ($hasVariants !== null) {
             $productData['has_view_variants'] = $hasVariants;
         }
 
