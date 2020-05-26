@@ -29,9 +29,8 @@ class Cron
      */
     public function process()
     {
-        $zaiusClient = $this->sdk->getSdkClient();
-
-        $worker = new Worker();
-        $worker->processAll();
+        // $zaiusClient = $this->sdk->getSdkClient();
+        // $worker = new Worker();
+        // $worker->processAll();
     }
 }
