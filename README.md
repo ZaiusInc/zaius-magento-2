@@ -157,9 +157,20 @@ Navigate to the Zaius integration [(Settings (cogwheel) > Integrations)](https:/
 Zaius does not recommend clicking "Start Bulk Import" at this time. Please consult with your Customer Success Manager to coordinate the bulk import process.
 
 
-## Configuration
+### Configuration
 
 After installing the module and setting up the API user, all configuration is done via Stores >> Configuration >> Zaius >> Engage.
+
+Make sure to set these values:
+
+1. Zaius Engage Status > Enabled
+2. Zaius Engage Status > Zaius Tracker ID (Found at [API Management](https://app.zaius.com/app#/api_management))
+3. Zaius Engage Status > Zaius Private API Key (Found at [API Management](https://app.zaius.com/app#/api_management))
+4. Save your changes before proceeding to the next step.
+5. Schema Update > Update Schema
+
+
+## Configuration Settings
 
 #### Zaius Engage Status
 
