@@ -3,7 +3,7 @@
 namespace Zaius\Engage\Model;
 
 use Zaius\Engage\Helper\Sdk;
-use ZaiusSDK\Zaius\Worker;
+// use ZaiusSDK\Zaius\Worker;
 
 /**
  * Class Cron
