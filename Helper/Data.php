@@ -403,7 +403,7 @@ class Data extends AbstractHelper
     public function getVTSRC()
     {
         $vtsrcCookie = $this->_cookieManager->getCookie('vtsrc');
-        $vtsrc = null;
+        $vtsrc = [];
         if ($vtsrcCookie) {
             $vtsrc = $this->prepareVtsrc($vtsrcCookie);
         }
