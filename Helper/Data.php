@@ -384,7 +384,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @return null|array
+     * @return array
      */
     public function getVTSRC()
     {
