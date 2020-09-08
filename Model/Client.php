@@ -125,7 +125,7 @@ class Client implements ClientInterface
             return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
         }
         try {
-            return $zaiusClient->call($object, 'POST', $url, $this->isBatchUpdate());
+            return $zaiusClient->call($object, 'POST', $url, /* $this->isBatchUpdate() */ false);
         } catch (\Exception $e) {
             $this->_logger->error('Something happened while calling to Zaius' . $e->getMessage());
             return $this;
@@ -444,6 +444,8 @@ class Client implements ClientInterface
 
     protected function isBatchUpdate()
     {
-        return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);
+        // ZAI-224 Removing batch / queue system
+        return false; 
+        // return $this->_scopeConfig->getValue(self::XML_PATH_BATCH_ENABLED);
     }
 }

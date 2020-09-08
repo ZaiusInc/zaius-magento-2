@@ -96,14 +96,14 @@ class Sdk
         }
         $zaiusClient = new \ZaiusSDK\ZaiusClient($apiKey, $privateKey);
 
-        $zaiusClient->setQueueDatabaseCredentials([
+        /* $zaiusClient->setQueueDatabaseCredentials([
             'driver' => 'mysql',
             'host' => $this->_deploymentConfig->get('db/connection/default/host'),
             'db_name' => $this->_deploymentConfig->get('db/connection/default/dbname'),
             'user' => $this->_deploymentConfig->get('db/connection/default/username'),
             'password' => $this->_deploymentConfig->get('db/connection/default/password'),
             'port' => $this->_deploymentConfig->get('db/connection/default/port'),
-        ], $this->_deploymentConfig->get('db/connection/default/dbname') . '.zaius_job');
+        ], $this->_deploymentConfig->get('db/connection/default/dbname') . '.zaius_job'); */ 
 
         return $zaiusClient;
     }

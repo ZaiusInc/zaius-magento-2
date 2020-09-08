@@ -3,7 +3,7 @@
 namespace Zaius\Engage\Model;
 
 use Zaius\Engage\Helper\Sdk;
-use ZaiusSDK\Zaius\Worker;
+// use ZaiusSDK\Zaius\Worker;
 
 /**
  * Class Cron
@@ -29,9 +29,8 @@ class Cron
      */
     public function process()
     {
-        $zaiusClient = $this->sdk->getSdkClient();
-
-        $worker = new Worker();
-        $worker->processAll();
+        // $zaiusClient = $this->sdk->getSdkClient();
+        // $worker = new Worker();
+        // $worker->processAll();
     }
 }
