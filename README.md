@@ -241,7 +241,13 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ### Release Notes
 
-1.0.4 - 2019-11-27: Stabilization fix
+1.0.6 - 2020-09-23: Performance and Security Updates 
+* Updated dependencies to remove deprecated references
+* Improved handling of unexpected missing cookie cases
+
+1.0.5 - Version intentionally skipped, features still in limited testing
+
+1.0.4 - DEPRECATED - 2019-11-27: Stabilization fix
 * Reverted base back to 1.0.0 
 * Re-applied "Configurable products now report their own product ID as their parent_product_id (smoother use of parent_product fields in Zaius)."
 * Re-applied "Users reported incorrect references when multiple items were in a minicart and one of the items was updated. This has been addressed."
