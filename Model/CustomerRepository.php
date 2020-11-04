@@ -117,35 +117,34 @@ class CustomerRepository implements CustomerRepositoryInterface
         $customers = $this->_customerCollectionFactory->create();
         $customers->getSelect()
             ->joinLeft(
-                ['s' => 'newsletter_subscriber'],
+                ['s' => $customers->getTable('newsletter_subscriber')],
                 's.customer_id=e.entity_id',
                 ['subscriber_status']
             )->joinLeft(
-            ['billing' => 'customer_address_entity'],
-            'e.default_billing=billing.entity_id',
-            [
+                ['billing' => $customers->getTable('customer_address_entity')],
+                'e.default_billing=billing.entity_id',
+                [
                 'billing_street' => 'street',
                 'billing_city' => 'city',
                 'billing_region' => 'region',
                 'billing_postcode' => 'postcode',
                 'billing_country_id' => 'country_id',
                 'billing_telephone' => 'telephone',
-            ]
-        )->joinLeft(
-            ['shipping' => 'customer_address_entity'],
-            'e.default_shipping=shipping.entity_id',
-            [
+                ]
+            )->joinLeft(
+                ['shipping' => $customers->getTable('customer_address_entity')],
+                'e.default_shipping=shipping.entity_id',
+                [
                 'shipping_street' => 'street',
                 'shipping_city' => 'city',
                 'shipping_region' => 'region',
                 'shipping_postcode' => 'postcode',
                 'shipping_country_id' => 'country_id',
                 'shipping_telephone' => 'telephone',
-            ]
-        );
-        $customers->getSelect()
-            ->group('e.entity_id');
-
+                ]
+            );
+            $customers->getSelect()
+                ->group('e.entity_id');
         return $customers;
     }
 
