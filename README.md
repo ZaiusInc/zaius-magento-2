@@ -241,6 +241,9 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ### Release Notes
 
+1.0.7 - 2020-11-10: Performance Updates 
+* Improved handling of prefixed table names
+
 1.0.6 - 2020-09-23: Performance and Security Updates 
 * Updated dependencies to remove deprecated references
 * Improved handling of unexpected missing cookie cases
