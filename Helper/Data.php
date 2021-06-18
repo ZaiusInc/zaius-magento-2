@@ -16,10 +16,12 @@ use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Quote\Model\Quote;
 use Magento\SalesRule\Model\RuleRepository;
 use Magento\Store\Model\StoreManagerInterface;
+use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\Flag;
+use Zaius\Engage\Model\FlagFactory;
+use Zaius\Engage\Model\Session;
 use Zaius\Engage\Helper\Locale as LocaleHelper;
 use Zaius\Engage\Logger\Logger;
-use Zaius\Engage\Model\Client;
-use Zaius\Engage\Model\Session;
 
 /**
  * Class Data
@@ -88,6 +90,8 @@ class Data extends AbstractHelper
     /**
      * @var Locale
      */
+    protected $_flag;
+    protected $_flagFactory;
     protected $_localeHelper;
     /**
      * @var Sdk
@@ -128,6 +132,8 @@ class Data extends AbstractHelper
         RuleRepository $ruleRepository,
         StoreManagerInterface $storeManager,
         Context $context,
+        Flag $flag,
+        FlagFactory $flagFactory,
         Sdk $sdk,
         LocaleHelper $localeHelper,
         Logger $logger,
@@ -141,6 +147,8 @@ class Data extends AbstractHelper
         $this->_moduleList = $moduleList;
         $this->_ruleRepository = $ruleRepository;
         $this->_storeManager = $storeManager;
+        $this->_flag = $flag;
+        $this->_flagFactory = $flagFactory;
         $this->_localeHelper = $localeHelper;
         $this->_sdk = $sdk;
         $this->_logger = $logger;
@@ -390,7 +398,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @return array
+     * @return null|array
      */
     public function getVTSRC()
     {
@@ -529,14 +537,16 @@ class Data extends AbstractHelper
 
     /**
      * @param mixed $event
+     * @param mixed $storeId
      * @return $this;
      * @throws \ZaiusSDK\ZaiusException
      */
-    public function addEventToSession($event)
+    public function addEventToSession($event, $storeId = null)
     {
+        $store = $storeId ?? $this->_storeManager->getStore()->getId();
         $event['data'] += $this->getDataSourceFields();
         if ($this->isBatchUpdate()) {
-            $zaiusClient = $this->_sdk->getSdkClient();
+            $zaiusClient = $this->_sdk->getSdkClient($store);
             if (null === $zaiusClient) {
                 return json_decode('{"Status":"Failure. ZaiusClient is NULL"}', true);
             }
@@ -628,6 +638,9 @@ class Data extends AbstractHelper
      */
     public function getNewsletterListId($store = null)
     {
+        if (!$store) {
+            $store = $this->_storeManager->getStore()->getId();
+        }
         $listId = $this->scopeConfig->getValue('zaius_engage/settings/newsletter_list_id', 'store', $store);
         if (empty($listId)) {
             $listId = 'newsletter';
@@ -649,5 +662,32 @@ class Data extends AbstractHelper
             'data_source_details' => 'Magento processed at: ' . time() . ';',
         ];
         return $dataSource;
+    }
+
+    public function getCheckedValues($store = null)
+    {
+        return $this->scopeConfig->getValue('zaius_engage/bulk_imports/datatypes', 'store', $store);
+    }
+
+    public function getFlagData() {
+        $flag = $this->_flagFactory->create();
+        $flag->loadSelf();
+
+        return $flag->getFlagData();
+    }
+
+    public function setFlagData($value) {
+        $flag = $this->_flagFactory->create();
+        $flag->loadSelf();
+
+        $flag->setFlagData($value);
+        $flag->save();
+    }
+
+    public function deleteFlagData() {
+        $flag = $this->_flagFactory->create();
+        $flag->loadSelf();
+
+        $flag->delete();
     }
 }

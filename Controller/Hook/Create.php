@@ -80,6 +80,8 @@ class Create extends AbstractHook
      */
     protected $_logger;
 
+    protected $_storeManager;
+
     /**
      * Create constructor.
      * @param \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager
@@ -107,6 +109,7 @@ class Create extends AbstractHook
         ProductFactory $product,
         \Zaius\Engage\Cookie\ZaiusCartMode $cookie,
         \Zaius\Engage\Logger\Logger $logger,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableType
     )
     {
@@ -121,6 +124,7 @@ class Create extends AbstractHook
         $this->_cookie = $cookie;
         $this->_logger = $logger;
         $this->_configurable = $configurableType;
+        $this->_storeManager = $storeManager;
     }
 
     /**
@@ -168,7 +172,7 @@ class Create extends AbstractHook
                 case 'noconflict':
                     //causes the platform to ignore the cart string if there is already a pre-existing cart
                     $this->_cookie->set('ignored');
-                    return $this->getResponse()->setRedirect('/checkout/cart/index');
+                    return $this->getResponse()->setRedirect('/'.$this->getStoreCode.'/checkout/cart/index');
                 case 'overwrite':
                     //causes the platform to create a new cart exactly as specified in the string
                     if ($quoteCount) {
@@ -229,6 +233,16 @@ class Create extends AbstractHook
         } catch (\Exception $e) {
             $this->_logger->error('Something happened while running Zaius cart creation. :(' . $e->getMessage());
         }
-        return $this->getResponse()->setRedirect('/checkout/cart/index' . $queryString);
+        return $this->getResponse()->setRedirect('/'.$this->getStoreCode().'/checkout/cart/index' . $queryString);
+    }
+
+    /**
+     * Get Store code
+     *
+     * @return string
+     */
+    public function getStoreCode()
+    {
+        return $this->_storeManager->getStore()->getCode();
     }
 }

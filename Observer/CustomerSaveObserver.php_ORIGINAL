@@ -3,19 +3,20 @@
 namespace Zaius\Engage\Observer;
 
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Customer\Model\Customer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Customer\Model\Address;
-use Zaius\Engage\Helper\Data as Helper;
-use Zaius\Engage\Api\ClientInterface;
+use Magento\Customer\Model\Customer;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
+use Zaius\Engage\Helper\Data;
+use Zaius\Engage\Model\Client;
+use Zaius\Engage\Model\CustomerManager;
+
 
 /**
- * Class CustomerAddressSaveObserver
+ * Class CustomerSaveObserver
  * @package Zaius\Engage\Observer
  */
-class CustomerAddressSaveObserver
+class CustomerSaveObserver
     implements ObserverInterface
 {
     /**
@@ -23,36 +24,42 @@ class CustomerAddressSaveObserver
      */
     protected $_storeManager;
     /**
-     * @var Helper
+     * @var Data
      */
     protected $_helper;
-    /**
-     * @var ClientInterface
-     */
-    protected $_client;
     /**
      * @var CustomerRepositoryInterface
      */
     protected $_customerRepository;
+    /**
+     * @var CustomerManager
+     */
+    private $customerManager;
+    /**
+     * @var Client
+     */
+    private $client;
 
     /**
-     * CustomerAddressSaveObserver constructor.
+     * CustomerSaveObserver constructor.
      * @param StoreManagerInterface $storeManager
-     * @param Helper $helper
-     * @param ClientInterface $client
+     * @param Data $helper
      * @param CustomerRepositoryInterface $customerRepository
+     * @param CustomerManager $customerManager
+     * @param Client $client
      */
     public function __construct(
         StoreManagerInterface $storeManager,
-        Helper $helper,
-        ClientInterface $client,
-        CustomerRepositoryInterface $customerRepository
-    )
-    {
+        Data $helper,
+        CustomerRepositoryInterface $customerRepository,
+        CustomerManager $customerManager,
+        Client $client
+    ) {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
-        $this->_client = $client;
         $this->_customerRepository = $customerRepository;
+        $this->customerManager = $customerManager;
+        $this->client = $client;
     }
 
     /**
@@ -63,15 +70,13 @@ class CustomerAddressSaveObserver
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
-            $eventName = $observer->getEvent()->getName();
-            /** @var Address $address */
-            $address = $observer->getEvent()->getData('customer_address');
+            /** @var Customer $c */
+            $c = $observer->getEvent()->getData('customer');
             /** @var Customer $customer */
             $customer = $this->_customerRepository->getCustomerCollection()
-                ->addFieldToFilter('entity_id', $address->getCustomer()->getId())
+                ->addFieldToFilter('entity_id', $c->getId())
                 ->getFirstItem();
-            $customer->setData('updated_address', $address);
-            $this->_client->postCustomer($customer, $eventName, $this->_storeManager->getStore()->getId());
+            $this->customerManager->sendCustomer($customer, $this->client);
         }
         return $this;
     }

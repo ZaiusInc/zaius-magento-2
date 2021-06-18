@@ -14,7 +14,7 @@ use Zaius\Engage\Helper\Data as Helper;
  * Class OrderPlaceAfterObserver
  * @package Zaius\Engage\Observer
  */
-class OrderPlaceAfterObserver
+class AdminOrderPlaceAfterObserver
     implements ObserverInterface
 {
     /**
@@ -61,14 +61,10 @@ class OrderPlaceAfterObserver
      */
     public function execute(Observer $observer)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $state = $objectManager->get('Magento\Framework\App\State');
-        
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
-        if ($this->_helper->getStatus($order->getStore()) && $this->_helper->getIsTrackingOrdersOnFrontend($order->getStore()) && $this->_storeManager->getStore()->getId() != 0 && $state->getAreaCode() != "adminhtml") {
-            $orderEventData = $this->_orderRepository->getOrderEventData($order);
-            $this->_helper->addEventToSession($orderEventData);
+        if ($this->_helper->getStatus($order->getStore())  && $this->_storeManager->getStore()->getId() != 0) {
+            $this->_client->postOrder($order);
         }
         return $this;
     }

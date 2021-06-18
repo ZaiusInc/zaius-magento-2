@@ -285,10 +285,7 @@ class Client implements ClientInterface
      */
     public function postCustomer($customer, $eventName = null, $storeId = null)
     {
-        return $this->postEntity(
-            $this->_customerRepository->getCustomerEventData($customer, $eventName),
-            $storeId
-        );
+        return $this->postEntity($this->_customerRepository->getCustomerEventData($customer, $eventName));
     }
 
     /**

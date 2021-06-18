@@ -61,9 +61,12 @@ class OrderSaveAfterObserver
      */
     public function execute(Observer $observer)
     {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $state = $objectManager->get('Magento\Framework\App\State');
+
         /** @var Order $order */
         $order = $observer->getEvent()->getData('order');
-        if ($this->_helper->getStatus($order->getStore()) && (!$this->_helper->getIsTrackingOrdersOnFrontend($order->getStore()) || $this->_storeManager->getStore()->getId() == 0)) {
+        if ($order->canCancel() && $this->_helper->getStatus($order->getStore()) && (!$this->_helper->getIsTrackingOrdersOnFrontend($order->getStore()) || $this->_storeManager->getStore()->getId() == 0) && $state->getAreaCode() != "adminhtml") {
             $this->_client->postOrder($order);
         }
         return $this;

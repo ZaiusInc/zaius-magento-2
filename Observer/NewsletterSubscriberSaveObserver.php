@@ -70,10 +70,9 @@ class NewsletterSubscriberSaveObserver
      */
     public function execute(Observer $observer)
     {
-        $store = $this->_storeManager->getStore();
-        if ($this->_helper->getStatus($store)) {
-            /** @var Subscriber $subscriber */
-            $subscriber = $observer->getEvent()->getData('data_object');
+        /** @var Subscriber $subscriber */
+        $subscriber = $observer->getEvent()->getData('data_object');
+        if ($this->_helper->getStatus($subscriber->getStoreId())) {
             switch ($subscriber->getSubscriberStatus()) {
                 case Subscriber::STATUS_SUBSCRIBED:
                     $action = 'subscribe';
@@ -90,7 +89,7 @@ class NewsletterSubscriberSaveObserver
             $event = array();
             $event['type'] = 'list';
             $event['action'] = $action;
-            $event['data']['list_id'] = $this->_helper->getNewsletterListId();
+            $event['data']['list_id'] = $this->_helper->getNewsletterListId($subscriber->getStoreId());
             $event['data']['email'] = $subscriber->getSubscriberEmail();
             $event['data']['subscribed'] = $subscribed;
             $event['data']['store_id'] = $subscriber->getStoreId();
@@ -109,11 +108,13 @@ class NewsletterSubscriberSaveObserver
             }
 
             $event['data']['ts'] = ($event['data']['ts']) ? $event['data']['ts'] : $this->timezone->scopeTimeStamp();
-            $event['identifiers']['vuid'] = $event['identifiers']['vuid'] ?? $subscriber->getSubscriberEmail();
+            $event['identifiers']['email'] = $subscriber->getSubscriberEmail();
 
-            $this->_client->postEvent($event);
-            $event['data']['list_id'] = 'zaius_all';
-            $this->_client->postEvent($event);
+            $this->_client->postEvent($event, $subscriber->getStoreId());
+            if ($action == 'subscribe') {
+                $event['data']['list_id'] = 'zaius_all';
+                $this->_client->postEvent($event, $subscriber->getStoreId());
+            }
         }
         return $this;
     }

@@ -10,12 +10,13 @@ use Magento\Customer\Model\Address;
 use Zaius\Engage\Helper\Data as Helper;
 use Zaius\Engage\Api\ClientInterface;
 use Zaius\Engage\Api\CustomerRepositoryInterface;
+use Magento\Backend\Model\Session\Quote as AdminCheckoutSession;
 
 /**
  * Class CustomerAddressSaveObserver
  * @package Zaius\Engage\Observer
  */
-class CustomerAddressSaveObserver
+class AdminCustomerAddressSaveObserver
     implements ObserverInterface
 {
     /**
@@ -34,6 +35,10 @@ class CustomerAddressSaveObserver
      * @var CustomerRepositoryInterface
      */
     protected $_customerRepository;
+    /**
+     * @var AdminCheckoutSession
+     */
+    private $adminCheckoutSession;
 
     /**
      * CustomerAddressSaveObserver constructor.
@@ -46,13 +51,15 @@ class CustomerAddressSaveObserver
         StoreManagerInterface $storeManager,
         Helper $helper,
         ClientInterface $client,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        AdminCheckoutSession $adminCheckoutSession
     )
     {
         $this->_storeManager = $storeManager;
         $this->_helper = $helper;
         $this->_client = $client;
         $this->_customerRepository = $customerRepository;
+        $this->adminCheckoutSession = $adminCheckoutSession;
     }
 
     /**
@@ -63,6 +70,11 @@ class CustomerAddressSaveObserver
     public function execute(Observer $observer)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
+            $quote = $this->adminCheckoutSession->getQuote();
+            $storeId = $this->_storeManager->getStore();
+            if($quote->getReservedOrderId()){
+                $storeId = $quote->getStoreId();
+            }
             $eventName = $observer->getEvent()->getName();
             /** @var Address $address */
             $address = $observer->getEvent()->getData('customer_address');
@@ -71,7 +83,7 @@ class CustomerAddressSaveObserver
                 ->addFieldToFilter('entity_id', $address->getCustomer()->getId())
                 ->getFirstItem();
             $customer->setData('updated_address', $address);
-            $this->_client->postCustomer($customer, $eventName, $this->_storeManager->getStore()->getId());
+            $this->_client->postCustomer($customer, $eventName, $storeId);
         }
         return $this;
     }

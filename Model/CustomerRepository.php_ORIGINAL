@@ -195,12 +195,6 @@ class CustomerRepository implements CustomerRepositoryInterface
      */
     public function getCustomerEventData($customer, $eventName = null)
     {
-        if($customer->getCreatedIn()) {
-            $storeName = $customer->getCreatedIn();
-        } else {
-            $storeName = $this->storeManager->getStore()->getName();
-        }
-
         $isFullCustomerObject = $customer instanceof Customer;
         $customerData = [
             'customer_id' => $customer->getId(),
@@ -208,8 +202,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             'first_name' => $customer->getFirstname(),
             'last_name' => $customer->getLastname(),
             'store_view_code' => $this->_localeHelper->getWebsiteCode($customer->getWebsiteId()),
-            //'store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId()),
-            'store_view' => $storeName,
+            'store_view' => $this->_localeHelper->getLangCodeFromWebsite($customer->getWebsiteId()),
         ];
         $addressType = null;
         if ($isFullCustomerObject && $customer->getData('default_shipping')) {

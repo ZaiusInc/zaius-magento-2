@@ -10,6 +10,7 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductColl
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Zaius\Engage\Api\ProductRepositoryInterface;
 use Zaius\Engage\Helper\Data;
@@ -119,13 +120,17 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getList($limit = null, $offset = null, $trackingID = null)
     {
-        /** @var ProductCollection $products */
+        if ($trackingID === null) {
+            return [];
+        }
+            /** @var ProductCollection $products */
         $products = $this->_productCollectionFactory->create();
 
         try {
             $storeId = $this->trackScopeManager->getStoreIdByConfigValue($trackingID);
             $products->addStoreFilter($storeId);
         } catch (\Exception $e) {
+            return [];
         }
 
         $products->addAttributeToSelect(['name', 'price', 'special_price', 'special_from_date', 'special_to_date', 'short_description', 'image', 'url_key'])
@@ -138,6 +143,8 @@ class ProductRepository implements ProductRepositoryInterface
         }
         $result = [];
         $suppressions = 0;
+
+        $duplicatedTrackingIds = $this->trackScopeManager->getStoresWithDuplicatedTrackingId();
         /** @var Product $product */
         foreach ($products as $product) {
             if (is_null($product->getId())) {
@@ -148,6 +155,34 @@ class ProductRepository implements ProductRepositoryInterface
                 // missing field
                 $this->_logger->warning("ZAIUS: Null field: product_id.");
             } else {
+
+                if (sizeof($product->getStoreIds()) > 1 && array_intersect($product->getStoreIds(), array_keys($duplicatedTrackingIds))) {
+                    $storeIds = $product->getStoreIds();
+                    $baseProduct = $this->getStoreProduct(Store::DEFAULT_STORE_ID, $product);
+                    $hasVariants = false;
+                    foreach ($storeIds as $productStoreId) {
+                        $storeProduct = $this->getStoreProduct($productStoreId, $product);
+                        $store = $this->_storeManager->getStore($productStoreId);
+                        if (!$store->getIsActive() || !$this->hasVariants($baseProduct, $storeProduct)) {
+                            continue;
+                        }
+
+                        if ((int)$productStoreId != Store::DEFAULT_STORE_ID) {
+                            $hasVariants = true;
+                            $newId = $storeProduct->getId() . '-' . $this->trackScopeManager->getStoreCode($productStoreId);
+                            $storeProduct->setData('generic_product_id', $storeProduct->getId());
+                            $storeProduct->setId($newId);
+                        }
+                        $storeProduct->setData('has_view_variants', $hasVariants);
+                        $result[] = $this->getProductEventData('product', $storeProduct);
+                    }
+                    $baseProduct->setData('has_view_variants', $hasVariants);
+                    $baseProduct->setData('generic_product_id', $baseProduct->getId());
+                    $result[] = $this->getProductEventData('product', $baseProduct);
+                    continue;
+                }
+                $product->setData('has_view_variants', false);
+                $product->setData('generic_product_id', $product->getId());
                 $result[] = $this->getProductEventData('product', $product);
             }
         }
@@ -205,8 +240,18 @@ class ProductRepository implements ProductRepositoryInterface
         if (!$product->getImage()) {
             $this->_logger->error('ZAIUS: Unable to retrieve product image_url');
         }
+
+        if ($genericProductId = $product->getData('generic_product_id')) {
+            $productData['generic_product_id'] = $genericProductId;
+        }
+        $hasVariants = $product->getData('has_view_variants');
+        if ($hasVariants !== null) {
+            $productData['has_view_variants'] = $hasVariants;
+        }
+
         $productData += $this->_helper->getDataSourceFields();
         $this->_logger->info("Event: $event");
+        $this->_logger->info("Event: $event " . json_encode($productData['product_id']));
         return $productData;
     }
 
@@ -229,5 +274,50 @@ class ProductRepository implements ProductRepositoryInterface
             }
         }
         return $this->_extraProductAttributes;
+    }
+
+    /**
+     * @param $productBase
+     * @param $productStore
+     * @return bool
+     */
+    private function hasVariants($productBase, $productStore)
+    {
+        $hasVariants = false;
+        $productBaseData = $this->getProductEventData('product', $productBase);
+        $productStoreData = $this->getProductEventData('product', $productStore);
+        foreach ($productBaseData as $k => $value) {
+            if ($k === 'store_id') {
+                continue;
+            }
+            if ($productBaseData[$k] != $productStoreData[$k]) {
+                return true;
+            }
+        }
+        return $hasVariants;
+    }
+
+    /**
+     * @param $productStoreId
+     * @param $product
+     * @return mixed
+     */
+    private function getStoreProduct($productStoreId, $product)
+    {
+        $collection = $this->_productCollectionFactory->create();
+        $collection->setStoreId($productStoreId);
+        $collection->addAttributeToSelect([
+            'name',
+            'price',
+            'special_price',
+            'special_from_date',
+            'special_to_date',
+            'short_description',
+            'image',
+            'url_key'
+        ]);
+        $collection->addIdFilter($product->getId());
+        $storeProduct = $collection->getFirstItem();
+        return $storeProduct;
     }
 }

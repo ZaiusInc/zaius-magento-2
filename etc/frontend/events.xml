@@ -31,4 +31,8 @@
     <event name="customer_logout">
         <observer name="zaius_engage_logout" instance="Zaius\Engage\Observer\CustomerLogoutObserver"/>
     </event>
+
+    <event name="customer_address_save_after">
+        <observer name="zaius_engage" instance="Zaius\Engage\Observer\CustomerAddressSaveObserver"/>
+    </event>
 </config>

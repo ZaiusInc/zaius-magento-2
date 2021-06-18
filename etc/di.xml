@@ -14,6 +14,7 @@
     <preference for="Zaius\Engage\Api\LocalesInterface" type="Zaius\Engage\Model\LocalesRepository"/>
     <preference for="Zaius\Engage\Api\CouponsInterface" type="Zaius\Engage\Model\CouponsManagement"/>
     <preference for="Zaius\Engage\Api\ConfigurationInterface" type="Zaius\Engage\Model\ConfigurationRepository"/>
+    <preference for="Zaius\Engage\Api\SubscriberRepositoryInterface" type="Zaius\Engage\Model\SubscriberRepository"/>
     <type name="Zaius\Engage\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
@@ -26,5 +27,8 @@
                 <item name="system" xsi:type="object">Zaius\Engage\Logger\Handler</item>
             </argument>
         </arguments>
+    </type>
+    <type name="Magento\Framework\Event\ManagerInterface">
+        <plugin name="list_all_dispatched_event" type="Zaius\Engage\Plugin\ListDispatchedEvents" sortOrder="10" disabled="false"/>
     </type>
 </config>
