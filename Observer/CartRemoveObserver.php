@@ -58,7 +58,7 @@ class CartRemoveObserver
 
     /**
      * @param Observer $observer
-     * @param null $item
+     * @param Quote\Item|null $item
      * @param null $info
      * @return $this|void
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -66,11 +66,6 @@ class CartRemoveObserver
     public function execute(Observer $observer, $item = null, $info = null)
     {
         if ($this->_helper->getStatus($this->_storeManager->getStore())) {
-            /** @var Quote $quote */
-            $quote = $this->_checkoutSession->getQuote();
-            if (empty($quote->getCreatedAt())) {
-                $quote = $quote->load($quote->getId());
-            }
             $action = 'update_qty';
             if (is_null($item)) {
                 /** @var QuoteItem $item */
@@ -79,7 +74,9 @@ class CartRemoveObserver
                 $action = 'remove_from_cart';
             }
 
-            /** @var Product $item */
+            /** @var Quote $quote */
+            $quote = $item->getQuote();
+
             // when working with configurable/simple products, product/item models grab the configurable parent of a
             // simple product, but contain the sku of the simple product. We need to grab that sku, and load the simple
             // product model for processing to Zaius.

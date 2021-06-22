@@ -93,7 +93,7 @@ class CartUpdateObserver
                 $product = $item->getProduct();
                 if (isset($info[$item->getId()]) && $item->getQty() != $info[$item->getId()]['qty']) {
                     if ($item->getQty() > $info[$item->getId()]['qty']) {
-                        $this->_cartRemove->execute($observer, $product, $info);
+                        $this->_cartRemove->execute($observer, $item, $info);
                     }
                     if ($item->getQty() < $info[$item->getId()]['qty']) {
                         $this->_cartAdd->execute($observer, $product, $info);
