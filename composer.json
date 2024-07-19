@@ -3,7 +3,7 @@
   "type": "magento2-module",
   "description": "The Zaius Engage Connector for Magento 2.",
   "license": "MIT",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "require": {
     "php": ">=5.5",
     "zaius/zaius-php-sdk": "^1.0"

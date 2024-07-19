@@ -34,7 +34,7 @@ class Data extends AbstractHelper
     /**
      * @var API_URL
      */
-    const API_URL = 'http://api.zaius.com/v2';
+    const API_URL = 'https://api.zaius.com/v2';
     /**
      * @var VUID_LENGTH
      */
